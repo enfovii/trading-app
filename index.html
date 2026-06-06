@@ -69,7 +69,6 @@ input {
 
 <div id="home">
 
-<!-- MOVED TO TOP -->
 <div class="card">
 <div>Total Portfolio Balance</div>
 <div id="totalBalance" class="big lime">$0</div>
@@ -145,13 +144,12 @@ input {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let currentIndex = null;
 
-/* SAVE */
 function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
 /* =========================
-   YOUR EXACT LOGIC (UNCHANGED)
+   UPDATED MULTIPLIER LOGIC
    ========================= */
 
 function getMultiplier(b) {
@@ -161,9 +159,18 @@ function getMultiplier(b) {
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
-    return 5;
+    // NEW SYSTEM 200k+
+    let extra = b - 200000;
+
+    let fullSteps = Math.floor(extra / 40000);   // +1x per 40k
+    let halfSteps = Math.floor(extra / 20000);   // +0.5x per 20k
+
+    let halfOnly = halfSteps - fullSteps * 2;
+
+    return 4 + (fullSteps * 1) + (halfOnly * 0.5);
 }
 
+/* PROFIT */
 function getProfit(mult){
     return {
         dailyMin: mult * 800,
@@ -181,7 +188,7 @@ function getNextMilestone(b){
     if (b < 140000) return "£140,000 (3.5x)";
     if (b < 160000) return "£160,000 (4x)";
     if (b < 200000) return "£200,000 (5x)";
-    return "Max tier";
+    return "Extended scaling active";
 }
 
 /* HOME */
