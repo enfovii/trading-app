@@ -206,15 +206,15 @@ button {
     </div>
 
     <button onclick="back()">Back</button>
-    <button style="background:#ff5c7a;" onclick="openDeleteModal()">Delete Account</button>
 </div>
 
 </div>
 
-<button class="addBtn" id="addBtn" onclick="openModal()">+ Add Account</button>
+<button class="addBtn" onclick="openModal()">+ Add Account</button>
 
 <div class="modal" id="modal">
     <div class="modal-content">
+
         <div class="big">Add Account</div>
 
         <input id="newName" placeholder="Account name">
@@ -225,32 +225,34 @@ button {
     </div>
 </div>
 
-<div class="modal" id="deleteModal">
-    <div class="modal-content">
-        <div class="big">Delete Account?</div>
-        <div class="small">This action cannot be undone.</div>
-
-        <button class="danger" onclick="confirmDelete()">Yes, Delete</button>
-        <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
-    </div>
-</div>
-
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
+/* ✅ FIXED NUMBER PARSER (500k / 500,000 / 1.2m support) */
+function num(v){
+    if(v === null || v === undefined) return 0;
+
+    v = v.toString().toLowerCase().replace(/,/g,'');
+
+    if(v.includes("k")){
+        return parseFloat(v.replace("k","")) * 1000;
+    }
+
+    if(v.includes("m")){
+        return parseFloat(v.replace("m","")) * 1000000;
+    }
+
+    let n = Number(v);
+    return isNaN(n) ? 0 : n;
+}
+
 function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-function num(v){
-    return isNaN(Number(v)) ? 0 : Number(v);
-}
-
-/* =========================
-   FIXED MULTIPLIER (UPDATED)
-========================= */
+/* MULTIPLIER (your fixed system) */
 function mult(b){
     b = num(b);
 
@@ -278,6 +280,7 @@ function show(page){
         page === "home" ? "block" : "none";
 }
 
+/* HOME */
 function render(){
 
     let el=document.getElementById("accounts");
@@ -288,6 +291,7 @@ function render(){
     accounts.forEach((a,i)=>{
 
         let b=num(a.balance);
+        let m=mult(b);
 
         t+=b;
         d+=daily(b);
@@ -297,7 +301,8 @@ function render(){
         <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
             ${money(b)}<br>
-            <span class="green">Daily ${money(daily(b))}</span>
+            <span class="green">${m.toFixed(2)}x</span><br>
+            <span class="small">Daily ${money(daily(b))}</span>
         </div>`;
     });
 
@@ -306,6 +311,7 @@ function render(){
     document.getElementById("dd").innerText = money(draw.toFixed(0));
 }
 
+/* OPEN */
 function openAccount(i){
     current=i;
     let a=accounts[i];
@@ -317,6 +323,7 @@ function openAccount(i){
     updateAccount();
 }
 
+/* UPDATE */
 function updateAccount(){
 
     if(current===null) return;
@@ -338,11 +345,13 @@ function updateAccount(){
     render();
 }
 
+/* BACK */
 function back(){
     current=null;
     show("home");
 }
 
+/* ADD ACCOUNT */
 function openModal(){
     document.getElementById("modal").style.display="flex";
 }
@@ -362,28 +371,6 @@ function createAccount(){
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
     closeModal();
-    render();
-}
-
-function openDeleteModal(){
-    document.getElementById("deleteModal").style.display="flex";
-}
-
-function closeDeleteModal(){
-    document.getElementById("deleteModal").style.display="none";
-}
-
-function confirmDelete(){
-
-    if(current===null) return;
-
-    accounts.splice(current,1);
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    current=null;
-
-    closeDeleteModal();
-    show("home");
     render();
 }
 
