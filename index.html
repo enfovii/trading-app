@@ -47,6 +47,7 @@ input {
 
 .big { font-size: 26px; font-weight: 800; }
 .lime { color: #22c55e; }
+.red { color: #ff4d4d; }
 .small { font-size: 12px; color: rgba(230,234,242,0.6); }
 
 .hidden { display:none; }
@@ -175,7 +176,7 @@ function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* ================= MULTIPLIER ================= */
+/* ================= MULTIPLIER (ONLY FIXED EXTENSION) ================= */
 
 function getMultiplier(b) {
 
@@ -184,23 +185,22 @@ function getMultiplier(b) {
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
+    // =========================
+    // 200k+ EXTENSION (ADDED ONLY)
+    // =========================
+
+    let base = 4;
     let extra = b - 200000;
-    let fullSteps = Math.floor(extra / 40000);
-    let halfSteps = Math.floor(extra / 20000);
-    let halfOnly = halfSteps - fullSteps * 2;
 
-    return 4 + (fullSteps * 1) + (halfOnly * 0.5);
+    let fullSteps = Math.floor(extra / 40000);   // +1x per 40k
+    let halfSteps = Math.floor(extra / 20000);   // +0.5x per 20k
+
+    let remainingHalfSteps = halfSteps - (fullSteps * 2);
+
+    return base + (fullSteps * 1) + (remainingHalfSteps * 0.5);
 }
 
-function getProfit(mult){
-    return {
-        dailyMin: mult * 800,
-        dailyMax: mult * 1000
-    };
-}
-
-/* ================= HOME ================= */
-
+/* HOME */
 function renderHome(){
 
     document.getElementById("home").classList.remove("hidden");
@@ -218,17 +218,16 @@ function renderHome(){
 
         let b = a.balance;
         let mult = getMultiplier(b);
-        let profit = getProfit(mult);
 
         total += b;
-        totalDaily += profit.dailyMin;
-        totalWeekly += profit.dailyMin * 7;
+        totalDaily += mult * 800;
+        totalWeekly += mult * 800 * 7;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
-                <span class="small">${mult.toFixed(2)}x • $${profit.dailyMin.toFixed(0)}/day</span>
+                <span class="small">${mult.toFixed(2)}x • $${(mult*800).toFixed(0)}/day</span>
             </div>
         `;
     });
@@ -238,8 +237,7 @@ function renderHome(){
     document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
 }
 
-/* ================= DETAIL ================= */
-
+/* DETAIL */
 function openAccount(i){
     currentIndex = i;
 
@@ -260,18 +258,17 @@ function updateAccount(){
     accounts[currentIndex].balance = b;
 
     let mult = getMultiplier(b);
-    let profit = getProfit(mult);
 
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
 
     document.getElementById("daily").innerText =
-        "$" + profit.dailyMin.toFixed(0) + " - $" + profit.dailyMax.toFixed(0);
+        "$" + (mult*800).toFixed(0) + " - $" + (mult*1000).toFixed(0);
 
     document.getElementById("weekly").innerText =
-        "$" + (profit.dailyMin * 7).toFixed(0);
+        "$" + (mult*800*7).toFixed(0);
 
     document.getElementById("monthly").innerText =
-        "$" + (profit.dailyMin * 30).toFixed(0);
+        "$" + (mult*800*30).toFixed(0);
 
     document.getElementById("nextTier").innerText =
         getNextTier(b);
@@ -288,8 +285,7 @@ function getNextTier(b){
     return "$" + extra.toLocaleString();
 }
 
-/* ================= JOURNAL ================= */
-
+/* JOURNAL */
 function showJournal(){
     renderCalendar();
     document.getElementById("home").classList.add("hidden");
@@ -380,7 +376,6 @@ function saveDay(){
     renderCalendar();
 }
 
-/* NAV */
 function back(){
     renderHome();
 }
