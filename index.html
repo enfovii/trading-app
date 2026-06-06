@@ -75,7 +75,6 @@ input {
     text-align: center;
     font-size: 12px;
     cursor: pointer;
-    transition: 0.2s;
 }
 </style>
 </head>
@@ -85,13 +84,12 @@ input {
 <h2>📊 Trading Dashboard</h2>
 
 <div class="card">
-<button onclick="SafeUI.show('home')">Accounts</button>
-<button onclick="SafeUI.show('journal')">Journal</button>
+<button onclick="UI.show('home')">Accounts</button>
+<button onclick="UI.show('journal')">Journal</button>
 </div>
 
 <!-- HOME -->
 <div id="home" class="page">
-
 <div class="card">
 <div>Total Portfolio Balance</div>
 <div id="totalBalance" class="big">$0</div>
@@ -101,49 +99,22 @@ input {
 </div>
 
 <div id="accounts"></div>
-
 </div>
 
 <!-- DETAIL -->
 <div id="detail" class="page hidden">
-
 <div class="card">
 <h3 id="accName"></h3>
 
-<input id="editBalance" oninput="SafeAccounts.update()">
+<input id="editBalance" oninput="App.accounts.update()">
 
-<div class="card">
-<div>Multiplier</div>
-<div id="mult" class="big lime"></div>
-</div>
+<div class="card"><div>Multiplier</div><div id="mult" class="big lime"></div></div>
+<div class="card"><div>Daily Profit</div><div id="daily"></div></div>
+<div class="card"><div>Weekly Profit</div><div id="weekly"></div></div>
+<div class="card"><div>Monthly Profit</div><div id="monthly"></div></div>
+<div class="card"><div>Drawdown</div><div id="dd" class="big red"></div></div>
 
-<div class="card">
-<div>Daily Profit</div>
-<div id="daily"></div>
-</div>
-
-<div class="card">
-<div>Weekly Profit</div>
-<div id="weekly"></div>
-</div>
-
-<div class="card">
-<div>Monthly Profit</div>
-<div id="monthly"></div>
-</div>
-
-<div class="card">
-<div>Next Tier</div>
-<div id="nextTier"></div>
-</div>
-
-<div class="card">
-<div>Drawdown</div>
-<div id="dd" class="big red"></div>
-</div>
-
-<button onclick="SafeUI.show('home')">Back</button>
-
+<button onclick="UI.show('home')">Back</button>
 </div>
 
 <!-- JOURNAL -->
@@ -152,8 +123,8 @@ input {
 <div class="card">
 <div class="big" id="monthLabel"></div>
 
-<button onclick="SafeJournal.changeMonth(-1)">⬅ Prev</button>
-<button onclick="SafeJournal.changeMonth(1)">Next ➡</button>
+<button onclick="App.journal.changeMonth(-1)">⬅ Prev</button>
+<button onclick="App.journal.changeMonth(1)">Next ➡</button>
 
 <div class="card">
 <div>Monthly P/L</div>
@@ -166,7 +137,7 @@ input {
 <div class="card">
 <div id="selectedDay">Select a day</div>
 <input id="profitInput" placeholder="Enter profit">
-<button onclick="SafeJournal.save()">Save</button>
+<button onclick="App.journal.save()">Save</button>
 </div>
 
 </div>
@@ -174,133 +145,121 @@ input {
 <script>
 
 /* =========================
-   SAFE BOOT SYSTEM
+   CORE APP NAMESPACE (ISOLATION LAYER)
 ========================= */
 
-function safe(fn, label){
-    try {
-        return fn();
-    } catch(e){
-        console.error("SAFE ERROR:", label, e);
-        return null;
-    }
-}
+const App = {};
 
 /* =========================
-   STORAGE
+   SAFE STORAGE LAYER
 ========================= */
 
-const Store = {
-    get(k,f){
+App.store = {
+    get(key, fallback){
         try {
-            return JSON.parse(localStorage.getItem(k)) || f;
+            return JSON.parse(localStorage.getItem(key)) ?? fallback;
         } catch {
-            return f;
+            return fallback;
         }
     },
-    set(k,v){
-        localStorage.setItem(k, JSON.stringify(v));
+    set(key, value){
+        localStorage.setItem(key, JSON.stringify(value));
     }
 };
 
 /* =========================
-   ACCOUNTS (ISOLATED)
+   LOGIC LAYER (NO UI)
 ========================= */
 
-const SafeAccounts = {
-    data: Store.get("accounts", []),
-    current: null,
-
-    mult(b){
+App.logic = {
+    multiplier(b){
         if (b < 90000) return b / 30000;
         if (b < 140000) return 3;
         if (b < 160000) return 3.5;
         if (b < 200000) return 4;
         return 5;
     },
+    drawdown(b){ return b * 0.4; },
+    daily(b){ return this.multiplier(b) * 800; }
+};
+
+/* =========================
+   ACCOUNTS MODULE
+========================= */
+
+App.accounts = {
+    data: App.store.get("accounts", []),
+    current: null,
 
     render(){
-        safe(() => {
 
-            let c = document.getElementById("accounts");
-            if(!c) return;
+        let el = document.getElementById("accounts");
+        el.innerHTML = "";
 
-            let total=0, daily=0, dd=0;
+        let total=0, daily=0, dd=0;
 
-            c.innerHTML="";
+        this.data.forEach((a,i)=>{
 
-            this.data.forEach((a,i)=>{
+            let b=a.balance;
 
-                let b=a.balance;
+            total+=b;
+            daily+=App.logic.daily(b);
+            dd+=App.logic.drawdown(b);
 
-                let m=this.mult(b);
-                let d=m*800;
-                let draw=b*0.4;
+            el.innerHTML+=`
+            <div class="account" onclick="App.accounts.open(${i})">
+                <b>${a.name}</b><br>
+                <span class="small">$${b}</span><br>
+                <span class="small lime">Daily $${App.logic.daily(b).toFixed(0)}</span>
+            </div>`;
+        });
 
-                total+=b; daily+=d; dd+=draw;
-
-                c.innerHTML+=`
-                <div class="account" onclick="SafeAccounts.open(${i})">
-                    <b>${a.name}</b><br>
-                    <span class="small">$${b}</span><br>
-                    <span class="small">${m.toFixed(2)}x</span><br>
-                    <span class="small lime">Daily $${d.toFixed(0)}</span>
-                </div>`;
-            });
-
-            document.getElementById("totalBalance").innerText="$"+total;
-            document.getElementById("totalDaily").innerText=daily.toFixed(0);
-            document.getElementById("totalDD").innerText=dd.toFixed(0);
-        },"accounts.render");
+        document.getElementById("totalBalance").innerText="$"+total;
+        document.getElementById("totalDaily").innerText=daily.toFixed(0);
+        document.getElementById("totalDD").innerText=dd.toFixed(0);
     },
 
     open(i){
-        safe(()=>{
-            this.current=i;
-            SafeUI.show('detail');
+        this.current=i;
+        UI.show('detail');
 
-            let a=this.data[i];
+        let a=this.data[i];
 
-            document.getElementById("accName").innerText=a.name;
-            document.getElementById("editBalance").value=a.balance;
+        document.getElementById("accName").innerText=a.name;
+        document.getElementById("editBalance").value=a.balance;
 
-            this.update();
-        },"accounts.open");
+        this.update();
     },
 
     update(){
-        safe(()=>{
-            let b=parseFloat(document.getElementById("editBalance").value)||0;
+        let b=parseFloat(document.getElementById("editBalance").value)||0;
 
-            this.data[this.current].balance=b;
-            Store.set("accounts",this.data);
+        this.data[this.current].balance=b;
+        App.store.set("accounts",this.data);
 
-            let m=this.mult(b);
-            let d=m*800;
+        let m=App.logic.multiplier(b);
+        let d=App.logic.daily(b);
 
-            document.getElementById("mult").innerText=m.toFixed(2)+"x";
-            document.getElementById("daily").innerText="$"+d.toFixed(0);
-            document.getElementById("weekly").innerText="$"+(d*7).toFixed(0);
-            document.getElementById("monthly").innerText="$"+(d*30).toFixed(0);
-            document.getElementById("nextTier").innerText=b;
-            document.getElementById("dd").innerText="$"+(b*0.4).toFixed(0);
-
-        },"accounts.update");
+        document.getElementById("mult").innerText=m.toFixed(2)+"x";
+        document.getElementById("daily").innerText="$"+d.toFixed(0);
+        document.getElementById("weekly").innerText="$"+(d*7).toFixed(0);
+        document.getElementById("monthly").innerText="$"+(d*30).toFixed(0);
+        document.getElementById("dd").innerText="$"+App.logic.drawdown(b).toFixed(0);
     }
 };
 
 /* =========================
-   JOURNAL (FULLY SAFE)
+   JOURNAL MODULE (ISOLATED)
 ========================= */
 
-const SafeJournal = {
-    data: Store.get("journal", {}),
+App.journal = {
+    data: App.store.get("journal", {}),
     date: new Date(),
     selected:null,
 
-    safe(n){
-        n=Number(n);
-        return isNaN(n)?0:n;
+    save(){
+        App.store.set("journal",this.data);
+        this.render();
     },
 
     changeMonth(d){
@@ -309,85 +268,74 @@ const SafeJournal = {
     },
 
     render(){
-        safe(()=>{
 
-            let y=this.date.getFullYear();
-            let m=this.date.getMonth();
+        let y=this.date.getFullYear();
+        let m=this.date.getMonth();
 
-            document.getElementById("monthLabel").innerText=
-                this.date.toLocaleString('default',{month:'long',year:'numeric'});
+        document.getElementById("monthLabel").innerText=
+            this.date.toLocaleString('default',{month:'long',year:'numeric'});
 
-            let html="";
-            let total=0;
+        let html="";
+        let total=0;
 
-            for(let i=1;i<=31;i++){
+        for(let i=1;i<=31;i++){
 
-                let date=new Date(y,m,i);
-                if(date.getMonth()!=m) break;
+            let date=new Date(y,m,i);
+            if(date.getMonth()!=m) break;
 
-                let key=`${y}-${m+1}-${i}`;
-                let val=this.safe(this.data[key]);
+            let key=`${y}-${m+1}-${i}`;
+            let val=Number(this.data[key]||0);
 
-                total+=val;
+            total+=val;
 
-                html+=`
-                <div class="day"
-                     onclick="SafeJournal.select('${key}')"
-                     style="background:rgba(34,197,94,${Math.min(val/500,0.8)})">
-                    ${i}<br><span class="small">$${val}</span>
-                </div>`;
-            }
+            html+=`
+            <div class="day"
+                 onclick="App.journal.select('${key}')"
+                 style="background:rgba(34,197,94,${Math.min(val/500,0.8)})">
+                ${i}<br><span class="small">$${val}</span>
+            </div>`;
+        }
 
-            document.getElementById("calendar").innerHTML=html;
-            document.getElementById("monthlyPL").innerText="$"+total.toFixed(2);
-
-        },"journal.render");
+        document.getElementById("calendar").innerHTML=html;
+        document.getElementById("monthlyPL").innerText="$"+total.toFixed(2);
     },
 
     select(k){
         this.selected=k;
-        document.getElementById("selectedDay").innerText="Selected "+k;
-        document.getElementById("profitInput").value=this.safe(this.data[k]);
+        document.getElementById("selectedDay").innerText=k;
+        document.getElementById("profitInput").value=this.data[k]||0;
     },
 
-    save(){
-        safe(()=>{
-            if(!this.selected) return;
+    saveDay(){
+        if(!this.selected) return;
 
-            this.data[this.selected]=this.safe(document.getElementById("profitInput").value);
-            Store.set("journal",this.data);
-            this.render();
-
-        },"journal.save");
+        this.data[this.selected]=Number(document.getElementById("profitInput").value)||0;
+        this.save();
     }
 };
 
 /* =========================
-   SAFE UI ROUTER
+   UI LAYER ONLY
 ========================= */
 
-const SafeUI = {
+const UI = {
     show(page){
 
-        safe(()=>{
-
-            document.querySelectorAll(".page")
+        document.querySelectorAll(".page")
             .forEach(p=>p.classList.add("hidden"));
 
-            document.getElementById(page).classList.remove("hidden");
+        document.getElementById(page).classList.remove("hidden");
 
-            if(page==="home") SafeAccounts.render();
-            if(page==="journal") SafeJournal.render();
-
-        },"UI.show");
+        if(page==="home") App.accounts.render();
+        if(page==="journal") App.journal.render();
     }
 };
 
 /* =========================
-   BOOT APP
+   BOOT (SAFE ENTRY POINT)
 ========================= */
 
-safe(()=>SafeAccounts.render(),"boot");
+App.accounts.render();
 
 </script>
 
