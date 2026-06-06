@@ -88,7 +88,6 @@ input {
 .day.has-data {
     border-color: #1f6feb;
 }
-
 </style>
 </head>
 
@@ -176,11 +175,16 @@ input {
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+
+/* =========================
+   JOURNAL FIX (ROBUST CORE)
+   ========================= */
 let journal = JSON.parse(localStorage.getItem("journal") || "{}");
 
-let currentIndex = null;
-let selectedDate = null;
-let viewDate = new Date();
+let journalState = {
+    selectedDate: null,
+    viewDate: new Date()
+};
 
 /* NAV */
 function showHome(){
@@ -195,8 +199,11 @@ function showJournal(){
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.remove("hidden");
 
-    selectedDate = null;
-    renderCalendar();
+    journalState.selectedDate = null;
+
+    setTimeout(() => {
+        renderCalendar();
+    }, 0);
 }
 
 /* HOME */
@@ -293,64 +300,74 @@ function back(){
     document.getElementById("home").classList.remove("hidden");
 }
 
-/* JOURNAL */
-function showJournal(){
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("detail").classList.add("hidden");
-    document.getElementById("journal").classList.remove("hidden");
-    selectedDate = null;
-    renderCalendar();
-}
+/* =========================
+   JOURNAL (FIXED CORE)
+   ========================= */
 
 function changeMonth(dir){
-    viewDate.setMonth(viewDate.getMonth() + dir);
+    journalState.viewDate.setMonth(journalState.viewDate.getMonth() + dir);
     renderCalendar();
 }
 
 function renderCalendar(){
 
-    let y = viewDate.getFullYear();
-    let m = viewDate.getMonth();
+    const y = journalState.viewDate.getFullYear();
+    const m = journalState.viewDate.getMonth();
 
     document.getElementById("monthLabel").innerText =
-        viewDate.toLocaleString('default',{month:'long',year:'numeric'});
+        journalState.viewDate.toLocaleString('default',{
+            month:'long',
+            year:'numeric'
+        });
 
     let html = "";
-    let total = 0;
+    let monthlyTotal = 0;
 
-    for(let d=1; d<=31; d++){
+    for(let d = 1; d <= 31; d++){
 
-        let date = new Date(y,m,d);
+        const date = new Date(y, m, d);
         if(date.getMonth() !== m) break;
 
-        let day = date.getDay();
+        const day = date.getDay();
         if(day === 0 || day === 6) continue;
 
-        let key = `${y}-${m+1}-${d}`;
-        let val = journal[key] || 0;
+        const key = `${y}-${m+1}-${d}`;
+        const val = Number(journal[key] || 0);
 
-        total += Number(val);
+        monthlyTotal += val;
 
         html += `
-        <div class="day ${val?'has-data':''}" onclick="selectDay('${key}')">
-            ${d}<br><span class="small">$${val}</span>
-        </div>`;
+            <div class="day ${val ? 'has-data' : ''}"
+                 onclick="selectDay('${key}')">
+                ${d}<br>
+                <span class="small">$${val}</span>
+            </div>
+        `;
     }
 
     document.getElementById("calendar").innerHTML = html;
-    document.getElementById("monthlyPL").innerText = "$" + total.toFixed(2);
+    document.getElementById("monthlyPL").innerText = "$" + monthlyTotal.toFixed(2);
 }
 
 function selectDay(key){
-    selectedDate = key;
-    document.getElementById("selectedDay").innerText = "Selected: " + key;
-    document.getElementById("profitInput").value = journal[key] || "";
+    journalState.selectedDate = key;
+
+    document.getElementById("selectedDay").innerText =
+        "Selected: " + key;
+
+    document.getElementById("profitInput").value =
+        journal[key] || "";
 }
 
 function saveDay(){
-    if(!selectedDate) return;
 
-    journal[selectedDate] = parseFloat(document.getElementById("profitInput").value) || 0;
+    const key = journalState.selectedDate;
+    if(!key) return;
+
+    const value = parseFloat(document.getElementById("profitInput").value);
+
+    journal[key] = isNaN(value) ? 0 : value;
+
     localStorage.setItem("journal", JSON.stringify(journal));
 
     renderCalendar();
