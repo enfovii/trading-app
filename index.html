@@ -205,7 +205,7 @@ function showJournal(){
     document.getElementById("journal").classList.remove("hidden");
 
     selectedDate = null;
-    setTimeout(renderCalendar,0);
+    renderCalendar();
 }
 
 /* HOME */
@@ -330,7 +330,7 @@ function renderCalendar(){
         if(day === 0 || day === 6) continue;
 
         let key = `${y}-${m+1}-${d}`;
-        let val = journal[key] || 0;
+        let val = journal[key] ?? 0;
 
         total += Number(val);
 
