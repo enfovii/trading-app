@@ -41,13 +41,32 @@ h2 {
 .page { display:none; }
 .active { display:block; }
 
-/* FIXED GRID - perfect 4 boxes */
+/* HOME LAYOUT */
 .topbar {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* BIG PORTFOLIO BOX */
+.portfolioBox {
+    background: rgba(17,24,35,0.55);
+    border: 1px solid rgba(120,170,255,0.18);
+    backdrop-filter: blur(12px);
+    padding: 18px;
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+}
+
+/* 3 SMALL BOX ROW */
+.statsRow {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
 
+/* STAT BOX */
 .stat {
     background: rgba(17,24,35,0.55);
     border: 1px solid rgba(120,170,255,0.18);
@@ -55,17 +74,12 @@ h2 {
     padding: 12px;
     border-radius: 14px;
     text-align: center;
-    cursor: pointer;
-    min-height: 70px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
 
 .big {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
 }
 
@@ -158,24 +172,30 @@ button {
 
 <div class="topbar">
 
-    <div class="stat" onclick="openPortfolio()">
+    <!-- BIG PORTFOLIO -->
+    <div class="portfolioBox" onclick="openPortfolio()">
         <div class="small">Portfolio</div>
         <div class="big" id="total">$0</div>
     </div>
 
-    <div class="stat">
-        <div class="small">Daily</div>
-        <div class="big green" id="daily">$0</div>
-    </div>
+    <!-- 3 STATS ROW -->
+    <div class="statsRow">
 
-    <div class="stat">
-        <div class="small">Weekly</div>
-        <div class="big" id="weeklyHome">$0</div>
-    </div>
+        <div class="stat">
+            <div class="small">Daily</div>
+            <div class="big green" id="daily">$0</div>
+        </div>
 
-    <div class="stat">
-        <div class="small">Monthly</div>
-        <div class="big" id="monthlyHome">$0</div>
+        <div class="stat">
+            <div class="small">Weekly</div>
+            <div class="big" id="weeklyHome">$0</div>
+        </div>
+
+        <div class="stat">
+            <div class="small">Monthly</div>
+            <div class="big" id="monthlyHome">$0</div>
+        </div>
+
     </div>
 
 </div>
@@ -183,7 +203,7 @@ button {
 <div id="accounts"></div>
 </div>
 
-<!-- PORTFOLIO (FULL ACCOUNT STYLE OVERVIEW) -->
+<!-- PORTFOLIO -->
 <div id="portfolio" class="page">
 
 <div class="card">
