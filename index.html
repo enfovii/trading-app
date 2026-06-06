@@ -171,12 +171,11 @@ let viewDate = new Date();
 let selectedDate = null;
 let currentIndex = null;
 
-/* SAVE ACCOUNTS */
+/* SAVE */
 function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* SAVE JOURNAL */
 function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
@@ -184,6 +183,16 @@ function saveJournal(){
 /* NAV */
 function showHome(){
     renderHome();
+}
+
+function showJournal(){
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("detail").classList.add("hidden");
+    document.getElementById("journal").classList.remove("hidden");
+
+    requestAnimationFrame(() => {
+        renderCalendar();
+    });
 }
 
 /* MULTIPLIER (UNCHANGED) */
@@ -291,17 +300,7 @@ function updateAccount(){
         getNextTier(b);
 }
 
-/* JOURNAL FIX */
-function showJournal(){
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("detail").classList.add("hidden");
-    document.getElementById("journal").classList.remove("hidden");
-
-    setTimeout(() => {
-        renderCalendar();
-    }, 0);
-}
-
+/* JOURNAL */
 function changeMonth(dir){
     viewDate.setMonth(viewDate.getMonth() + dir);
     renderCalendar();
@@ -389,8 +388,9 @@ function back(){
     renderHome();
 }
 
+/* BOOT FIX */
 renderHome();
-renderCalendar();
+window.onload = () => renderCalendar();
 
 </script>
 
