@@ -64,22 +64,6 @@ input {
     cursor: pointer;
 }
 
-/* PROGRESS */
-.progress-wrap {
-    margin-top: 10px;
-    background: rgba(255,255,255,0.08);
-    border-radius: 10px;
-    height: 10px;
-    overflow: hidden;
-}
-
-.progress-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #2f81f7, #22c55e);
-    transition: width 0.5s ease;
-}
-
 /* MINI BAR */
 .mini-wrap {
     margin-top: 8px;
@@ -93,6 +77,22 @@ input {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #2f81f7, #22c55e);
+}
+
+/* MAIN PROGRESS */
+.progress-wrap {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2f81f7, #22c55e);
+    transition: width 0.5s ease;
 }
 </style>
 </head>
@@ -109,9 +109,13 @@ input {
 
 <div id="accounts"></div>
 
+<!-- TOTAL PANEL (RESTORED PROFITS) -->
 <div class="card">
 <div>Total Portfolio Balance</div>
 <div id="totalBalance" class="big lime">$0</div>
+
+<div class="small">Total Daily Profit: $<span id="totalDaily">0</span></div>
+<div class="small">Total Weekly Profit: $<span id="totalWeekly">0</span></div>
 </div>
 
 </div>
@@ -191,16 +195,12 @@ function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* =========================
-   SINGLE SOURCE OF TRUTH
-   ========================= */
+/* TIER SYSTEM */
 function getTier(b) {
-
     if (b < 140000) return { mult: 3.5, prev: 90000, next: 140000 };
     if (b < 160000) return { mult: 4, prev: 140000, next: 160000 };
     if (b < 200000) return { mult: 4.5, prev: 160000, next: 200000 };
     if (b < 240000) return { mult: 5, prev: 200000, next: 240000 };
-
     return { mult: 5, prev: 240000, next: 240000 };
 }
 
@@ -208,19 +208,14 @@ function getMultiplier(b) {
     return getTier(b).mult;
 }
 
-/* PROGRESS */
 function getProgress(b) {
+    let t = getTier(b);
+    if (t.next === t.prev) return 100;
 
-    let tier = getTier(b);
-
-    if (tier.next === tier.prev) return 100;
-
-    let p = ((b - tier.prev) / (tier.next - tier.prev)) * 100;
-
+    let p = ((b - t.prev) / (t.next - t.prev)) * 100;
     return Math.max(0, Math.min(100, p));
 }
 
-/* NEXT MILESTONE */
 function getNextMilestone(b){
     return "$" + getTier(b).next.toLocaleString();
 }
@@ -248,14 +243,19 @@ function renderHome(){
     container.innerHTML = "";
 
     let total = 0;
+    let totalDaily = 0;
+    let totalWeekly = 0;
 
     accounts.forEach((a,i)=>{
 
         let b = a.balance;
         let mult = getMultiplier(b);
+        let profit = getProfit(mult);
         let p = getProgress(b);
 
         total += b;
+        totalDaily += profit.dailyMin;
+        totalWeekly += profit.dailyMin * 7;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
@@ -263,7 +263,7 @@ function renderHome(){
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
 
-                <span class="small">${mult.toFixed(2)}x</span>
+                <span class="small">${mult.toFixed(2)}x • $${profit.dailyMin.toFixed(0)}/day</span>
 
                 <div class="mini-wrap">
                     <div class="mini-bar" style="width:${p}%"></div>
@@ -277,6 +277,12 @@ function renderHome(){
 
     document.getElementById("totalBalance").innerText =
         "$" + total.toLocaleString();
+
+    document.getElementById("totalDaily").innerText =
+        totalDaily.toFixed(0);
+
+    document.getElementById("totalWeekly").innerText =
+        totalWeekly.toFixed(0);
 }
 
 /* ADD */
@@ -301,7 +307,6 @@ function addAccount(){
 
 /* OPEN */
 function openAccount(i){
-
     currentIndex = i;
 
     document.getElementById("home").classList.add("hidden");
@@ -348,11 +353,8 @@ function updateAccount(){
     document.getElementById("nextMilestone").innerText =
         getNextMilestone(b);
 
-    let p = getProgress(b);
-
-    requestAnimationFrame(() => {
-        document.getElementById("progressBar").style.width = p + "%";
-    });
+    document.getElementById("progressBar").style.width =
+        getProgress(b) + "%";
 }
 
 /* DELETE */
