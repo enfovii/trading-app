@@ -11,6 +11,7 @@ body {
     padding: 14px;
     color: #e8ecf3;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 body::before {
@@ -118,6 +119,7 @@ button {
     right: 12px;
 }
 
+/* MODAL */
 .modal {
     position: fixed;
     inset: 0;
@@ -138,8 +140,12 @@ button {
     border-radius: 14px;
 }
 
-.danger {
-    background: #ff5c7a !important;
+/* SCROLL FIX */
+#accounts {
+    max-height: 55vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 120px;
 }
 </style>
 </head>
@@ -270,15 +276,21 @@ function mult(b){
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-/* NAV */
+/* NAV FIX (HIDES ADD BUTTON PROPERLY) */
 function show(page){
+
     document.querySelectorAll(".page")
         .forEach(p => p.classList.remove("active"));
 
     document.getElementById(page).classList.add("active");
+
+    const addBtn = document.querySelector(".addBtn");
+    if(addBtn){
+        addBtn.style.display = (page === "home") ? "block" : "none";
+    }
 }
 
-/* RENDER (FIXED ALWAYS RUNS) */
+/* RENDER */
 function render(){
 
     let el = document.getElementById("accounts");
@@ -364,10 +376,10 @@ function createAccount(){
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
     closeModal();
-    render(); // FIX: ensures accounts always appear immediately
+    render();
 }
 
-/* DELETE (FIXED) */
+/* DELETE */
 function deleteAccount(){
 
     if(current===null) return;
@@ -381,7 +393,7 @@ function deleteAccount(){
     render();
 }
 
-/* INIT FIX */
+/* INIT */
 window.onload = function(){
     show("home");
     render();
