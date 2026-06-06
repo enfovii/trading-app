@@ -111,7 +111,6 @@ button {
     box-sizing: border-box;
 }
 
-/* ADD BUTTON */
 .addBtn {
     position: fixed;
     bottom: 18px;
@@ -119,7 +118,10 @@ button {
     right: 12px;
 }
 
-/* MODAL */
+/* =========================
+   CONFIRM MODAL (NEW)
+========================= */
+
 .modal {
     position: fixed;
     inset: 0;
@@ -138,6 +140,10 @@ button {
     backdrop-filter: blur(14px);
     padding: 16px;
     border-radius: 14px;
+}
+
+.danger {
+    background: #ff5c7a !important;
 }
 </style>
 </head>
@@ -206,7 +212,7 @@ button {
     </div>
 
     <button onclick="back()">Back</button>
-    <button style="background:#ff5c7a;" onclick="deleteAccount()">Delete Account</button>
+    <button style="background:#ff5c7a;" onclick="openDeleteModal()">Delete Account</button>
 </div>
 
 </div>
@@ -214,10 +220,9 @@ button {
 <!-- ADD BUTTON -->
 <button class="addBtn" id="addBtn" onclick="openModal()">+ Add Account</button>
 
-<!-- MODAL -->
+<!-- ADD MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
-
         <div class="big">Add Account</div>
 
         <input id="newName" placeholder="Account name">
@@ -225,7 +230,17 @@ button {
 
         <button onclick="createAccount()">Create</button>
         <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
+    </div>
+</div>
 
+<!-- CONFIRM DELETE MODAL (NEW) -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="big">Delete Account?</div>
+        <div class="small">This action cannot be undone.</div>
+
+        <button class="danger" onclick="confirmDelete()">Yes, Delete</button>
+        <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
 
@@ -262,7 +277,6 @@ function show(page){
         .forEach(p=>p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
 
-    // ✅ hide add button on account page
     document.getElementById("addBtn").style.display =
         page === "home" ? "block" : "none";
 }
@@ -330,27 +344,15 @@ function updateAccount(){
     render();
 }
 
-/* DELETE ACCOUNT */
-function deleteAccount(){
-
-    if(current===null) return;
-
-    accounts.splice(current,1);
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    current=null;
-
-    show("home");
-    render();
-}
-
 /* BACK */
 function back(){
     current=null;
     show("home");
 }
 
-/* MODAL */
+/* =========================
+   ADD MODAL
+========================= */
 function openModal(){
     document.getElementById("modal").style.display="flex";
 }
@@ -369,14 +371,35 @@ function createAccount(){
     accounts.push({name,balance});
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
-    document.getElementById("newName").value="";
-    document.getElementById("newBalance").value="";
-
     closeModal();
     render();
 }
 
-/* INIT */
+/* =========================
+   DELETE MODAL (NEW)
+========================= */
+function openDeleteModal(){
+    document.getElementById("deleteModal").style.display="flex";
+}
+
+function closeDeleteModal(){
+    document.getElementById("deleteModal").style.display="none";
+}
+
+function confirmDelete(){
+
+    if(current===null) return;
+
+    accounts.splice(current,1);
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    current=null;
+
+    closeDeleteModal();
+    show("home");
+    render();
+}
+
 show("home");
 render();
 
