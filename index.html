@@ -44,18 +44,18 @@ h2 {
 .page { display:none; }
 .active { display:block; }
 
-/* 📱 RESPONSIVE TOPBAR (FIX) */
+/* =========================
+   TOPBAR (UPDATED LAYOUT)
+========================= */
 .topbar {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 8px;
 }
 
-/* on small screens stack better */
-@media (max-width: 420px) {
-    .topbar {
-        grid-template-columns: 1fr;
-    }
+/* Portfolio spans full width */
+.topbar .stat:first-child {
+    grid-column: 1 / -1;
 }
 
 /* STAT BOX */
@@ -89,7 +89,7 @@ h2 {
     border-radius: 14px;
 }
 
-/* ACCOUNT CARD */
+/* ACCOUNT */
 .account {
     padding: 14px;
     margin-top: 10px;
@@ -130,7 +130,7 @@ button {
     font-weight: 600;
 }
 
-/* ADD BUTTON SAFE FOR iPHONE */
+/* ADD BUTTON */
 .addBtn {
     position: fixed;
     bottom: 16px;
@@ -138,7 +138,7 @@ button {
     right: 16px;
 }
 
-/* MODAL SAFE AREA */
+/* MODAL */
 .modal {
     position: fixed;
     inset: 0;
@@ -175,10 +175,12 @@ button {
         <div class="small">Portfolio</div>
         <div class="big" id="total">$0</div>
     </div>
+
     <div class="stat">
         <div class="small">Daily</div>
         <div class="big green" id="daily">$0</div>
     </div>
+
     <div class="stat">
         <div class="small">Drawdown</div>
         <div class="big red" id="dd">$0</div>
