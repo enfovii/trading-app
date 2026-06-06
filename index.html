@@ -24,8 +24,7 @@ h2 { font-size: 22px; font-weight: 800; }
     border-radius: 18px;
 }
 
-/* ================= NAV BAR UPGRADE ================= */
-
+/* NAV (UNCHANGED DESIGN) */
 .navBar {
     position: relative;
     display: flex;
@@ -41,9 +40,6 @@ h2 { font-size: 22px; font-weight: 800; }
     background: transparent;
     color: #e6eaf2;
     font-weight: 600;
-    cursor: pointer;
-    position: relative;
-    z-index: 2;
 }
 
 .navIndicator {
@@ -56,14 +52,7 @@ h2 { font-size: 22px; font-weight: 800; }
     border: 1px solid rgba(47,129,247,0.5);
     border-radius: 12px;
     transition: transform 0.25s ease;
-    z-index: 1;
 }
-
-.active {
-    color: #22c55e;
-}
-
-/* ================= END NAV ================= */
 
 button {
     width: 100%;
@@ -213,9 +202,6 @@ let viewDate = new Date();
 let selectedDate = null;
 let currentIndex = null;
 
-/* NAV STATE */
-let activeTab = "home";
-
 /* SAVE */
 function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
@@ -225,27 +211,14 @@ function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* NAV ANIMATION */
-function updateNav(tab){
-
-    activeTab = tab;
-
-    let indicator = document.getElementById("navIndicator");
-
-    if(tab === "home"){
-        indicator.style.transform = "translateX(0%)";
-    } else {
-        indicator.style.transform = "translateX(100%)";
-    }
-}
-
 /* NAV */
 function showHome(){
     document.getElementById("home").classList.remove("hidden");
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.add("hidden");
 
-    updateNav("home");
+    document.getElementById("navIndicator").style.transform = "translateX(0%)";
+
     renderHome();
 }
 
@@ -254,7 +227,8 @@ function showJournal(){
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.remove("hidden");
 
-    updateNav("journal");
+    document.getElementById("navIndicator").style.transform = "translateX(100%)";
+
     requestAnimationFrame(() => {
         renderCalendar();
     });
@@ -322,7 +296,47 @@ function renderHome(){
     document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
 }
 
-/* JOURNAL FUNCTIONS (UNCHANGED) */
+/* DETAIL FIX RESTORED */
+function openAccount(i){
+    currentIndex = i;
+
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("journal").classList.add("hidden");
+    document.getElementById("detail").classList.remove("hidden");
+
+    let acc = accounts[i];
+
+    document.getElementById("accName").innerText = acc.name;
+    document.getElementById("editBalance").value = acc.balance;
+
+    updateAccount();
+}
+
+function updateAccount(){
+
+    let b = parseFloat(document.getElementById("editBalance").value);
+    accounts[currentIndex].balance = b;
+
+    save();
+
+    let mult = getMultiplier(b);
+
+    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+
+    document.getElementById("daily").innerText =
+        "$" + (mult*800).toFixed(0) + " - $" + (mult*1000).toFixed(0);
+
+    document.getElementById("weekly").innerText =
+        "$" + (mult*800*7).toFixed(0);
+
+    document.getElementById("monthly").innerText =
+        "$" + (mult*800*30).toFixed(0);
+
+    document.getElementById("nextTier").innerText =
+        getNextTier(b);
+}
+
+/* JOURNAL */
 function changeMonth(dir){
     viewDate.setMonth(viewDate.getMonth() + dir);
     renderCalendar();
@@ -410,8 +424,7 @@ function back(){
     showHome();
 }
 
-/* INIT */
-showHome();
+renderHome();
 updateNav("home");
 
 </script>
