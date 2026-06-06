@@ -185,19 +185,19 @@ function getMultiplier(b) {
     if (b < 200000) return 4;
 
     // =========================
-    // FIXED 200K+ STACKING SYSTEM
+    // FIXED CLEAN 200K+ SYSTEM
     // =========================
 
     let base = 4;
     let extra = b - 200000;
 
-    let fullSteps = Math.floor(extra / 40000); // +1x per 40k
+    // convert everything into 20k blocks
+    let halfBlocks = Math.floor(extra / 20000);
 
-    let remainder = extra - (fullSteps * 40000); // clean leftover
+    let fullSteps = Math.floor(halfBlocks / 2); // 2 half blocks = 1x
+    let remainingHalf = halfBlocks % 2;
 
-    let halfSteps = Math.floor(remainder / 20000); // +0.5x per 20k
-
-    return base + fullSteps + (halfSteps * 0.5);
+    return base + fullSteps + (remainingHalf * 0.5);
 }
 
 /* HOME */
