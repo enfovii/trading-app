@@ -169,34 +169,33 @@ let journal = JSON.parse(localStorage.getItem("journal") || "{}");
 
 let viewDate = new Date();
 let selectedDate = null;
+let currentIndex = null;
 
-/* SAVE */
+/* SAVE ACCOUNTS */
+function save(){
+    localStorage.setItem("accounts", JSON.stringify(accounts));
+}
+
+/* SAVE JOURNAL */
 function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* ================= FIXED MULTIPLIER (CLEAN + STABLE) ================= */
+/* ================= FIXED MULTIPLIER ================= */
 
 function getMultiplier(b) {
 
-    // ORIGINAL LOGIC (UNCHANGED)
     if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
-    // =========================
-    // EXTENSION (SAFE TIER SYSTEM)
-    // =========================
+    // 200k BASE ANCHOR = 4x
+    let extra = b - 200000;
 
-    if (b < 240000) return 4.5;
-    if (b < 280000) return 5;
-    if (b < 320000) return 5.5;
-    if (b < 360000) return 6;
-    if (b < 400000) return 6.5;
+    let halfSteps = Math.floor(extra / 20000);
 
-    let extra = Math.floor((b - 400000) / 40000);
-    return 6.5 + extra;
+    return 4 + (halfSteps * 0.5);
 }
 
 /* HOME */
@@ -236,7 +235,7 @@ function renderHome(){
     document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
 }
 
-/* DETAIL */
+/* OPEN ACCOUNT */
 function openAccount(i){
     currentIndex = i;
 
@@ -251,10 +250,13 @@ function openAccount(i){
     updateAccount();
 }
 
+/* UPDATE ACCOUNT (FIXED SAVE) */
 function updateAccount(){
 
     let b = parseFloat(document.getElementById("editBalance").value);
     accounts[currentIndex].balance = b;
+
+    save(); // ✅ FIX: persist balance on change
 
     let mult = getMultiplier(b);
 
@@ -273,6 +275,7 @@ function updateAccount(){
         getNextTier(b);
 }
 
+/* NEXT TIER */
 function getNextTier(b){
 
     if (b < 90000) return "$90,000";
@@ -280,18 +283,11 @@ function getNextTier(b){
     if (b < 160000) return "$160,000";
     if (b < 200000) return "$200,000";
 
-    if (b < 240000) return "$240,000";
-    if (b < 280000) return "$280,000";
-    if (b < 320000) return "$320,000";
-    if (b < 360000) return "$360,000";
-    if (b < 400000) return "$400,000";
-
-    let steps = Math.ceil((b - 400000) / 40000);
-    return "$" + (400000 + steps * 40000).toLocaleString();
+    let steps = Math.ceil((b - 200000) / 20000);
+    return "$" + (200000 + steps * 20000).toLocaleString();
 }
 
-/* JOURNAL (UNCHANGED) */
-
+/* JOURNAL */
 function showJournal(){
     renderCalendar();
     document.getElementById("home").classList.add("hidden");
