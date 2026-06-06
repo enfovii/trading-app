@@ -13,23 +13,20 @@ body {
     padding: 18px;
 }
 
-/* HEADER */
 h2 {
     font-size: 22px;
     font-weight: 800;
-    margin-bottom: 10px;
 }
 
-/* CARDS (APP STYLE) */
 .card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(14px);
     padding: 16px;
+    margin-top: 12px;
     border-radius: 18px;
 }
 
-/* BUTTON */
 button {
     width: 100%;
     padding: 14px;
@@ -41,7 +38,6 @@ button {
     font-weight: 600;
 }
 
-/* INPUT */
 input {
     width: 100%;
     padding: 14px;
@@ -52,7 +48,6 @@ input {
     color: white;
 }
 
-/* TEXT */
 .big { font-size: 26px; font-weight: 800; }
 .lime { color: #22c55e; }
 .red { color: #ff4d4d; }
@@ -60,7 +55,6 @@ input {
 
 .hidden { display:none; }
 
-/* ACCOUNT CARD (APP TILE STYLE) */
 .account {
     padding: 14px;
     background: rgba(255,255,255,0.03);
@@ -70,29 +64,7 @@ input {
     cursor: pointer;
 }
 
-/* MINI PROGRESS */
-.mini-wrap {
-    margin-top: 10px;
-    background: rgba(255,255,255,0.08);
-    height: 7px;
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.mini-bar {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #2f81f7, #22c55e);
-    transition: width 0.4s ease;
-}
-
-.row {
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-/* DETAIL PROGRESS */
+/* PROGRESS */
 .progress-wrap {
     margin-top: 10px;
     background: rgba(255,255,255,0.08);
@@ -106,6 +78,21 @@ input {
     width: 0%;
     background: linear-gradient(90deg, #2f81f7, #22c55e);
     transition: width 0.5s ease;
+}
+
+/* MINI BAR */
+.mini-wrap {
+    margin-top: 8px;
+    background: rgba(255,255,255,0.08);
+    height: 7px;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.mini-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2f81f7, #22c55e);
 }
 </style>
 </head>
@@ -147,7 +134,7 @@ input {
 
 <input id="editBalance" oninput="updateAccount()">
 
-<div class="small">Progress to next milestone</div>
+<div class="small">Progress to next tier</div>
 <div class="small" id="tierLabel">-</div>
 
 <div class="progress-wrap">
@@ -204,38 +191,38 @@ function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* FIXED MULTIPLIER */
-function getMultiplier(b) {
-    if (b < 90000) return 3;
-    if (b < 140000) return 3.5;
-    if (b < 160000) return 4;
-    if (b < 200000) return 4.5;
-    if (b < 240000) return 5;
-    return 5;
+/* =========================
+   SINGLE SOURCE OF TRUTH
+   ========================= */
+function getTier(b) {
+
+    if (b < 140000) return { mult: 3.5, prev: 90000, next: 140000 };
+    if (b < 160000) return { mult: 4, prev: 140000, next: 160000 };
+    if (b < 200000) return { mult: 4.5, prev: 160000, next: 200000 };
+    if (b < 240000) return { mult: 5, prev: 200000, next: 240000 };
+
+    return { mult: 5, prev: 240000, next: 240000 };
 }
 
-/* TIERS */
-function getTierRange(b) {
-    if (b < 90000) return { prev: 0, next: 90000 };
-    if (b < 140000) return { prev: 90000, next: 140000 };
-    if (b < 160000) return { prev: 140000, next: 160000 };
-    if (b < 200000) return { prev: 160000, next: 200000 };
-    if (b < 240000) return { prev: 200000, next: 240000 };
-    return { prev: 240000, next: 240000 };
+function getMultiplier(b) {
+    return getTier(b).mult;
 }
 
 /* PROGRESS */
 function getProgress(b) {
-    let { prev, next } = getTierRange(b);
-    if (next === prev) return 100;
-    let p = ((b - prev) / (next - prev)) * 100;
+
+    let tier = getTier(b);
+
+    if (tier.next === tier.prev) return 100;
+
+    let p = ((b - tier.prev) / (tier.next - tier.prev)) * 100;
+
     return Math.max(0, Math.min(100, p));
 }
 
-/* NEXT */
+/* NEXT MILESTONE */
 function getNextMilestone(b){
-    let { next } = getTierRange(b);
-    return "$" + next.toLocaleString();
+    return "$" + getTier(b).next.toLocaleString();
 }
 
 /* PROFIT */
@@ -273,12 +260,10 @@ function renderHome(){
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
 
-                <div class="row">
-                    <b>${a.name}</b>
-                    <span class="small">${mult.toFixed(2)}x</span>
-                </div>
+                <b>${a.name}</b><br>
+                <span class="small">$${b.toLocaleString()}</span><br>
 
-                <div class="small">$${b.toLocaleString()}</div>
+                <span class="small">${mult.toFixed(2)}x</span>
 
                 <div class="mini-wrap">
                     <div class="mini-bar" style="width:${p}%"></div>
@@ -316,6 +301,7 @@ function addAccount(){
 
 /* OPEN */
 function openAccount(i){
+
     currentIndex = i;
 
     document.getElementById("home").classList.add("hidden");
@@ -341,7 +327,8 @@ function updateAccount(){
     let profit = getProfit(mult);
     let dd = getDD(b);
 
-    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+    document.getElementById("mult").innerText =
+        mult.toFixed(2) + "x";
 
     document.getElementById("daily").innerText =
         "$" + profit.dailyMin.toFixed(0) + " - $" + profit.dailyMax.toFixed(0);
@@ -356,7 +343,7 @@ function updateAccount(){
         "$" + dd.toFixed(0);
 
     document.getElementById("tierLabel").innerText =
-        `Next: ${getNextMilestone(b)}`;
+        "Next: " + getNextMilestone(b);
 
     document.getElementById("nextMilestone").innerText =
         getNextMilestone(b);
