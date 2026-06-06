@@ -7,10 +7,26 @@
 <style>
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-    background: #0a0f1a;
-    color: #e8ecf3;
     margin: 0;
     padding: 18px;
+    color: #e8ecf3;
+    overflow-x: hidden;
+}
+
+/* 🌊 BLUE GRADIENT BACKGROUND + GLASS BASE */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(circle at 20% 20%, rgba(60,120,255,0.18), transparent 40%),
+        radial-gradient(circle at 80% 30%, rgba(0,180,255,0.10), transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(40,90,255,0.12), transparent 50%),
+        #070b14;
+    z-index: -1;
 }
 
 /* TITLE */
@@ -30,6 +46,18 @@ h2 {
 .page { display:none; }
 .active { display:block; }
 
+/* 🧊 GLASS EFFECT CORE */
+.stat,
+.card,
+.account,
+.modal-content {
+    background: rgba(17, 24, 35, 0.55);
+    border: 1px solid rgba(120, 170, 255, 0.18);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
 /* TOPBAR */
 .topbar {
     display: grid;
@@ -38,8 +66,6 @@ h2 {
 }
 
 .stat {
-    background: #111a2b;
-    border: 1px solid #1e2a3a;
     padding: 14px;
     border-radius: 14px;
     text-align: center;
@@ -57,20 +83,16 @@ h2 {
 
 /* CARDS */
 .card {
-    background: #111823;
-    border: 1px solid #1e2a3a;
     padding: 16px;
     margin-top: 12px;
     border-radius: 14px;
 }
 
-/* ACCOUNT */
+/* ACCOUNTS */
 .account {
     padding: 14px;
-    background: #111823;
     margin-top: 12px;
     border-radius: 14px;
-    border: 1px solid #1e2a3a;
     cursor: pointer;
 }
 
@@ -79,18 +101,20 @@ h2 {
 .big { font-size: 26px; font-weight: 700; }
 
 /* COLORS */
-.green { color: #22c55e; }
-.red { color: #ef4444; }
+.green { color: #2ee59d; }
+.red { color: #ff5c7a; }
 
-/* INPUTS */
+/* INPUT */
 input {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    border: 1px solid #263445;
+    border: 1px solid rgba(120, 170, 255, 0.2);
     margin-top: 8px;
-    background: #0f1622;
+    background: rgba(10, 18, 32, 0.6);
     color: #e8ecf3;
+    outline: none;
+    backdrop-filter: blur(10px);
 }
 
 /* BUTTON */
@@ -98,21 +122,21 @@ button {
     width: 100%;
     padding: 14px;
     margin-top: 10px;
-    background: #1f6feb;
+    background: linear-gradient(135deg, rgba(60,120,255,0.8), rgba(30,80,160,0.8));
     color: white;
-    border: none;
+    border: 1px solid rgba(120,170,255,0.3);
     border-radius: 12px;
     font-weight: 600;
+    cursor: pointer;
 }
 
-/* ADD BUTTON (BOTTOM FLOAT STYLE) */
+/* ADD BUTTON */
 .addBtn {
     position: fixed;
     bottom: 18px;
     left: 18px;
     right: 18px;
-    background: linear-gradient(135deg, #1b4d6b, #14324a);
-    border: 1px solid #2b4a6f;
+    display: none;
 }
 
 /* MODAL */
@@ -122,7 +146,7 @@ button {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.55);
     display: none;
     align-items: center;
     justify-content: center;
@@ -131,8 +155,6 @@ button {
 .modal-content {
     width: 90%;
     max-width: 360px;
-    background: #111823;
-    border: 1px solid #1e2a3a;
     padding: 16px;
     border-radius: 14px;
 }
@@ -167,7 +189,7 @@ button {
 
 </div>
 
-<!-- ACCOUNT PAGE -->
+<!-- ACCOUNT -->
 <div id="account" class="page">
 
 <div class="card">
@@ -205,7 +227,7 @@ button {
 
 </div>
 
-<!-- ADD ACCOUNT MODAL -->
+<!-- MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
 
@@ -215,27 +237,24 @@ button {
         <input id="newBalance" placeholder="Starting balance">
 
         <button onclick="createAccount()">Create</button>
-        <button onclick="closeModal()" style="background:#263445;">Cancel</button>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
 
     </div>
 </div>
 
 <!-- ADD BUTTON -->
-<button class="addBtn" onclick="openModal()">+ Add Account</button>
+<button class="addBtn" id="addBtn" onclick="openModal()">+ Add Account</button>
 
 <script>
 
-/* DATA */
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* SAFE NUM */
 function num(v){
     v = Number(v);
     return isNaN(v) ? 0 : v;
 }
 
-/* LOGIC */
 function mult(b){
     b = num(b);
     if (b < 90000) return b / 30000;
@@ -245,20 +264,19 @@ function mult(b){
     return 5;
 }
 
-function daily(b){
-    return mult(b) * 800;
-}
-
-function dd(b){
-    return b * 0.4;
-}
+function daily(b){ return mult(b) * 800; }
+function dd(b){ return b * 0.4; }
 
 /* NAV */
 function show(page){
+
     document.querySelectorAll(".page")
         .forEach(p => p.classList.remove("active"));
 
     document.getElementById(page).classList.add("active");
+
+    document.getElementById("addBtn").style.display =
+        page === "home" ? "block" : "none";
 }
 
 /* RENDER */
@@ -290,7 +308,7 @@ function render(){
     document.getElementById("dd").innerText="$"+draw.toFixed(0);
 }
 
-/* OPEN ACCOUNT */
+/* OPEN */
 function openAccount(i){
 
     current=i;
@@ -342,7 +360,7 @@ function closeModal(){
     document.getElementById("modal").style.display="none";
 }
 
-/* CREATE ACCOUNT */
+/* CREATE */
 function createAccount(){
 
     let name=document.getElementById("newName").value.trim();
