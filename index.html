@@ -118,10 +118,6 @@ button {
     right: 12px;
 }
 
-/* =========================
-   CONFIRM MODAL (NEW)
-========================= */
-
 .modal {
     position: fixed;
     inset: 0;
@@ -154,7 +150,6 @@ button {
     <h2>Pro Trading Dashboard</h2>
 </div>
 
-<!-- HOME -->
 <div id="home" class="page active">
 
 <div class="topbar">
@@ -178,7 +173,6 @@ button {
 
 </div>
 
-<!-- ACCOUNT -->
 <div id="account" class="page">
 
 <div class="card">
@@ -217,10 +211,8 @@ button {
 
 </div>
 
-<!-- ADD BUTTON -->
 <button class="addBtn" id="addBtn" onclick="openModal()">+ Add Account</button>
 
-<!-- ADD MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
         <div class="big">Add Account</div>
@@ -233,7 +225,6 @@ button {
     </div>
 </div>
 
-<!-- CONFIRM DELETE MODAL (NEW) -->
 <div class="modal" id="deleteModal">
     <div class="modal-content">
         <div class="big">Delete Account?</div>
@@ -249,7 +240,6 @@ button {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* MONEY */
 function money(v){
     return "$" + Number(v).toLocaleString();
 }
@@ -258,20 +248,27 @@ function num(v){
     return isNaN(Number(v)) ? 0 : Number(v);
 }
 
-/* LOGIC */
+/* =========================
+   FIXED MULTIPLIER (UPDATED)
+========================= */
 function mult(b){
-    b=num(b);
-    if(b<90000) return b/30000;
-    if(b<140000) return 3;
-    if(b<160000) return 3.5;
-    if(b<200000) return 4;
-    return 5;
+    b = num(b);
+
+    if (b < 90000) return b / 30000;
+    if (b < 140000) return 3;
+    if (b < 160000) return 3.5;
+    if (b < 200000) return 4;
+
+    let base = 5;
+    let extraSteps = Math.floor((b - 200000) / 20000);
+    base += extraSteps * 0.5;
+
+    return base;
 }
 
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-/* NAV */
 function show(page){
     document.querySelectorAll(".page")
         .forEach(p=>p.classList.remove("active"));
@@ -281,7 +278,6 @@ function show(page){
         page === "home" ? "block" : "none";
 }
 
-/* RENDER */
 function render(){
 
     let el=document.getElementById("accounts");
@@ -310,7 +306,6 @@ function render(){
     document.getElementById("dd").innerText = money(draw.toFixed(0));
 }
 
-/* OPEN */
 function openAccount(i){
     current=i;
     let a=accounts[i];
@@ -322,7 +317,6 @@ function openAccount(i){
     updateAccount();
 }
 
-/* UPDATE */
 function updateAccount(){
 
     if(current===null) return;
@@ -344,15 +338,11 @@ function updateAccount(){
     render();
 }
 
-/* BACK */
 function back(){
     current=null;
     show("home");
 }
 
-/* =========================
-   ADD MODAL
-========================= */
 function openModal(){
     document.getElementById("modal").style.display="flex";
 }
@@ -375,9 +365,6 @@ function createAccount(){
     render();
 }
 
-/* =========================
-   DELETE MODAL (NEW)
-========================= */
 function openDeleteModal(){
     document.getElementById("deleteModal").style.display="flex";
 }
