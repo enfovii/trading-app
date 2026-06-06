@@ -19,7 +19,6 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* HEADER SUMMARY */
 .topbar {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -44,7 +43,6 @@ h2 {
     font-weight: 700;
 }
 
-/* CARDS */
 .card {
     background: #111823;
     border: 1px solid #1e2a3a;
@@ -61,7 +59,6 @@ h2 {
     border: 1px solid #1e2a3a;
 }
 
-/* COLORS */
 .green { color: #22c55e; }
 .red { color: #ef4444; }
 .small { font-size: 12px; color: #93a4b8; }
@@ -96,7 +93,6 @@ input {
 
 <h2>📊 Pro Trading Dashboard</h2>
 
-<!-- TOP STATS -->
 <div class="topbar">
     <div class="stat">
         <div class="label">Portfolio</div>
@@ -112,10 +108,9 @@ input {
     </div>
 </div>
 
-<!-- ACCOUNTS -->
 <div id="accounts"></div>
 
-<!-- DETAIL VIEW -->
+<!-- DETAIL -->
 <div id="detail" class="hidden">
 
 <div class="card">
@@ -143,6 +138,12 @@ input {
         <div id="monthly"></div>
     </div>
 
+    <!-- ✅ NEW: ACCOUNT DRAWDOWN -->
+    <div class="card">
+        <div class="small">Account Drawdown</div>
+        <div class="big red" id="accdd"></div>
+    </div>
+
     <button onclick="back()">Back</button>
 </div>
 
@@ -158,7 +159,7 @@ let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
 /* =========================
-   SAFE CALC
+   SAFE MATH
 ========================= */
 
 function num(v){
@@ -179,8 +180,12 @@ function daily(b){
     return multiplier(b) * 800;
 }
 
+function drawdown(b){
+    return num(b) * 0.4;
+}
+
 /* =========================
-   HOME RENDER
+   HOME
 ========================= */
 
 function render(){
@@ -198,7 +203,7 @@ function render(){
 
         total += b;
         d += daily(b);
-        dd += b * 0.4;
+        dd += drawdown(b);
 
         el.innerHTML += `
         <div class="account" onclick="openA(${i})">
@@ -250,6 +255,10 @@ function updateAccount(){
     document.getElementById("dailyp").innerText = "$" + d.toFixed(0);
     document.getElementById("weekly").innerText = "$" + (d*7).toFixed(0);
     document.getElementById("monthly").innerText = "$" + (d*30).toFixed(0);
+
+    // ✅ NEW: per-account drawdown
+    document.getElementById("accdd").innerText =
+        "$" + drawdown(b).toFixed(0);
 
     render();
 }
