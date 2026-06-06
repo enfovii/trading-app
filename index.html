@@ -112,14 +112,15 @@ button {
     box-sizing: border-box;
 }
 
+/* FIXED ADD BUTTON (NO OVERLAP EVER) */
 .addBtn {
     position: fixed;
     bottom: 18px;
     left: 12px;
     right: 12px;
+    z-index: 10;
 }
 
-/* MODALS */
 .modal {
     position: fixed;
     inset: 0;
@@ -128,6 +129,7 @@ button {
     justify-content: center;
     background: rgba(0,0,0,0.6);
     padding: 16px;
+    z-index: 20;
 }
 
 .modal-content {
@@ -140,12 +142,6 @@ button {
     border-radius: 14px;
 }
 
-.big {
-    font-size: 22px;
-    font-weight: 700;
-}
-
-/* RED DELETE */
 .danger {
     background: #ff5c7a !important;
 }
@@ -238,7 +234,7 @@ button {
     </div>
 </div>
 
-<!-- DELETE CONFIRM MODAL -->
+<!-- DELETE MODAL -->
 <div class="modal" id="deleteModal">
     <div class="modal-content">
 
@@ -290,10 +286,19 @@ function mult(b){
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-/* NAV */
+/* NAV FIX — THIS IS THE IMPORTANT FIX */
 function show(page){
-    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+
+    document.querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
     document.getElementById(page).classList.add("active");
+
+    const addBtn = document.querySelector(".addBtn");
+
+    if(addBtn){
+        addBtn.style.display = (page === "home") ? "block" : "none";
+    }
 }
 
 /* RENDER */
@@ -385,7 +390,7 @@ function createAccount(){
     render();
 }
 
-/* DELETE FLOW */
+/* DELETE */
 function confirmDelete(){
     document.getElementById("deleteModal").style.display="flex";
 }
