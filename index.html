@@ -69,12 +69,7 @@ input {
 
 <div id="home">
 
-<div class="card">
-<button onclick="showAdd()">➕ Add New Account</button>
-</div>
-
-<div id="accounts"></div>
-
+<!-- MOVED TO TOP -->
 <div class="card">
 <div>Total Portfolio Balance</div>
 <div id="totalBalance" class="big lime">$0</div>
@@ -82,6 +77,12 @@ input {
 <div class="small">Total Daily Profit: $<span id="totalDaily">0</span></div>
 <div class="small">Total Weekly Profit: $<span id="totalWeekly">0</span></div>
 </div>
+
+<div class="card">
+<button onclick="showAdd()">➕ Add New Account</button>
+</div>
+
+<div id="accounts"></div>
 
 </div>
 
@@ -155,7 +156,7 @@ function save(){
 
 function getMultiplier(b) {
 
-    if (b < 90000) return b / 30000;   // 30k per 1x
+    if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
@@ -163,7 +164,6 @@ function getMultiplier(b) {
     return 5;
 }
 
-/* FIXED PROFIT (ONLY CORRECTION) */
 function getProfit(mult){
     return {
         dailyMin: mult * 800,
