@@ -41,14 +41,12 @@ h2 {
 .page { display:none; }
 .active { display:block; }
 
-/* HOME LAYOUT */
 .topbar {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-/* BIG PORTFOLIO BOX */
 .portfolioBox {
     background: rgba(17,24,35,0.55);
     border: 1px solid rgba(120,170,255,0.18);
@@ -59,14 +57,12 @@ h2 {
     cursor: pointer;
 }
 
-/* 3 SMALL BOX ROW */
 .statsRow {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 8px;
 }
 
-/* STAT BOX */
 .stat {
     background: rgba(17,24,35,0.55);
     border: 1px solid rgba(120,170,255,0.18);
@@ -101,6 +97,7 @@ h2 {
 }
 
 .green { color: #2ee59d; }
+.red { color: #ff5c7a; }
 
 input {
     width: 100%;
@@ -172,13 +169,11 @@ button {
 
 <div class="topbar">
 
-    <!-- BIG PORTFOLIO -->
     <div class="portfolioBox" onclick="openPortfolio()">
         <div class="small">Portfolio</div>
         <div class="big" id="total">$0</div>
     </div>
 
-    <!-- 3 STATS ROW -->
     <div class="statsRow">
 
         <div class="stat">
@@ -229,6 +224,11 @@ button {
         <div id="p_month"></div>
     </div>
 
+    <div class="card">
+        <div class="small">Drawdown</div>
+        <div class="big red" id="p_dd"></div>
+    </div>
+
     <button onclick="backHome()">Back</button>
 </div>
 
@@ -260,6 +260,11 @@ button {
     <div class="card">
         <div class="small">Monthly</div>
         <div id="monthly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Drawdown</div>
+        <div class="big red" id="accdd"></div>
     </div>
 
     <button onclick="back()">Back</button>
@@ -318,6 +323,7 @@ function mult(b){
 }
 
 function daily(b){ return mult(b)*800; }
+function dd(b){ return b*0.4; }
 
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
@@ -333,18 +339,20 @@ function openPortfolio(){
 
 function renderPortfolio(){
 
-    let t=0,d=0;
+    let t=0,d=0,draw=0;
 
     accounts.forEach(a=>{
         let b=num(a.balance);
         t+=b;
         d+=daily(b);
+        draw+=dd(b);
     });
 
     document.getElementById("p_total").innerText = money(t.toFixed(0));
     document.getElementById("p_daily").innerText = money(d.toFixed(0));
     document.getElementById("p_week").innerText = money((d*7).toFixed(0));
     document.getElementById("p_month").innerText = money((d*30).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
 /* HOME */
@@ -353,12 +361,13 @@ function render(){
     let el=document.getElementById("accounts");
     el.innerHTML="";
 
-    let t=0,d=0;
+    let t=0,d=0,draw=0;
 
     accounts.forEach((a,i)=>{
         let b=num(a.balance);
         t+=b;
         d+=daily(b);
+        draw+=dd(b);
 
         el.innerHTML+=`
         <div class="account" onclick="openAccount(${i})">
@@ -396,6 +405,7 @@ function updateAccount(){
     document.getElementById("dailyP").innerText=money(daily(b));
     document.getElementById("weekly").innerText=money(daily(b)*7);
     document.getElementById("monthly").innerText=money(daily(b)*30);
+    document.getElementById("accdd").innerText=money(dd(b));
 
     render();
 }
