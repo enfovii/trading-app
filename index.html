@@ -7,80 +7,126 @@
 <style>
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-    background: radial-gradient(circle at top, #0f1b33, #070b14);
-    color: #e6eaf2;
+    background: #0b0f14;
+    color: #e8ecf3;
     margin: 0;
     padding: 18px;
 }
 
-h2 { font-size: 22px; font-weight: 800; }
-
-.card {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.08);
-    backdrop-filter: blur(14px);
-    padding: 16px;
-    margin-top: 12px;
-    border-radius: 18px;
-    overflow: hidden;
+/* HEADER TEXT */
+h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+    color: #e8ecf3;
 }
 
+/* CARDS */
+.card {
+    background: #111823;
+    border: 1px solid #1e2a3a;
+    padding: 16px;
+    margin-top: 12px;
+    border-radius: 14px;
+}
+
+/* BUTTONS */
 button {
     width: 100%;
     padding: 14px;
     margin-top: 10px;
-    background: linear-gradient(135deg, #2f81f7, #22c55e);
+    background: #1f6feb;
     color: white;
     border: none;
-    border-radius: 14px;
+    border-radius: 12px;
     font-weight: 600;
+    font-size: 14px;
 }
 
+button:hover {
+    background: #2b7cff;
+}
+
+/* INPUT */
 input {
     width: 100%;
     padding: 14px;
-    border-radius: 14px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    border: 1px solid #263445;
     margin-top: 8px;
-    background: rgba(255,255,255,0.04);
-    color: white;
+    background: #0f1622;
+    color: #e8ecf3;
+    outline: none;
 }
 
-.big { font-size: 26px; font-weight: 800; }
-.lime { color: #22c55e; }
-.red { color: #ff4d4d; }
-.small { font-size: 12px; color: rgba(230,234,242,0.6); }
+/* TEXT STYLES */
+.big {
+    font-size: 26px;
+    font-weight: 700;
+}
 
-.hidden { display:none; }
+.small {
+    font-size: 12px;
+    color: #93a4b8;
+}
 
+.lime {
+    color: #22c55e;
+}
+
+.red {
+    color: #ef4444;
+}
+
+.hidden {
+    display: none;
+}
+
+/* ACCOUNT CARDS */
 .account {
     padding: 14px;
-    background: rgba(255,255,255,0.03);
+    background: #111823;
     margin-top: 12px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    border: 1px solid #1e2a3a;
     cursor: pointer;
+    transition: 0.15s ease;
 }
+
+.account:hover {
+    border-color: #2a3b52;
+    transform: translateY(-1px);
+}
+
+/* TOP SUMMARY */
+.summary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+    font-size: 13px;
+    color: #93a4b8;
+}
+
 </style>
 </head>
 
 <body>
 
-<h2>📊 Trading Dashboard</h2>
-
-<div class="card">
-<button onclick="showHome()">🏠 Accounts</button>
-</div>
+<h2>Trading Dashboard</h2>
 
 <!-- HOME -->
 <div id="home">
 
 <div class="card">
 <div>Total Portfolio Balance</div>
-<div id="totalBalance" class="big lime">$0</div>
-<div class="small">Daily Profit: $<span id="totalDaily">0</span></div>
-<div class="small">Weekly Profit: $<span id="totalWeekly">0</span></div>
-<div class="small red">Max Drawdown: $<span id="totalDD">0</span></div>
+<div id="totalBalance" class="big">$0</div>
+
+<div class="summary">
+<div>Daily Profit: <span class="lime">$<span id="totalDaily">0</span></span></div>
+<div>Weekly Profit: <span class="lime">$<span id="totalWeekly">0</span></span></div>
+<div>Max Drawdown: <span class="red">$<span id="totalDD">0</span></span></div>
+</div>
 </div>
 
 <div id="accounts"></div>
@@ -165,7 +211,6 @@ function renderHome(){
 
         let daily = mult * 800;
         let weekly = daily * 7;
-        let monthly = daily * 30;
 
         total += b;
         totalDaily += daily;
@@ -177,7 +222,7 @@ function renderHome(){
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
                 <span class="small">${mult.toFixed(2)}x</span><br>
-                <span class="small lime">Daily: $${daily.toFixed(0)} • Weekly: $${weekly.toFixed(0)} • Monthly: $${monthly.toFixed(0)}</span>
+                <span class="small">Daily $${daily.toFixed(0)} • Weekly $${weekly.toFixed(0)}</span>
             </div>
         `;
     });
