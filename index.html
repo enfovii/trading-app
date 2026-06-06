@@ -20,7 +20,6 @@ h2 {
     margin-bottom: 16px;
 }
 
-/* CARD */
 .card {
     background: rgba(255,255,255,0.05);
     border: 1px solid rgba(255,255,255,0.08);
@@ -30,7 +29,6 @@ h2 {
     border-radius: 18px;
 }
 
-/* BUTTON */
 button {
     width: 100%;
     padding: 14px;
@@ -42,7 +40,6 @@ button {
     font-weight: 600;
 }
 
-/* INPUT */
 input {
     width: 100%;
     padding: 14px;
@@ -54,13 +51,11 @@ input {
     color: white;
 }
 
-/* TEXT */
 .big { font-size: 26px; font-weight: 800; }
 .lime { color: #22c55e; }
 .red { color: #ff4d4d; }
 .small { font-size: 12px; color: rgba(230,234,242,0.6); }
 
-/* ACCOUNT */
 .account {
     padding: 14px;
     background: rgba(255,255,255,0.03);
@@ -72,7 +67,7 @@ input {
 
 .hidden { display:none; }
 
-/* PROGRESS BAR */
+/* PROGRESS */
 .progress-wrap {
     margin-top: 10px;
     background: rgba(255,255,255,0.08);
@@ -85,7 +80,7 @@ input {
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, #2f81f7, #22c55e);
-    transition: 0.3s ease;
+    transition: width 0.5s ease;
 }
 </style>
 </head>
@@ -94,7 +89,6 @@ input {
 
 <h2>📊 Trading Dashboard</h2>
 
-<!-- HOME -->
 <div id="home">
 
 <div class="card">
@@ -113,7 +107,6 @@ input {
 
 </div>
 
-<!-- ADD -->
 <div id="addScreen" class="hidden">
 <div class="card">
 <h3>Add Account</h3>
@@ -124,15 +117,15 @@ input {
 </div>
 </div>
 
-<!-- DETAIL -->
 <div id="detail" class="hidden">
 <div class="card">
 <h3 id="accName"></h3>
 
 <input id="editBalance" oninput="updateAccount()">
 
-<!-- PROGRESS BAR (ONLY DETAIL PAGE) -->
 <div class="small">Progress to next X tier</div>
+<div class="small" id="tierLabel">-</div>
+
 <div class="progress-wrap">
     <div id="progressBar" class="progress-bar"></div>
 </div>
@@ -173,7 +166,6 @@ input {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let currentIndex = null;
 
-/* SETTINGS */
 const MIN_PER_X = 800;
 const MAX_PER_X = 1000;
 const DD_RATE = 0.40;
@@ -183,7 +175,7 @@ function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* MULTIPLIER SYSTEM (FIXED TIERS) */
+/* MULTIPLIER */
 function getMultiplier(b) {
     if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
@@ -191,25 +183,19 @@ function getMultiplier(b) {
     return 4 + ((b - 160000) / 40000);
 }
 
-/* NEXT TIER LOGIC */
-function getNextTier(b) {
-    if (b < 90000) return 90000;
-    if (b < 140000) return 140000;
-    if (b < 160000) return 160000;
-    return null;
+/* TIERS */
+function getTierRange(b) {
+    if (b < 90000) return { prev: 0, next: 90000 };
+    if (b < 140000) return { prev: 90000, next: 140000 };
+    if (b < 160000) return { prev: 140000, next: 160000 };
+    return { prev: 160000, next: b + 40000 };
 }
 
-/* PROGRESS % */
+/* PROGRESS */
 function getProgress(b) {
-    let next = getNextTier(b);
-    if (!next) return 100;
-
-    let prev =
-        next === 90000 ? 0 :
-        next === 140000 ? 90000 :
-        next === 160000 ? 140000 : 160000;
-
-    return Math.min(100, ((b - prev) / (next - prev)) * 100);
+    let { prev, next } = getTierRange(b);
+    let p = ((b - prev) / (next - prev)) * 100;
+    return Math.max(0, Math.min(100, p));
 }
 
 /* PROFIT */
@@ -220,7 +206,7 @@ function getProfit(mult){
     };
 }
 
-/* DRAW DOWN */
+/* DD */
 function getDD(b){
     return b * DD_RATE;
 }
@@ -326,9 +312,16 @@ function updateAccount(){
     document.getElementById("dd").innerText =
         "$" + dd.toFixed(0);
 
-    /* PROGRESS BAR */
-    document.getElementById("progressBar").style.width =
-        getProgress(b) + "%";
+    /* TIER LABEL */
+    let {prev, next} = getTierRange(b);
+    document.getElementById("tierLabel").innerText =
+        `$${prev.toLocaleString()} → $${next.toLocaleString()}`;
+
+    /* SMOOTH PROGRESS BAR */
+    let p = getProgress(b);
+    requestAnimationFrame(() => {
+        document.getElementById("progressBar").style.width = p + "%";
+    });
 }
 
 /* DELETE */
