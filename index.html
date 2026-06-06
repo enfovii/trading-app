@@ -24,36 +24,6 @@ h2 { font-size: 22px; font-weight: 800; }
     border-radius: 18px;
 }
 
-/* NAV (UNCHANGED DESIGN) */
-.navBar {
-    position: relative;
-    display: flex;
-    gap: 10px;
-    padding: 6px;
-}
-
-.navBar button {
-    flex: 1;
-    padding: 12px;
-    border: none;
-    border-radius: 12px;
-    background: transparent;
-    color: #e6eaf2;
-    font-weight: 600;
-}
-
-.navIndicator {
-    position: absolute;
-    bottom: 6px;
-    left: 6px;
-    width: calc(50% - 6px);
-    height: calc(100% - 12px);
-    background: rgba(47,129,247,0.25);
-    border: 1px solid rgba(47,129,247,0.5);
-    border-radius: 12px;
-    transition: transform 0.25s ease;
-}
-
 button {
     width: 100%;
     padding: 14px;
@@ -99,6 +69,35 @@ input {
     text-align:center;
     cursor:pointer;
 }
+
+/* NAV (UNCHANGED) */
+.navBar {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    padding: 6px;
+}
+
+.navBar button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: #e6eaf2;
+    font-weight: 600;
+}
+
+.navIndicator {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    width: calc(50% - 6px);
+    height: calc(100% - 12px);
+    background: rgba(47,129,247,0.25);
+    border-radius: 12px;
+    transition: transform 0.25s ease;
+}
 </style>
 </head>
 
@@ -141,40 +140,40 @@ input {
 
 <div class="card">
 <div>Daily Profit</div>
-<div id="daily" class="big lime"></div>
+<div id="daily"></div>
 </div>
 
 <div class="card">
 <div>Weekly Profit</div>
-<div id="weekly" class="big lime"></div>
+<div id="weekly"></div>
 </div>
 
 <div class="card">
 <div>Monthly Profit</div>
-<div id="monthly" class="big lime"></div>
+<div id="monthly"></div>
 </div>
 
 <div class="card">
 <div>Next Tier</div>
-<div id="nextTier" class="big"></div>
+<div id="nextTier"></div>
 </div>
 
 <button onclick="back()">Back</button>
 
 </div>
 
-<!-- JOURNAL -->
+<!-- JOURNAL (REBUILT) -->
 <div id="journal" class="hidden">
 
 <div class="card">
 <h3>📅 Journal</h3>
 
-<div style="display:flex;justify-content:space-between;">
-<button style="width:48%" onclick="changeMonth(-1)">⬅ Prev</button>
-<button style="width:48%" onclick="changeMonth(1)">Next ➡</button>
+<div style="display:flex;gap:10px;">
+<button style="flex:1" onclick="changeMonth(-1)">⬅ Prev</button>
+<button style="flex:1" onclick="changeMonth(1)">Next ➡</button>
 </div>
 
-<div class="big" style="text-align:center;margin-top:10px;" id="monthLabel"></div>
+<div class="big" id="monthLabel" style="text-align:center;margin-top:10px;"></div>
 
 <div class="card">
 <div>Monthly P/L</div>
@@ -182,12 +181,13 @@ input {
 </div>
 
 <div id="calendar"></div>
+
 </div>
 
 <div class="card">
 <h3>Selected Day</h3>
-<div id="selectedDay" class="big">-</div>
-<input id="dayProfit" placeholder="Enter profit for day">
+<div id="selectedDay">None</div>
+<input id="dayProfit" placeholder="Enter profit">
 <button onclick="saveDay()">Save</button>
 </div>
 
@@ -201,15 +201,6 @@ let journal = JSON.parse(localStorage.getItem("journal") || "{}");
 let viewDate = new Date();
 let selectedDate = null;
 let currentIndex = null;
-
-/* SAVE */
-function save(){
-    localStorage.setItem("accounts", JSON.stringify(accounts));
-}
-
-function saveJournal(){
-    localStorage.setItem("journal", JSON.stringify(journal));
-}
 
 /* NAV */
 function showHome(){
@@ -229,9 +220,7 @@ function showJournal(){
 
     document.getElementById("navIndicator").style.transform = "translateX(100%)";
 
-    requestAnimationFrame(() => {
-        renderCalendar();
-    });
+    renderCalendar();
 }
 
 /* MULTIPLIER */
@@ -286,7 +275,7 @@ function renderHome(){
             <div class="account" onclick="openAccount(${i})">
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
-                <span class="small">${mult.toFixed(2)}x • $${(mult*800).toFixed(0)}/day</span>
+                <span class="small">${mult.toFixed(2)}x</span>
             </div>
         `;
     });
@@ -296,7 +285,7 @@ function renderHome(){
     document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
 }
 
-/* DETAIL FIX RESTORED */
+/* DETAIL */
 function openAccount(i){
     currentIndex = i;
 
@@ -317,14 +306,14 @@ function updateAccount(){
     let b = parseFloat(document.getElementById("editBalance").value);
     accounts[currentIndex].balance = b;
 
-    save();
+    localStorage.setItem("accounts", JSON.stringify(accounts));
 
     let mult = getMultiplier(b);
 
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
 
     document.getElementById("daily").innerText =
-        "$" + (mult*800).toFixed(0) + " - $" + (mult*1000).toFixed(0);
+        "$" + (mult*800).toFixed(0);
 
     document.getElementById("weekly").innerText =
         "$" + (mult*800*7).toFixed(0);
@@ -336,7 +325,7 @@ function updateAccount(){
         getNextTier(b);
 }
 
-/* JOURNAL */
+/* JOURNAL (FULL WORKING REBUILD) */
 function changeMonth(dir){
     viewDate.setMonth(viewDate.getMonth() + dir);
     renderCalendar();
@@ -344,33 +333,6 @@ function changeMonth(dir){
 
 function isWeekend(d){
     return d.getDay() === 0 || d.getDay() === 6;
-}
-
-function getMonthlyTotal(year, month){
-
-    let total = 0;
-
-    for(let d=1; d<=31; d++){
-
-        let date = new Date(year, month, d);
-        if(date.getMonth() !== month) break;
-
-        if(isWeekend(date)) continue;
-
-        let key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-
-        if(journal[key]){
-            total += parseFloat(journal[key]);
-        }
-    }
-
-    return total;
-}
-
-function getColor(v){
-    if(!v) return "rgba(255,255,255,0.04)";
-    if(v > 0) return "rgba(34,197,94,0.3)";
-    return "rgba(255,77,77,0.3)";
 }
 
 function renderCalendar(){
@@ -381,10 +343,8 @@ function renderCalendar(){
     document.getElementById("monthLabel").innerText =
         viewDate.toLocaleString('default', { month:'long', year:'numeric' });
 
-    document.getElementById("monthlyPL").innerText =
-        "$" + getMonthlyTotal(year, month).toFixed(2);
-
-    let cal = "";
+    let total = 0;
+    let html = "";
 
     for(let d=1; d<=31; d++){
 
@@ -395,16 +355,24 @@ function renderCalendar(){
         let key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         let val = journal[key] || 0;
 
-        cal += `
-        <div class="dayBox"
-            style="background:${getColor(val)}"
-            onclick="selectDay('${key}')">
-            ${d}<br>
+        total += parseFloat(val);
+
+        let bg = val > 0
+            ? "rgba(34,197,94,0.25)"
+            : val < 0
+                ? "rgba(255,77,77,0.25)"
+                : "rgba(255,255,255,0.05)";
+
+        html += `
+        <div onclick="selectDay('${key}')"
+            style="display:inline-block;width:30%;margin:1%;padding:14px;border-radius:12px;background:${bg};text-align:center;">
+            <b>${d}</b><br>
             <span class="small">$${val}</span>
         </div>`;
     }
 
-    document.getElementById("calendar").innerHTML = cal;
+    document.getElementById("calendar").innerHTML = html;
+    document.getElementById("monthlyPL").innerText = "$" + total.toFixed(2);
 }
 
 function selectDay(key){
@@ -415,17 +383,16 @@ function selectDay(key){
 
 function saveDay(){
     if(!selectedDate) return;
-    journal[selectedDate] = parseFloat(document.getElementById("dayProfit").value) || 0;
-    saveJournal();
+
+    journal[selectedDate] =
+        parseFloat(document.getElementById("dayProfit").value) || 0;
+
+    localStorage.setItem("journal", JSON.stringify(journal));
     renderCalendar();
 }
 
-function back(){
-    showHome();
-}
-
-renderHome();
-updateNav("home");
+/* INIT */
+showHome();
 
 </script>
 
