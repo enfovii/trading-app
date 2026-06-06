@@ -350,8 +350,11 @@ function renderPortfolio(){
 
     document.getElementById("p_total").innerText = money(t.toFixed(0));
     document.getElementById("p_daily").innerText = money(d.toFixed(0));
-    document.getElementById("p_week").innerText = money((d*7).toFixed(0));
-    document.getElementById("p_month").innerText = money((d*30).toFixed(0));
+
+    // FIXED TO 5 DAY WEEK + 22 DAY MONTH
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+
     document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
@@ -379,8 +382,10 @@ function render(){
 
     document.getElementById("total").innerText=money(t.toFixed(0));
     document.getElementById("daily").innerText=money(d.toFixed(0));
-    document.getElementById("weeklyHome").innerText=money((d*7).toFixed(0));
-    document.getElementById("monthlyHome").innerText=money((d*30).toFixed(0));
+
+    // FIXED TO 5 DAY WEEK + 22 DAY MONTH
+    document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
+    document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
 }
 
 /* ACCOUNT */
@@ -402,8 +407,11 @@ function updateAccount(){
 
     document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
     document.getElementById("dailyP").innerText=money(daily(b));
-    document.getElementById("weekly").innerText=money(daily(b)*7);
-    document.getElementById("monthly").innerText=money(daily(b)*30);
+
+    // FIXED TO 5 DAY WEEK + 22 DAY MONTH
+    document.getElementById("weekly").innerText=money(daily(b)*5);
+    document.getElementById("monthly").innerText=money(daily(b)*22);
+
     document.getElementById("accdd").innerText=money(dd(b));
 
     render();
