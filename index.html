@@ -150,17 +150,12 @@ function save(){
 }
 
 /* =========================
-   YOUR FULL SYSTEM LOGIC
+   YOUR EXACT LOGIC (UNCHANGED)
    ========================= */
 
 function getMultiplier(b) {
 
-    // 0 - 90k: smooth scaling (30k = 1x)
-    if (b < 90000) {
-        return b / 30000;
-    }
-
-    // locked tiers
+    if (b < 90000) return b / 30000;   // 30k per 1x
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
@@ -168,13 +163,11 @@ function getMultiplier(b) {
     return 5;
 }
 
-function getProfit(mult, balance){
-
-    let perX = balance < 90000 ? 30000 : 40000;
-
+/* FIXED PROFIT (ONLY CORRECTION) */
+function getProfit(mult){
     return {
-        dailyMin: mult * perX * 0.8,
-        dailyMax: mult * perX
+        dailyMin: mult * 800,
+        dailyMax: mult * 1000
     };
 }
 
@@ -209,7 +202,7 @@ function renderHome(){
 
         let b = a.balance;
         let mult = getMultiplier(b);
-        let profit = getProfit(mult, b);
+        let profit = getProfit(mult);
 
         total += b;
         totalDaily += profit.dailyMin;
@@ -278,7 +271,7 @@ function updateAccount(){
     save();
 
     let mult = getMultiplier(b);
-    let profit = getProfit(mult, b);
+    let profit = getProfit(mult);
     let dd = getDD(b);
 
     document.getElementById("mult").innerText =
