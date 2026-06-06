@@ -58,6 +58,7 @@ h2 {
     padding: 12px;
     border-radius: 14px;
     text-align: center;
+    cursor: pointer;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -112,7 +113,6 @@ button {
     box-sizing: border-box;
 }
 
-/* FIXED ADD BUTTON (NO OVERLAP EVER) */
 .addBtn {
     position: fixed;
     bottom: 18px;
@@ -158,7 +158,7 @@ button {
 <div id="home" class="page active">
 
 <div class="topbar">
-    <div class="stat">
+    <div class="stat" onclick="openPortfolio()">
         <div class="small">Portfolio</div>
         <div class="big" id="total">$0</div>
     </div>
@@ -175,7 +175,40 @@ button {
 </div>
 
 <div id="accounts"></div>
+</div>
 
+<!-- PORTFOLIO PAGE -->
+<div id="portfolio" class="page">
+    <div class="card">
+        <h3>Portfolio Overview</h3>
+
+        <div class="card">
+            <div class="small">Total Balance</div>
+            <div class="big" id="p_total"></div>
+        </div>
+
+        <div class="card">
+            <div class="small">Daily Profit</div>
+            <div class="big green" id="p_daily"></div>
+        </div>
+
+        <div class="card">
+            <div class="small">Weekly</div>
+            <div id="p_weekly"></div>
+        </div>
+
+        <div class="card">
+            <div class="small">Monthly</div>
+            <div id="p_monthly"></div>
+        </div>
+
+        <div class="card">
+            <div class="small">Drawdown</div>
+            <div class="big red" id="p_dd"></div>
+        </div>
+
+        <button onclick="backHome()">Back</button>
+    </div>
 </div>
 
 <!-- ACCOUNT -->
@@ -220,30 +253,23 @@ button {
 <!-- ADD BUTTON -->
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
 
-<!-- ADD MODAL -->
+<!-- MODALS -->
 <div class="modal" id="modal">
     <div class="modal-content">
-
         <div class="big">Add Account</div>
-
         <input id="newName" placeholder="Account name">
         <input id="newBalance" placeholder="Starting balance">
-
         <button onclick="createAccount()">Create</button>
         <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
 
-<!-- DELETE MODAL -->
 <div class="modal" id="deleteModal">
     <div class="modal-content">
-
         <div class="big">Are you sure?</div>
         <div class="small">This action cannot be undone.</div>
-
         <button class="danger" onclick="deleteAccount()">Yes, Delete</button>
         <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
-
     </div>
 </div>
 
@@ -252,14 +278,11 @@ button {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* SAFE NUMBER */
 function num(v){
     if(!v) return 0;
     v = v.toString().toLowerCase().replace(/,/g,'');
-
     if(v.includes("k")) return parseFloat(v)*1000;
     if(v.includes("m")) return parseFloat(v)*1000000;
-
     let n = Number(v);
     return isNaN(n) ? 0 : n;
 }
@@ -268,40 +291,53 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* MULTIPLIER */
 function mult(b){
     b = num(b);
-
     if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
-
     let base = 5;
     base += Math.floor((b - 200000) / 20000) * 0.5;
-
     return base;
 }
 
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-/* NAV FIX — THIS IS THE IMPORTANT FIX */
 function show(page){
-
-    document.querySelectorAll(".page")
-        .forEach(p => p.classList.remove("active"));
-
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
 
     const addBtn = document.querySelector(".addBtn");
-
-    if(addBtn){
-        addBtn.style.display = (page === "home") ? "block" : "none";
-    }
+    addBtn.style.display = (page === "home") ? "block" : "none";
 }
 
-/* RENDER */
+/* PORTFOLIO */
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
+
+function renderPortfolio(){
+
+    let t=0,d=0,draw=0;
+
+    accounts.forEach(a=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+        draw+=dd(b);
+    });
+
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_weekly").innerText = money((d*7).toFixed(0));
+    document.getElementById("p_monthly").innerText = money((d*30).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+}
+
+/* HOME */
 function render(){
 
     let el=document.getElementById("accounts");
@@ -312,7 +348,6 @@ function render(){
     accounts.forEach((a,i)=>{
 
         let b=num(a.balance);
-        let m=mult(b);
 
         t+=b;
         d+=daily(b);
@@ -322,7 +357,7 @@ function render(){
         <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
             ${money(b)}<br>
-            <span class="green">${m.toFixed(2)}x</span><br>
+            <span class="green">${mult(b).toFixed(2)}x</span><br>
             <span class="small">Daily ${money(daily(b))}</span>
         </div>`;
     });
@@ -332,7 +367,7 @@ function render(){
     document.getElementById("dd").innerText=money(draw.toFixed(0));
 }
 
-/* OPEN */
+/* ACCOUNT */
 function openAccount(i){
     current=i;
     let a=accounts[i];
@@ -344,9 +379,7 @@ function openAccount(i){
     updateAccount();
 }
 
-/* UPDATE */
 function updateAccount(){
-
     if(current===null) return;
 
     let b=num(document.getElementById("balance").value);
@@ -354,30 +387,23 @@ function updateAccount(){
     accounts[current].balance=b;
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
-    let m=mult(b);
-    let d=daily(b);
-
-    document.getElementById("mult").innerText=m.toFixed(2)+"x";
-    document.getElementById("dailyP").innerText=money(d);
-    document.getElementById("weekly").innerText=money(d*7);
-    document.getElementById("monthly").innerText=money(d*30);
+    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
+    document.getElementById("dailyP").innerText=money(daily(b));
+    document.getElementById("weekly").innerText=money(daily(b)*7);
+    document.getElementById("monthly").innerText=money(daily(b)*30);
     document.getElementById("accdd").innerText=money(dd(b));
 
     render();
 }
 
-/* BACK */
-function back(){
-    current=null;
-    show("home");
-}
+/* NAV */
+function back(){ current=null; show("home"); }
+function backHome(){ show("home"); }
 
-/* ADD */
 function openModal(){ document.getElementById("modal").style.display="flex"; }
 function closeModal(){ document.getElementById("modal").style.display="none"; }
 
 function createAccount(){
-
     let name=document.getElementById("newName").value.trim();
     let balance=num(document.getElementById("newBalance").value);
 
@@ -391,13 +417,8 @@ function createAccount(){
 }
 
 /* DELETE */
-function confirmDelete(){
-    document.getElementById("deleteModal").style.display="flex";
-}
-
-function closeDeleteModal(){
-    document.getElementById("deleteModal").style.display="none";
-}
+function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
+function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
 
 function deleteAccount(){
 
@@ -407,14 +428,13 @@ function deleteAccount(){
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
     current=null;
-
     closeDeleteModal();
     show("home");
     render();
 }
 
 /* INIT */
-window.onload = function(){
+window.onload=function(){
     show("home");
     render();
 };
