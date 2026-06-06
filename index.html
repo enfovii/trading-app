@@ -190,14 +190,12 @@ function getMultiplier(b) {
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
-    // FIX: clean anchor at 200k
+    // NEW RULE: 200K = 5X BASE
     let extra = b - 200000;
 
-    if (extra <= 0) return 4;
+    let steps = Math.floor(extra / 20000);
 
-    let halfSteps = Math.floor(extra / 20000);
-
-    return 4 + (halfSteps * 0.5);
+    return 5 + (steps * 0.5);
 }
 
 /* HOME */
@@ -288,8 +286,7 @@ function getNextTier(b){
     return "$" + (200000 + steps * 20000).toLocaleString();
 }
 
-/* JOURNAL (UNCHANGED) */
-
+/* JOURNAL */
 function showJournal(){
     renderCalendar();
     document.getElementById("home").classList.add("hidden");
