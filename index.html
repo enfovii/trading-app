@@ -66,6 +66,22 @@ input {
 
 <body>
 
+<!-- 🔥 STEP 7: LOADING SCREEN -->
+<div id="loadingScreen" style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #0f0f0f;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    z-index: 9999;
+">
+    Loading accounts...
+</div>
+
 <h2>📊 Trading Accounts</h2>
 
 <!-- HOME -->
@@ -83,24 +99,10 @@ input {
 <div class="small">Total Multiplier: <span id="totalX">0x</span></div>
 </div>
 
-<!-- PORTFOLIO PROJECTIONS -->
-<div class="card">
-<div>Portfolio Projection</div>
-<div class="big" id="portfolioDaily">£0 - £0 / day</div>
-<div class="small" id="portfolioWeekly"></div>
-<div class="small" id="portfolioMonthly"></div>
-</div>
-
-<div class="card">
-<div style="color:red;">Portfolio Max Drawdown (40%)</div>
-<div id="portfolioDD" style="color:red; font-size:22px; font-weight:bold;">£0</div>
-</div>
-
 </div>
 
 <!-- ADD -->
 <div id="addScreen" class="hidden">
-
 <div class="card">
 <h3>Add Account</h3>
 <input id="name" placeholder="Account name">
@@ -108,12 +110,10 @@ input {
 <button onclick="addAccount()">Create</button>
 <button onclick="back()">Back</button>
 </div>
-
 </div>
 
 <!-- DETAIL -->
 <div id="detail" class="hidden">
-
 <div class="card">
 <h3 id="accName"></h3>
 
@@ -122,55 +122,109 @@ input {
 <div class="card">
 <div>Multiplier</div>
 <div id="mult" class="big">0x</div>
-<div id="tier" class="small"></div>
-</div>
-
-<div class="card">
-<div>Daily</div>
-<div id="daily" class="big">£0</div>
-</div>
-
-<!-- ACCOUNT PROJECTIONS -->
-<div class="card">
-<div>Projections</div>
-<div id="dailyRange" class="big">£0 - £0</div>
-<div id="weekly" class="small"></div>
-<div id="monthly" class="small"></div>
-</div>
-
-<div class="card">
-<div style="color:red;">Max Drawdown (40%)</div>
-<div id="dd" style="color:red; font-size:22px; font-weight:bold;">£0</div>
 </div>
 
 <button onclick="deleteAccount()">Delete Account</button>
 <button onclick="back()">Back</button>
-
+</div>
 </div>
 
-</div>
+---
+
+# 🔥 FIREBASE SDKs
+
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js"></script>
+
+---
+
+# 🔥 FIREBASE CONFIG
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBAwmQcJiIvNjeBYsNkdR0CIEsW882jzuY",
+  authDomain: "tradingapp-cb7fa.firebaseapp.com",
+  projectId: "tradingapp-cb7fa",
+  storageBucket: "tradingapp-cb7fa.firebasestorage.app",
+  messagingSenderId: "779849981337",
+  appId: "1:779849981337:web:c59f225be06a1b03920708"
+};
+</script>
+
+---
+
+# 🔥 INIT FIREBASE
+
+<script>
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const auth = firebase.auth();
+</script>
+
+---
+
+# 🔥 APP LOGIC (STEP 7 STABLE VERSION)
 
 <script>
 
-let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+let accounts = [];
 let currentIndex = null;
 
-// SAVE
+let userId = null;
+let isReady = false;
+
+/* -------------------------
+   AUTH
+--------------------------*/
+auth.signInAnonymously()
+    .then((userCredential) => {
+        userId = userCredential.user.uid;
+        loadAccounts();
+    })
+    .catch((error) => {
+        console.log("Auth error:", error);
+    });
+
+/* -------------------------
+   LOAD DATA
+--------------------------*/
+function loadAccounts() {
+    if (!userId) return;
+
+    db.collection("users").doc(userId).get().then(doc => {
+
+        if (doc.exists) {
+            accounts = doc.data().accounts || [];
+        } else {
+            accounts = [];
+        }
+
+        isReady = true;
+
+        document.getElementById("loadingScreen").style.display = "none";
+
+        renderHome();
+    });
+}
+
+/* -------------------------
+   SAVE DATA
+--------------------------*/
 function save() {
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    if (!userId || !isReady) return;
+
+    db.collection("users").doc(userId).set({
+        accounts: accounts
+    });
 }
 
-// MULTIPLIER
-function getMultiplier(b) {
-    if (b <= 90000) return b / 30000;
-    if (b <= 140000) return 3 + ((b - 90000) / 100000);
-    if (b <= 160000) return 3.5 + ((b - 140000) / 20000) * 0.5;
-    if (b <= 200000) return 4 + ((b - 160000) / 40000);
-    return 5;
-}
-
-// HOME RENDER (UPDATED)
+/* -------------------------
+   RENDER UI
+--------------------------*/
 function renderHome() {
+    if (!isReady) return;
 
     document.getElementById("home").classList.remove("hidden");
     document.getElementById("addScreen").classList.add("hidden");
@@ -182,9 +236,6 @@ function renderHome() {
     let totalBalance = 0;
     let totalX = 0;
 
-    let portfolioDailyMin = 0;
-    let portfolioDailyMax = 0;
-
     accounts.forEach((a, i) => {
 
         let b = a.balance;
@@ -192,12 +243,6 @@ function renderHome() {
 
         totalBalance += b;
         totalX += mult;
-
-        let dailyMin = mult * 800;
-        let dailyMax = mult * 1000;
-
-        portfolioDailyMin += dailyMin;
-        portfolioDailyMax += dailyMax;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
@@ -208,41 +253,30 @@ function renderHome() {
         `;
     });
 
-    let portfolioWeeklyMin = portfolioDailyMin * 7;
-    let portfolioWeeklyMax = portfolioDailyMax * 7;
-
-    let portfolioMonthlyMin = portfolioDailyMin * 30;
-    let portfolioMonthlyMax = portfolioDailyMax * 30;
-
-    let portfolioDD = totalBalance * 0.4;
-
-    document.getElementById("totalBalance").innerText =
-        "£" + totalBalance.toLocaleString();
-
-    document.getElementById("totalX").innerText =
-        totalX.toFixed(2) + "x";
-
-    document.getElementById("portfolioDaily").innerText =
-        "£" + portfolioDailyMin.toFixed(0) + " - £" + portfolioDailyMax.toFixed(0) + " / day";
-
-    document.getElementById("portfolioWeekly").innerText =
-        "Weekly: £" + portfolioWeeklyMin.toFixed(0) + " - £" + portfolioWeeklyMax.toFixed(0);
-
-    document.getElementById("portfolioMonthly").innerText =
-        "Monthly: £" + portfolioMonthlyMin.toFixed(0) + " - £" + portfolioMonthlyMax.toFixed(0);
-
-    document.getElementById("portfolioDD").innerText =
-        "£" + portfolioDD.toFixed(0);
+    document.getElementById("totalBalance").innerText = "£" + totalBalance.toLocaleString();
+    document.getElementById("totalX").innerText = totalX.toFixed(2) + "x";
 }
 
-// ADD
+/* -------------------------
+   MULTIPLIER
+--------------------------*/
+function getMultiplier(b) {
+    if (b <= 90000) return b / 30000;
+    if (b <= 140000) return 3 + ((b - 90000) / 100000);
+    if (b <= 160000) return 3.5 + ((b - 140000) / 20000) * 0.5;
+    if (b <= 200000) return 4 + ((b - 160000) / 40000);
+    return 5;
+}
+
+/* -------------------------
+   ADD
+--------------------------*/
 function showAdd() {
     document.getElementById("home").classList.add("hidden");
     document.getElementById("addScreen").classList.remove("hidden");
 }
 
 function addAccount() {
-
     let name = document.getElementById("name").value;
     let input = document.getElementById("balance").value.toLowerCase().trim();
 
@@ -254,17 +288,16 @@ function addAccount() {
         b = parseFloat(input);
     }
 
-    if (!name || isNaN(b)) return;
-
     accounts.push({ name, balance: b });
 
     save();
     renderHome();
 }
 
-// OPEN
+/* -------------------------
+   OPEN
+--------------------------*/
 function openAccount(i) {
-
     currentIndex = i;
 
     document.getElementById("home").classList.add("hidden");
@@ -278,62 +311,36 @@ function openAccount(i) {
     updateAccount();
 }
 
-// UPDATE ACCOUNT (FIXED)
+/* -------------------------
+   UPDATE
+--------------------------*/
 function updateAccount() {
-
     let input = document.getElementById("editBalance").value;
     let b = parseFloat(input);
 
-    if (isNaN(b)) return;
-
     accounts[currentIndex].balance = b;
+
     save();
 
     let mult = getMultiplier(b);
-
-    let dailyMin = mult * 800;
-    let dailyMax = mult * 1000;
-
-    let weeklyMin = dailyMin * 7;
-    let weeklyMax = dailyMax * 7;
-
-    let monthlyMin = dailyMin * 30;
-    let monthlyMax = dailyMax * 30;
-
-    let dd = b * 0.4;
-
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
-
-    document.getElementById("daily").innerText =
-        "£" + dailyMax.toFixed(0);
-
-    document.getElementById("dailyRange").innerText =
-        "£" + dailyMin.toFixed(0) + " - £" + dailyMax.toFixed(0);
-
-    document.getElementById("weekly").innerText =
-        "Weekly: £" + weeklyMin.toFixed(0) + " - £" + weeklyMax.toFixed(0);
-
-    document.getElementById("monthly").innerText =
-        "Monthly: £" + monthlyMin.toFixed(0) + " - £" + monthlyMax.toFixed(0);
-
-    document.getElementById("dd").innerText =
-        "£" + dd.toFixed(0);
 }
 
-// DELETE
+/* -------------------------
+   DELETE
+--------------------------*/
 function deleteAccount() {
     accounts.splice(currentIndex, 1);
     save();
     renderHome();
 }
 
-// BACK
+/* -------------------------
+   BACK
+--------------------------*/
 function back() {
     renderHome();
 }
-
-// INIT
-renderHome();
 
 </script>
 
