@@ -3,7 +3,6 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trading Dashboard</title>
-
 <style>
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
@@ -12,14 +11,12 @@ body {
     margin: 0;
     padding: 0;
 }
-
 /* HEADER */
 .header {
     padding: 18px;
     font-size: 20px;
     font-weight: 800;
 }
-
 /* NAV */
 .nav {
     position: fixed;
@@ -27,10 +24,10 @@ body {
     left: 0;
     right: 0;
     display: flex;
-    background: rgba(20,20,30,0.9);
+    background: rgba(20,20,30,0.95);
     border-top: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
 }
-
 .nav button {
     flex: 1;
     padding: 14px;
@@ -39,39 +36,35 @@ body {
     color: #E8ECF3;
     font-weight: 600;
 }
-
-/* CONTAINERS */
+/* PAGES */
 .page {
     display: none;
     padding: 16px;
-    padding-bottom: 80px;
+    padding-bottom: 90px;
 }
-
 .active {
     display: block;
 }
-
 /* CARD */
 .card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 14px;
     margin-top: 12px;
+    backdrop-filter: blur(12px);
 }
-
 /* BUTTON */
 button {
     width: 100%;
-    padding: 12px;
+    padding: 13px;
     border-radius: 12px;
     border: none;
-    background: #3B82F6;
+    background: #2563EB;
     color: white;
-    font-weight: 600;
+    font-weight: 700;
     margin-top: 10px;
 }
-
 /* INPUT */
 input {
     width: 100%;
@@ -81,194 +74,316 @@ input {
     background: rgba(255,255,255,0.03);
     color: white;
     margin-top: 8px;
+    box-sizing: border-box;
 }
-
 /* TEXT */
-.small { font-size: 12px; opacity: 0.7; }
-.big { font-size: 24px; font-weight: 800; }
-.green { color: #22C55E; }
-.red { color: #EF4444; }
-
-/* HISTORY ITEM */
-.history-item {
-    padding: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+.small {
+    font-size: 12px;
+    opacity: 0.7;
+}
+.big {
+    font-size: 28px;
+    font-weight: 800;
+}
+.green {
+    color: #22C55E;
+}
+.red {
+    color: #EF4444;
 }
 </style>
 </head>
-
 <body>
-
 <div class="header">📊 Trading Dashboard</div>
-
 <!-- HOME -->
 <div id="home" class="page active">
-
 <div class="card">
-<div>Total Balance</div>
-<div class="big green" id="totalBalance">$0</div>
-
-<div class="small">Daily: $<span id="totalDaily">0</span></div>
-<div class="small">Weekly: $<span id="totalWeekly">0</span></div>
+    <div>Total Balance</div>
+    <div class="big green" id="totalBalance">$0</div>
+    <div class="small">
+        Daily: $<span id="totalDaily">0</span>
+    </div>
+    <div class="small">
+        Weekly: $<span id="totalWeekly">0</span>
+    </div>
 </div>
-
 <div id="accounts"></div>
-
 </div>
-
+<!-- ACCOUNT PAGE -->
+<div id="accountPage" class="page">
+<div class="card">
+    <h3 id="accountTitle">Account</h3>
+    <div class="small">Current Balance</div>
+    <div class="big" id="accountBalance">$0</div>
+    <input
+        id="editBalance"
+        placeholder="New balance (e.g. 35k)"
+    >
+    <button onclick="updateBalance()">
+        Save Balance
+    </button>
+    <button
+        onclick="deleteAccount()"
+        style="background:#EF4444;">
+        Delete Account
+    </button>
+</div>
+</div>
 <!-- ADD -->
 <div id="add" class="page">
-
 <div class="card">
-<h3>Add Account</h3>
-<input id="name" placeholder="Account name">
-<input id="balance" placeholder="Balance (e.g. 20k)">
-<button onclick="addAccount()">Create</button>
+    <h3>Add Account</h3>
+    <input
+        id="name"
+        placeholder="Account name"
+    >
+    <input
+        id="balance"
+        placeholder="Balance (e.g. 20k)"
+    >
+    <button onclick="addAccount()">
+        Create
+    </button>
 </div>
-
 </div>
-
 <!-- HISTORY -->
 <div id="history" class="page">
-
 <div class="card">
-<h3>📈 Trading Journal</h3>
-
-<input id="logText" placeholder="Profit note (e.g. +$250 trade day)">
-<button onclick="addHistory()">Add Entry</button>
+    <h3>📈 Trading Journal</h3>
+    <input
+        id="logText"
+        placeholder="Profit note (e.g. +$250 trade day)"
+    >
+    <button onclick="addHistory()">
+        Add Entry
+    </button>
 </div>
-
 <div id="historyList"></div>
-
 </div>
-
 <!-- NAV -->
 <div class="nav">
-<button onclick="showPage('home')">Home</button>
-<button onclick="showPage('history')">History</button>
-<button onclick="showPage('add')">Add</button>
+    <button onclick="showPage('home')">
+        Home
+    </button>
+    <button onclick="showPage('history')">
+        History
+    </button>
+    <button onclick="showPage('add')">
+        Add
+    </button>
 </div>
-
 <script>
-
-let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-let history = JSON.parse(localStorage.getItem("history") || "[]");
-
+let accounts =
+    JSON.parse(localStorage.getItem("accounts") || "[]");
+let history =
+    JSON.parse(localStorage.getItem("history") || "[]");
+let selectedAccount = null;
 function save(){
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    localStorage.setItem(
+        "accounts",
+        JSON.stringify(accounts)
+    );
 }
-
 function saveHistory(){
-    localStorage.setItem("history", JSON.stringify(history));
+    localStorage.setItem(
+        "history",
+        JSON.stringify(history)
+    );
 }
-
-/* YOUR SYSTEM */
+/* YOUR X SYSTEM */
 function getMultiplier(b){
-    if (b < 90000) return b / 30000;
-    if (b < 140000) return 3;
-    if (b < 160000) return 3.5;
-    if (b < 200000) return 4;
+    if (b < 90000)
+        return b / 30000;
+    if (b < 140000)
+        return 3;
+    if (b < 160000)
+        return 3.5;
+    if (b < 200000)
+        return 4;
     return 5;
 }
-
 function getProfit(mult){
     return {
         dailyMin: mult * 800,
         dailyMax: mult * 1000
     };
 }
-
-/* NAVIGATION */
+/* PAGE NAVIGATION */
 function showPage(page){
-
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(page).classList.add("active");
-
-    if(page === "home") renderHome();
-    if(page === "history") renderHistory();
+    document
+        .querySelectorAll(".page")
+        .forEach(p =>
+            p.classList.remove("active")
+        );
+    document
+        .getElementById(page)
+        .classList.add("active");
+    if(page === "home")
+        renderHome();
+    if(page === "history")
+        renderHistory();
 }
-
 /* HOME */
 function renderHome(){
-
-    let container = document.getElementById("accounts");
+    let container =
+        document.getElementById("accounts");
     container.innerHTML = "";
-
     let total = 0;
     let daily = 0;
     let weekly = 0;
-
-    accounts.forEach(a=>{
-
+    accounts.forEach((a,index)=>{
         let b = a.balance;
-        let mult = getMultiplier(b);
-        let profit = getProfit(mult);
-
+        let mult =
+            getMultiplier(b);
+        let profit =
+            getProfit(mult);
         total += b;
         daily += profit.dailyMin;
         weekly += profit.dailyMin * 7;
-
         container.innerHTML += `
-        <div class="card">
+        <div class="card"
+             onclick="openAccount(${index})"
+             style="cursor:pointer">
             <b>${a.name}</b><br>
-            <span class="small">$${b.toLocaleString()}</span><br>
-            <span class="green">${mult.toFixed(2)}x • $${profit.dailyMin.toFixed(0)}/day</span>
+            <span class="small">
+                $${b.toLocaleString()}
+            </span><br>
+            <span class="green">
+                ${mult.toFixed(2)}x •
+                $${profit.dailyMin.toFixed(0)}/day
+            </span>
         </div>`;
     });
-
-    document.getElementById("totalBalance").innerText = "$" + total.toLocaleString();
-    document.getElementById("totalDaily").innerText = daily.toFixed(0);
-    document.getElementById("totalWeekly").innerText = weekly.toFixed(0);
+    document.getElementById(
+        "totalBalance"
+    ).innerText =
+        "$" + total.toLocaleString();
+    document.getElementById(
+        "totalDaily"
+    ).innerText =
+        daily.toFixed(0);
+    document.getElementById(
+        "totalWeekly"
+    ).innerText =
+        weekly.toFixed(0);
 }
-
+/* OPEN ACCOUNT */
+function openAccount(index){
+    selectedAccount = index;
+    let account =
+        accounts[index];
+    document.getElementById(
+        "accountTitle"
+    ).innerText =
+        account.name;
+    document.getElementById(
+        "accountBalance"
+    ).innerText =
+        "$" +
+        account.balance.toLocaleString();
+    document.getElementById(
+        "editBalance"
+    ).value = "";
+    showPage("accountPage");
+}
+/* UPDATE BALANCE */
+function updateBalance(){
+    let input =
+        document.getElementById(
+            "editBalance"
+        )
+        .value
+        .toLowerCase();
+    let newBalance =
+        input.includes("k")
+        ? parseFloat(
+            input.replace("k","")
+          ) * 1000
+        : parseFloat(input);
+    if(isNaN(newBalance))
+        return;
+    accounts[selectedAccount]
+        .balance = newBalance;
+    save();
+    renderHome();
+    showPage("home");
+}
+/* DELETE ACCOUNT */
+function deleteAccount(){
+    if(selectedAccount === null)
+        return;
+    accounts.splice(
+        selectedAccount,
+        1
+    );
+    save();
+    renderHome();
+    showPage("home");
+}
 /* ADD ACCOUNT */
 function addAccount(){
-
-    let name = document.getElementById("name").value;
-
-    let input = document.getElementById("balance").value.toLowerCase();
-
-    let b = input.includes("k")
-        ? parseFloat(input.replace("k","")) * 1000
+    let name =
+        document.getElementById(
+            "name"
+        ).value;
+    let input =
+        document.getElementById(
+            "balance"
+        )
+        .value
+        .toLowerCase();
+    let b =
+        input.includes("k")
+        ? parseFloat(
+            input.replace("k","")
+          ) * 1000
         : parseFloat(input);
-
-    accounts.push({name, balance:b});
+    if(!name || isNaN(b))
+        return;
+    accounts.push({
+        name,
+        balance: b
+    });
     save();
-
-    showPage('home');
+    document.getElementById("name").value = "";
+    document.getElementById("balance").value = "";
+    showPage("home");
 }
-
 /* HISTORY */
 function addHistory(){
-
-    let text = document.getElementById("logText").value;
-
+    let text =
+        document.getElementById(
+            "logText"
+        ).value;
+    if(!text) return;
     history.unshift({
         text,
-        time: new Date().toLocaleString()
+        time: new Date()
+            .toLocaleString()
     });
-
     saveHistory();
+    document.getElementById(
+        "logText"
+    ).value = "";
     renderHistory();
 }
-
 function renderHistory(){
-
-    let container = document.getElementById("historyList");
+    let container =
+        document.getElementById(
+            "historyList"
+        );
     container.innerHTML = "";
-
     history.forEach(h=>{
         container.innerHTML += `
         <div class="card">
             <div>${h.text}</div>
-            <div class="small">${h.time}</div>
+            <div class="small">
+                ${h.time}
+            </div>
         </div>`;
     });
 }
-
 renderHome();
-
 </script>
-
 </body>
 </html>
