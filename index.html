@@ -134,6 +134,16 @@ input {
 </div>
 
 <div class="card">
+<div>Weekly Profit</div>
+<div id="weekly"></div>
+</div>
+
+<div class="card">
+<div>Monthly Profit</div>
+<div id="monthly"></div>
+</div>
+
+<div class="card">
 <div>Next Tier</div>
 <div id="nextTier"></div>
 </div>
@@ -175,16 +185,11 @@ input {
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-
-/* =========================
-   JOURNAL FIX (ROBUST CORE)
-   ========================= */
 let journal = JSON.parse(localStorage.getItem("journal") || "{}");
 
-let journalState = {
-    selectedDate: null,
-    viewDate: new Date()
-};
+let currentIndex = null;
+let selectedDate = null;
+let viewDate = new Date();
 
 /* NAV */
 function showHome(){
@@ -199,11 +204,8 @@ function showJournal(){
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.remove("hidden");
 
-    journalState.selectedDate = null;
-
-    setTimeout(() => {
-        renderCalendar();
-    }, 0);
+    selectedDate = null;
+    setTimeout(renderCalendar,0);
 }
 
 /* HOME */
@@ -233,7 +235,7 @@ function renderHome(){
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
                 <span class="small">${mult.toFixed(2)}x</span><br>
-                <span class="small lime">Daily $${daily.toFixed(0)}</span><br>
+                <span class="small lime">Daily $${daily.toFixed(0)}</span>
                 <span class="small red">Drawdown $${dd.toFixed(0)}</span>
             </div>
         `;
@@ -244,7 +246,7 @@ function renderHome(){
     document.getElementById("totalDD").innerText = totalDD.toFixed(0);
 }
 
-/* ACCOUNT */
+/* ACCOUNT CLICK */
 function openAccount(i){
     currentIndex = i;
 
@@ -271,6 +273,8 @@ function updateAccount(){
 
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
     document.getElementById("daily").innerText = "$" + daily.toFixed(0);
+    document.getElementById("weekly").innerText = "$" + (daily*7).toFixed(0);
+    document.getElementById("monthly").innerText = "$" + (daily*30).toFixed(0);
     document.getElementById("nextTier").innerText = getNextTier(b);
     document.getElementById("dd").innerText = "$" + (b * 0.4).toFixed(0);
 }
@@ -300,74 +304,56 @@ function back(){
     document.getElementById("home").classList.remove("hidden");
 }
 
-/* =========================
-   JOURNAL (FIXED CORE)
-   ========================= */
-
+/* JOURNAL FIXED */
 function changeMonth(dir){
-    journalState.viewDate.setMonth(journalState.viewDate.getMonth() + dir);
+    viewDate.setMonth(viewDate.getMonth() + dir);
     renderCalendar();
 }
 
 function renderCalendar(){
 
-    const y = journalState.viewDate.getFullYear();
-    const m = journalState.viewDate.getMonth();
+    let y = viewDate.getFullYear();
+    let m = viewDate.getMonth();
 
     document.getElementById("monthLabel").innerText =
-        journalState.viewDate.toLocaleString('default',{
-            month:'long',
-            year:'numeric'
-        });
+        viewDate.toLocaleString('default',{month:'long',year:'numeric'});
 
     let html = "";
-    let monthlyTotal = 0;
+    let total = 0;
 
-    for(let d = 1; d <= 31; d++){
+    for(let d=1; d<=31; d++){
 
-        const date = new Date(y, m, d);
+        let date = new Date(y,m,d);
         if(date.getMonth() !== m) break;
 
-        const day = date.getDay();
+        let day = date.getDay();
         if(day === 0 || day === 6) continue;
 
-        const key = `${y}-${m+1}-${d}`;
-        const val = Number(journal[key] || 0);
+        let key = `${y}-${m+1}-${d}`;
+        let val = journal[key] || 0;
 
-        monthlyTotal += val;
+        total += Number(val);
 
         html += `
-            <div class="day ${val ? 'has-data' : ''}"
-                 onclick="selectDay('${key}')">
-                ${d}<br>
-                <span class="small">$${val}</span>
-            </div>
-        `;
+        <div class="day ${val?'has-data':''}" onclick="selectDay('${key}')">
+            ${d}<br><span class="small">$${val}</span>
+        </div>`;
     }
 
     document.getElementById("calendar").innerHTML = html;
-    document.getElementById("monthlyPL").innerText = "$" + monthlyTotal.toFixed(2);
+    document.getElementById("monthlyPL").innerText = "$" + total.toFixed(2);
 }
 
 function selectDay(key){
-    journalState.selectedDate = key;
-
-    document.getElementById("selectedDay").innerText =
-        "Selected: " + key;
-
-    document.getElementById("profitInput").value =
-        journal[key] || "";
+    selectedDate = key;
+    document.getElementById("selectedDay").innerText = "Selected: " + key;
+    document.getElementById("profitInput").value = journal[key] || "";
 }
 
 function saveDay(){
+    if(!selectedDate) return;
 
-    const key = journalState.selectedDate;
-    if(!key) return;
-
-    const value = parseFloat(document.getElementById("profitInput").value);
-
-    journal[key] = isNaN(value) ? 0 : value;
-
+    journal[selectedDate] = parseFloat(document.getElementById("profitInput").value) || 0;
     localStorage.setItem("journal", JSON.stringify(journal));
 
     renderCalendar();
