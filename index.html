@@ -49,6 +49,7 @@ h2 {
     gap: 10px;
 }
 
+/* FIX: prevent overflow */
 .stat {
     background: rgba(17,24,35,0.55);
     border: 1px solid rgba(120,170,255,0.18);
@@ -56,6 +57,14 @@ h2 {
     padding: 14px;
     border-radius: 14px;
     text-align: center;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.stat .value {
+    font-size: 16px;
+    font-weight: 700;
+    word-break: break-word;
 }
 
 /* CARDS */
@@ -116,6 +125,27 @@ button {
     left: 18px;
     right: 18px;
     display: none;
+}
+
+/* MODAL */
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 360px;
+    background: rgba(17,24,35,0.7);
+    border: 1px solid rgba(120,170,255,0.2);
+    backdrop-filter: blur(14px);
+    padding: 16px;
+    border-radius: 14px;
 }
 </style>
 </head>
@@ -184,6 +214,21 @@ button {
     <button onclick="back()">Back</button>
 </div>
 
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+
+        <div class="big">Add Account</div>
+
+        <input id="newName" placeholder="Account name">
+        <input id="newBalance" placeholder="Starting balance">
+
+        <button onclick="createAccount()">Create</button>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
+
+    </div>
 </div>
 
 <!-- ADD BUTTON -->
@@ -295,9 +340,32 @@ function back(){
     show("home");
 }
 
-/* CREATE ACCOUNT (placeholder if you still use modal elsewhere) */
+/* MODAL */
 function openModal(){
-    alert("Modal not included in this trimmed fix version");
+    document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display="none";
+}
+
+/* CREATE */
+function createAccount(){
+
+    let name=document.getElementById("newName").value.trim();
+    let balance=num(document.getElementById("newBalance").value);
+
+    if(!name) return;
+
+    accounts.push({name,balance});
+
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    document.getElementById("newName").value="";
+    document.getElementById("newBalance").value="";
+
+    closeModal();
+    render();
 }
 
 /* INIT — FIXED */
