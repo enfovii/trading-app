@@ -10,20 +10,26 @@ body {
     background: radial-gradient(circle at top, #0f1b33, #070b14);
     color: #e6eaf2;
     margin: 0;
-    padding: 20px;
+    padding: 18px;
 }
 
-h2 { font-size: 22px; font-weight: 800; }
+/* HEADER */
+h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
 
+/* CARDS (APP STYLE) */
 .card {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(14px);
     padding: 16px;
-    margin-top: 12px;
     border-radius: 18px;
 }
 
+/* BUTTON */
 button {
     width: 100%;
     padding: 14px;
@@ -35,6 +41,7 @@ button {
     font-weight: 600;
 }
 
+/* INPUT */
 input {
     width: 100%;
     padding: 14px;
@@ -45,6 +52,7 @@ input {
     color: white;
 }
 
+/* TEXT */
 .big { font-size: 26px; font-weight: 800; }
 .lime { color: #22c55e; }
 .red { color: #ff4d4d; }
@@ -52,16 +60,39 @@ input {
 
 .hidden { display:none; }
 
+/* ACCOUNT CARD (APP TILE STYLE) */
 .account {
     padding: 14px;
     background: rgba(255,255,255,0.03);
-    margin-top: 10px;
-    border-radius: 16px;
-    cursor: pointer;
+    margin-top: 12px;
+    border-radius: 18px;
     border: 1px solid rgba(255,255,255,0.06);
+    cursor: pointer;
 }
 
-/* PROGRESS */
+/* MINI PROGRESS */
+.mini-wrap {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.08);
+    height: 7px;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.mini-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2f81f7, #22c55e);
+    transition: width 0.4s ease;
+}
+
+.row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+/* DETAIL PROGRESS */
 .progress-wrap {
     margin-top: 10px;
     background: rgba(255,255,255,0.08);
@@ -173,7 +204,7 @@ function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* FIXED MULTIPLIER ONLY (NO SMOOTH ANYMORE) */
+/* FIXED MULTIPLIER */
 function getMultiplier(b) {
     if (b < 90000) return 3;
     if (b < 140000) return 3.5;
@@ -197,12 +228,11 @@ function getTierRange(b) {
 function getProgress(b) {
     let { prev, next } = getTierRange(b);
     if (next === prev) return 100;
-
     let p = ((b - prev) / (next - prev)) * 100;
     return Math.max(0, Math.min(100, p));
 }
 
-/* NEXT MILESTONE */
+/* NEXT */
 function getNextMilestone(b){
     let { next } = getTierRange(b);
     return "$" + next.toLocaleString();
@@ -236,14 +266,26 @@ function renderHome(){
 
         let b = a.balance;
         let mult = getMultiplier(b);
+        let p = getProgress(b);
 
         total += b;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
-                <b>${a.name}</b><br>
-                $${b.toLocaleString()}<br>
-                <span class="small">${mult.toFixed(2)}x</span>
+
+                <div class="row">
+                    <b>${a.name}</b>
+                    <span class="small">${mult.toFixed(2)}x</span>
+                </div>
+
+                <div class="small">$${b.toLocaleString()}</div>
+
+                <div class="mini-wrap">
+                    <div class="mini-bar" style="width:${p}%"></div>
+                </div>
+
+                <div class="small">${p.toFixed(0)}% to next tier</div>
+
             </div>
         `;
     });
@@ -299,8 +341,7 @@ function updateAccount(){
     let profit = getProfit(mult);
     let dd = getDD(b);
 
-    document.getElementById("mult").innerText =
-        mult.toFixed(2) + "x";
+    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
 
     document.getElementById("daily").innerText =
         "$" + profit.dailyMin.toFixed(0) + " - $" + profit.dailyMax.toFixed(0);
@@ -321,6 +362,7 @@ function updateAccount(){
         getNextMilestone(b);
 
     let p = getProgress(b);
+
     requestAnimationFrame(() => {
         document.getElementById("progressBar").style.width = p + "%";
     });
