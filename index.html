@@ -47,6 +47,7 @@ input {
 
 .big { font-size: 26px; font-weight: 800; }
 .lime { color: #22c55e; }
+.red { color: #ff4d4d; }
 .small { font-size: 12px; color: rgba(230,234,242,0.6); }
 
 .hidden { display:none; }
@@ -65,7 +66,6 @@ input {
     display:inline-block;
     margin: 1%;
     padding: 14px;
-    background: rgba(255,255,255,0.04);
     border-radius: 12px;
     text-align:center;
     cursor:pointer;
@@ -96,18 +96,65 @@ input {
 
 </div>
 
+<!-- DETAIL -->
+<div id="detail" class="hidden">
+
+<div class="card">
+<h3 id="accName"></h3>
+
+<input id="editBalance" oninput="updateAccount()">
+
+<div class="card">
+<div>Multiplier</div>
+<div id="mult" class="big lime">0x</div>
+</div>
+
+<div class="card">
+<div>Daily Profit</div>
+<div id="daily" class="big lime"></div>
+</div>
+
+<div class="card">
+<div>Weekly Profit</div>
+<div id="weekly" class="big lime"></div>
+</div>
+
+<div class="card">
+<div>Monthly Profit</div>
+<div id="monthly" class="big lime"></div>
+</div>
+
+<div class="card">
+<div>Next Tier</div>
+<div id="nextTier" class="big"></div>
+</div>
+
+<div class="card">
+<div>Gap to Next Tier</div>
+<div id="gapTier" class="big lime"></div>
+</div>
+
+<button onclick="back()">Back</button>
+
+</div>
+
 <!-- JOURNAL -->
 <div id="journal" class="hidden">
 
 <div class="card">
 <h3>📅 Journal</h3>
 
-<div style="display:flex;justify-content:space-between;align-items:center;">
+<div style="display:flex;justify-content:space-between;">
 <button style="width:48%" onclick="changeMonth(-1)">⬅ Prev</button>
 <button style="width:48%" onclick="changeMonth(1)">Next ➡</button>
 </div>
 
 <div class="big" style="text-align:center;margin-top:10px;" id="monthLabel"></div>
+
+<div class="card">
+<div>Monthly P/L</div>
+<div id="monthlyPL" class="big lime">$0</div>
+</div>
 
 <div id="calendar"></div>
 </div>
@@ -127,21 +174,14 @@ let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let journal = JSON.parse(localStorage.getItem("journal") || "{}");
 
 let currentIndex = null;
-
-/* JOURNAL STATE */
-let viewDate = new Date();
 let selectedDate = null;
-
-/* SAVE */
-function save(){
-    localStorage.setItem("accounts", JSON.stringify(accounts));
-}
+let viewDate = new Date();
 
 function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* ================= MULTIPLIER (unchanged) ================= */
+/* ================= MULTIPLIER ================= */
 
 function getMultiplier(b) {
 
@@ -151,19 +191,26 @@ function getMultiplier(b) {
     if (b < 200000) return 4;
 
     let extra = b - 200000;
-
     let fullSteps = Math.floor(extra / 40000);
     let halfSteps = Math.floor(extra / 20000);
-
     let halfOnly = halfSteps - fullSteps * 2;
 
     return 4 + (fullSteps * 1) + (halfOnly * 0.5);
 }
 
-/* HOME */
+function getProfit(mult){
+    return {
+        dailyMin: mult * 800,
+        dailyMax: mult * 1000
+    };
+}
+
+/* ================= HOME ================= */
+
 function renderHome(){
 
     document.getElementById("home").classList.remove("hidden");
+    document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.add("hidden");
 
     let container = document.getElementById("accounts");
@@ -177,10 +224,11 @@ function renderHome(){
 
         let b = a.balance;
         let mult = getMultiplier(b);
+        let profit = getProfit(mult);
 
         total += b;
-        totalDaily += mult * 800;
-        totalWeekly += mult * 800 * 7;
+        totalDaily += profit.dailyMin;
+        totalWeekly += profit.dailyMin * 7;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
@@ -196,13 +244,69 @@ function renderHome(){
     document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
 }
 
+/* ================= DETAIL ================= */
+
+function openAccount(i){
+    currentIndex = i;
+
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("detail").classList.remove("hidden");
+
+    let acc = accounts[i];
+
+    document.getElementById("accName").innerText = acc.name;
+    document.getElementById("editBalance").value = acc.balance;
+
+    updateAccount();
+}
+
+function updateAccount(){
+
+    let b = parseFloat(document.getElementById("editBalance").value);
+    accounts[currentIndex].balance = b;
+
+    let mult = getMultiplier(b);
+    let profit = getProfit(mult);
+
+    let nextTier = getNextTier(b);
+    let gap = nextTier - b;
+
+    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+
+    document.getElementById("daily").innerText =
+        "$" + profit.dailyMin.toFixed(0) + " - $" + profit.dailyMax.toFixed(0);
+
+    document.getElementById("weekly").innerText =
+        "$" + (profit.dailyMin * 7).toFixed(0);
+
+    document.getElementById("monthly").innerText =
+        "$" + (profit.dailyMin * 30).toFixed(0);
+
+    document.getElementById("nextTier").innerText =
+        "$" + nextTier.toLocaleString();
+
+    document.getElementById("gapTier").innerText =
+        "$" + gap.toLocaleString();
+}
+
+function getNextTier(b){
+
+    if (b < 90000) return 90000;
+    if (b < 140000) return 140000;
+    if (b < 160000) return 160000;
+    if (b < 200000) return 200000;
+
+    let extra = Math.ceil((b - 200000) / 20000) * 20000 + 200000;
+    return extra;
+}
+
 /* ================= JOURNAL ================= */
 
 function showJournal(){
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("journal").classList.remove("hidden");
-
     renderCalendar();
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("detail").classList.add("hidden");
+    document.getElementById("journal").classList.remove("hidden");
 }
 
 function changeMonth(dir){
@@ -210,65 +314,86 @@ function changeMonth(dir){
     renderCalendar();
 }
 
-/* skip weekends */
-function isWeekend(date){
-    let d = date.getDay();
-    return d === 0 || d === 6;
+function isWeekend(d){
+    return d.getDay() === 0 || d.getDay() === 6;
+}
+
+function getMonthlyTotal(year, month){
+
+    let total = 0;
+
+    for(let d=1; d<=31; d++){
+
+        let date = new Date(year, month, d);
+        if(date.getMonth() !== month) break;
+
+        if(isWeekend(date)) continue;
+
+        let key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+
+        if(journal[key]){
+            total += parseFloat(journal[key]);
+        }
+    }
+
+    return total;
+}
+
+function getColor(v){
+    if(!v) return "rgba(255,255,255,0.04)";
+    if(v > 0) return "rgba(34,197,94,0.3)";
+    return "rgba(255,77,77,0.3)";
 }
 
 function renderCalendar(){
-
-    let calendar = document.getElementById("calendar");
-    calendar.innerHTML = "";
 
     let year = viewDate.getFullYear();
     let month = viewDate.getMonth();
 
     document.getElementById("monthLabel").innerText =
-        viewDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+        viewDate.toLocaleString('default', { month:'long', year:'numeric' });
 
-    let daysInMonth = new Date(year, month + 1, 0).getDate();
+    document.getElementById("monthlyPL").innerText =
+        "$" + getMonthlyTotal(year, month).toFixed(2);
 
-    for(let day=1; day<=daysInMonth; day++){
+    let cal = "";
 
-        let date = new Date(year, month, day);
+    for(let d=1; d<=31; d++){
 
+        let date = new Date(year, month, d);
+        if(date.getMonth() !== month) break;
         if(isWeekend(date)) continue;
 
-        let key = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+        let key = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
         let val = journal[key] || 0;
 
-        calendar.innerHTML += `
-            <div class="dayBox" onclick="selectDay('${key}', ${day})">
-                ${day}<br>
-                <span class="small">$${val}</span>
-            </div>
-        `;
+        cal += `
+        <div class="dayBox"
+            style="background:${getColor(val)}"
+            onclick="selectDay('${key}', ${d})">
+            ${d}<br>
+            <span class="small">$${val}</span>
+        </div>`;
     }
+
+    document.getElementById("calendar").innerHTML = cal;
 }
 
-function selectDay(dateKey, day){
-
-    selectedDate = dateKey;
-
-    document.getElementById("selectedDay").innerText = dateKey;
-    document.getElementById("dayProfit").value = journal[dateKey] || "";
+function selectDay(key, day){
+    selectedDate = key;
+    document.getElementById("selectedDay").innerText = key;
+    document.getElementById("dayProfit").value = journal[key] || "";
 }
 
 function saveDay(){
-
     if(!selectedDate) return;
-
-    let val = parseFloat(document.getElementById("dayProfit").value) || 0;
-
-    journal[selectedDate] = val;
+    journal[selectedDate] = parseFloat(document.getElementById("dayProfit").value) || 0;
     saveJournal();
-
     renderCalendar();
 }
 
 /* NAV */
-function showHome(){
+function back(){
     renderHome();
 }
 
