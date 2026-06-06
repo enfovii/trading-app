@@ -181,8 +181,7 @@ function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* ================= FIXED MULTIPLIER ================= */
-
+/* MULTIPLIER (UNCHANGED) */
 function getMultiplier(b) {
 
     if (b < 90000) return b / 30000;
@@ -190,12 +189,30 @@ function getMultiplier(b) {
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
-    // NEW RULE: 200K = 5X BASE
     let extra = b - 200000;
 
     let steps = Math.floor(extra / 20000);
 
     return 5 + (steps * 0.5);
+}
+
+/* FIXED NEXT TIER */
+function getNextTier(b){
+
+    if (b < 90000) return "$90,000";
+    if (b < 140000) return "$140,000";
+    if (b < 160000) return "$160,000";
+    if (b < 200000) return "$200,000";
+
+    let base = 200000;
+
+    if (b < base) return "$200,000";
+
+    let steps = Math.floor((b - base) / 20000) + 1;
+
+    let next = base + (steps * 20000);
+
+    return "$" + next.toLocaleString();
 }
 
 /* HOME */
@@ -274,19 +291,8 @@ function updateAccount(){
         getNextTier(b);
 }
 
-/* NEXT TIER */
-function getNextTier(b){
+/* JOURNAL (UNCHANGED) */
 
-    if (b < 90000) return "$90,000";
-    if (b < 140000) return "$140,000";
-    if (b < 160000) return "$160,000";
-    if (b < 200000) return "$200,000";
-
-    let steps = Math.ceil((b - 200000) / 20000);
-    return "$" + (200000 + steps * 20000).toLocaleString();
-}
-
-/* JOURNAL */
 function showJournal(){
     renderCalendar();
     document.getElementById("home").classList.add("hidden");
