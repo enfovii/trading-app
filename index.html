@@ -24,6 +24,47 @@ h2 { font-size: 22px; font-weight: 800; }
     border-radius: 18px;
 }
 
+/* ================= NAV BAR UPGRADE ================= */
+
+.navBar {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    padding: 6px;
+}
+
+.navBar button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: #e6eaf2;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+}
+
+.navIndicator {
+    position: absolute;
+    bottom: 6px;
+    left: 6px;
+    width: calc(50% - 6px);
+    height: calc(100% - 12px);
+    background: rgba(47,129,247,0.25);
+    border: 1px solid rgba(47,129,247,0.5);
+    border-radius: 12px;
+    transition: transform 0.25s ease;
+    z-index: 1;
+}
+
+.active {
+    color: #22c55e;
+}
+
+/* ================= END NAV ================= */
+
 button {
     width: 100%;
     padding: 14px;
@@ -76,7 +117,8 @@ input {
 
 <h2>📊 Trading Dashboard</h2>
 
-<div class="card">
+<div class="card navBar">
+<div class="navIndicator" id="navIndicator"></div>
 <button onclick="showHome()">🏠 Accounts</button>
 <button onclick="showJournal()">📅 Journal</button>
 </div>
@@ -171,6 +213,9 @@ let viewDate = new Date();
 let selectedDate = null;
 let currentIndex = null;
 
+/* NAV STATE */
+let activeTab = "home";
+
 /* SAVE */
 function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
@@ -180,8 +225,27 @@ function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
+/* NAV ANIMATION */
+function updateNav(tab){
+
+    activeTab = tab;
+
+    let indicator = document.getElementById("navIndicator");
+
+    if(tab === "home"){
+        indicator.style.transform = "translateX(0%)";
+    } else {
+        indicator.style.transform = "translateX(100%)";
+    }
+}
+
 /* NAV */
 function showHome(){
+    document.getElementById("home").classList.remove("hidden");
+    document.getElementById("detail").classList.add("hidden");
+    document.getElementById("journal").classList.add("hidden");
+
+    updateNav("home");
     renderHome();
 }
 
@@ -190,12 +254,13 @@ function showJournal(){
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.remove("hidden");
 
+    updateNav("journal");
     requestAnimationFrame(() => {
         renderCalendar();
     });
 }
 
-/* MULTIPLIER (UNCHANGED) */
+/* MULTIPLIER */
 function getMultiplier(b) {
 
     if (b < 90000) return b / 30000;
@@ -209,7 +274,7 @@ function getMultiplier(b) {
     return 5 + (steps * 0.5);
 }
 
-/* NEXT TIER (UNCHANGED) */
+/* NEXT TIER */
 function getNextTier(b){
 
     if (b < 90000) return "$90,000";
@@ -226,10 +291,6 @@ function getNextTier(b){
 
 /* HOME */
 function renderHome(){
-
-    document.getElementById("home").classList.remove("hidden");
-    document.getElementById("detail").classList.add("hidden");
-    document.getElementById("journal").classList.add("hidden");
 
     let container = document.getElementById("accounts");
     container.innerHTML = "";
@@ -261,46 +322,7 @@ function renderHome(){
     document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
 }
 
-/* DETAIL */
-function openAccount(i){
-    currentIndex = i;
-
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("detail").classList.remove("hidden");
-
-    let acc = accounts[i];
-
-    document.getElementById("accName").innerText = acc.name;
-    document.getElementById("editBalance").value = acc.balance;
-
-    updateAccount();
-}
-
-function updateAccount(){
-
-    let b = parseFloat(document.getElementById("editBalance").value);
-    accounts[currentIndex].balance = b;
-
-    save();
-
-    let mult = getMultiplier(b);
-
-    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
-
-    document.getElementById("daily").innerText =
-        "$" + (mult*800).toFixed(0) + " - $" + (mult*1000).toFixed(0);
-
-    document.getElementById("weekly").innerText =
-        "$" + (mult*800*7).toFixed(0);
-
-    document.getElementById("monthly").innerText =
-        "$" + (mult*800*30).toFixed(0);
-
-    document.getElementById("nextTier").innerText =
-        getNextTier(b);
-}
-
-/* JOURNAL */
+/* JOURNAL FUNCTIONS (UNCHANGED) */
 function changeMonth(dir){
     viewDate.setMonth(viewDate.getMonth() + dir);
     renderCalendar();
@@ -362,7 +384,7 @@ function renderCalendar(){
         cal += `
         <div class="dayBox"
             style="background:${getColor(val)}"
-            onclick="selectDay('${key}', ${d})">
+            onclick="selectDay('${key}')">
             ${d}<br>
             <span class="small">$${val}</span>
         </div>`;
@@ -385,12 +407,12 @@ function saveDay(){
 }
 
 function back(){
-    renderHome();
+    showHome();
 }
 
-/* BOOT FIX */
-renderHome();
-window.onload = () => renderCalendar();
+/* INIT */
+showHome();
+updateNav("home");
 
 </script>
 
