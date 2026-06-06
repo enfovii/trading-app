@@ -1,1 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scaling Profit App</title>
 
+<style>
+body {
+    font-family: Arial;
+    background: #0f0f0f;
+    color: white;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+}
+
+.card {
+    background: #1c1c1c;
+    padding: 16px;
+    margin-top: 12px;
+    border-radius: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    font-size: 18px;
+    border-radius: 8px;
+    border: none;
+}
+
+.big {
+    font-size: 26px;
+    font-weight: bold;
+    color: lime;
+}
+
+.small {
+    font-size: 13px;
+    color: #aaa;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📊 Scaling Profit App</h2>
+
+<div class="card">
+<input id="balance" placeholder="Enter balance" oninput="calc()">
+<button onclick="resetData()">Reset</button>
+</div>
+
+<div class="card">
+<div>Multiplier</div>
+<div id="mult" class="big">0x</div>
+<div id="tier" class="small"></div>
+</div>
+
+<div class="card">
+<div>Daily Profit</div>
+<div id="daily" class="big">$0</div>
+</div>
+
+<div class="card">
+<div>Weekly Profit</div>
+<div id="weekly" class="big">$0</div>
+</div>
+
+<div class="card">
+<div>Monthly Profit</div>
+<div id="monthly" class="big">$0</div>
+</div>
+
+<script>
+
+window.onload = function () {
+    let saved = localStorage.getItem("balance");
+    if (saved) {
+        document.getElementById("balance").value = saved;
+    }
+    calc();
+};
+
+function save() {
+    localStorage.setItem("balance", document.getElementById("balance").value);
+}
+
+function resetData() {
+    localStorage.removeItem("balance");
+    document.getElementById("balance").value = "";
+    calc();
+}
+
+function calc() {
+
+    let b = parseFloat(document.getElementById("balance").value);
+
+    let mult = 0;
+    let tier = "";
+
+    if (!b || b <= 0) {
+        document.getElementById("mult").innerText = "0x";
+        document.getElementById("tier").innerText = "";
+        document.getElementById("daily").innerText = "$0";
+        document.getElementById("weekly").innerText = "$0";
+        document.getElementById("monthly").innerText = "$0";
+        return;
+    }
+
+    // =========================
+    // SCALING MODEL (FIXED)
+    // =========================
+
+    if (b <= 90000) {
+        mult = b / 30000;
+        tier = "Tier 1 (30k per 1x)";
+    }
+
+    else if (b <= 140000) {
+        mult = 3 + ((b - 90000) / 100000);
+        tier = "Tier 2 (40k per 1x + scaling)";
+    }
+
+    else if (b <= 160000) {
+        // FIXED: ends exactly at 4x
+        mult = 3.5 + ((b - 140000) / 20000) * 0.5;
+        tier = "Tier 3 (3.5x → 4x)";
+    }
+
+    else if (b <= 200000) {
+        // 4x → 5x
+        mult = 4 + ((b - 160000) / 40000);
+        tier = "Tier 4 (4x → 5x)";
+    }
+
+    else {
+        mult = 5;
+        tier = "Max Tier (5x)";
+    }
+
+    // =========================
+    // PROFIT MODEL
+    // =========================
+
+    let daily = mult * 900;
+    let weekly = daily * 7;
+    let monthly = daily * 30;
+
+    // =========================
+    // OUTPUT
+    // =========================
+
+    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+    document.getElementById("tier").innerText = tier;
+
+    document.getElementById("daily").innerText = "$" + daily.toFixed(0);
+    document.getElementById("weekly").innerText = "$" + weekly.toFixed(0);
+    document.getElementById("monthly").innerText = "$" + monthly.toFixed(0);
+
+    save();
+}
+
+</script>
+
+</body>
+</html>
