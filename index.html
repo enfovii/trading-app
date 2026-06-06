@@ -2,19 +2,49 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trading Dashboard</title>
+<title>Pro Trading Dashboard</title>
 
 <style>
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-    background: #0b0f14;
+    background: #0a0f1a;
     color: #e8ecf3;
     margin: 0;
     padding: 18px;
 }
 
-h2 { font-size: 22px; font-weight: 700; }
+h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
 
+/* HEADER SUMMARY */
+.topbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.stat {
+    background: #111a2b;
+    border: 1px solid #1e2a3a;
+    padding: 14px;
+    border-radius: 14px;
+    text-align: center;
+}
+
+.stat .label {
+    font-size: 11px;
+    color: #93a4b8;
+}
+
+.stat .value {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* CARDS */
 .card {
     background: #111823;
     border: 1px solid #1e2a3a;
@@ -22,6 +52,20 @@ h2 { font-size: 22px; font-weight: 700; }
     margin-top: 12px;
     border-radius: 14px;
 }
+
+.account {
+    padding: 14px;
+    background: #111823;
+    margin-top: 12px;
+    border-radius: 14px;
+    border: 1px solid #1e2a3a;
+}
+
+/* COLORS */
+.green { color: #22c55e; }
+.red { color: #ef4444; }
+.small { font-size: 12px; color: #93a4b8; }
+.big { font-size: 26px; font-weight: 700; }
 
 button {
     width: 100%;
@@ -44,101 +88,62 @@ input {
     color: #e8ecf3;
 }
 
-.big { font-size: 26px; font-weight: 700; }
-.small { font-size: 12px; color: #93a4b8; }
-
-.lime { color: #22c55e; }
-.red { color: #ef4444; }
-
 .hidden { display:none; }
-
-.account {
-    padding: 14px;
-    background: #111823;
-    margin-top: 12px;
-    border-radius: 14px;
-    border: 1px solid #1e2a3a;
-    cursor: pointer;
-}
-
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
-    margin-top: 10px;
-}
-
-.day {
-    padding: 10px;
-    border-radius: 10px;
-    border: 1px solid #1e2a3a;
-    text-align: center;
-    font-size: 12px;
-    cursor: pointer;
-}
 </style>
 </head>
 
 <body>
 
-<h2>📊 Trading Dashboard</h2>
+<h2>📊 Pro Trading Dashboard</h2>
 
-<div class="card">
-<button onclick="show('home')">Accounts</button>
-<button onclick="show('journal')">Journal</button>
+<!-- TOP STATS -->
+<div class="topbar">
+    <div class="stat">
+        <div class="label">Portfolio</div>
+        <div class="value" id="total">$0</div>
+    </div>
+    <div class="stat">
+        <div class="label">Daily</div>
+        <div class="value green" id="daily">$0</div>
+    </div>
+    <div class="stat">
+        <div class="label">Drawdown</div>
+        <div class="value red" id="dd">$0</div>
+    </div>
 </div>
 
-<!-- HOME -->
-<div id="home">
-
-<div class="card">
-<div>Total Portfolio Balance</div>
-<div id="totalBalance" class="big">$0</div>
-<div class="small">Daily: $<span id="totalDaily">0</span></div>
-<div class="small red">Drawdown: $<span id="totalDD">0</span></div>
-</div>
-
+<!-- ACCOUNTS -->
 <div id="accounts"></div>
-</div>
 
-<!-- DETAIL -->
+<!-- DETAIL VIEW -->
 <div id="detail" class="hidden">
 
 <div class="card">
-<h3 id="accName"></h3>
+    <h3 id="name"></h3>
 
-<input id="editBalance" oninput="updateAccount()">
+    <input id="balance" oninput="updateAccount()">
 
-<div class="card"><div>Multiplier</div><div id="mult" class="big lime"></div></div>
-<div class="card"><div>Daily Profit</div><div id="daily"></div></div>
-<div class="card"><div>Weekly Profit</div><div id="weekly"></div></div>
-<div class="card"><div>Monthly Profit</div><div id="monthly"></div></div>
-<div class="card"><div>Drawdown</div><div id="dd" class="big red"></div></div>
+    <div class="card">
+        <div class="small">Multiplier</div>
+        <div class="big green" id="mult"></div>
+    </div>
 
-<button onclick="show('home')">Back</button>
-</div>
+    <div class="card">
+        <div class="small">Daily Profit</div>
+        <div id="dailyp"></div>
+    </div>
 
-<!-- JOURNAL -->
-<div id="journal" class="hidden">
+    <div class="card">
+        <div class="small">Weekly Profit</div>
+        <div id="weekly"></div>
+    </div>
 
-<div class="card">
-<div class="big" id="monthLabel"></div>
+    <div class="card">
+        <div class="small">Monthly Profit</div>
+        <div id="monthly"></div>
+    </div>
 
-<button onclick="changeMonth(-1)">⬅ Prev</button>
-<button onclick="changeMonth(1)">Next ➡</button>
-
-<div class="card">
-<div>Monthly P/L</div>
-<div class="big lime" id="monthlyPL">$0</div>
-</div>
-
-<div id="calendar" class="calendar-grid"></div>
-</div>
-
-<div class="card">
-<div id="selectedDay">Select a day</div>
-<input id="profitInput" placeholder="Enter profit">
-<button onclick="saveDay()">Save</button>
+    <button onclick="back()">Back</button>
 </div>
 
 </div>
@@ -146,24 +151,22 @@ input {
 <script>
 
 /* =========================
-   SAFE CORE (FIXED VERSION)
+   SAFE STORAGE
 ========================= */
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-let journal = JSON.parse(localStorage.getItem("journal") || "{}");
+let current = null;
 
-let currentIndex = null;
-let selectedDate = null;
-let viewDate = new Date();
+/* =========================
+   SAFE CALC
+========================= */
 
-/* SAFE NUMBER FUNCTION (CRITICAL FIX) */
 function num(v){
     v = Number(v);
     return isNaN(v) ? 0 : v;
 }
 
-/* LOGIC */
-function getMultiplier(b){
+function multiplier(b){
     b = num(b);
     if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
@@ -172,154 +175,95 @@ function getMultiplier(b){
     return 5;
 }
 
-/* =========================
-   NAV
-========================= */
-
-function show(page){
-    document.getElementById("home").classList.add("hidden");
-    document.getElementById("detail").classList.add("hidden");
-    document.getElementById("journal").classList.add("hidden");
-
-    document.getElementById(page).classList.remove("hidden");
-
-    if(page === "home") renderHome();
-    if(page === "journal") renderJournal();
+function daily(b){
+    return multiplier(b) * 800;
 }
 
 /* =========================
-   HOME
+   HOME RENDER
 ========================= */
 
-function renderHome(){
+function render(){
 
-    let container = document.getElementById("accounts");
-    container.innerHTML = "";
+    let el = document.getElementById("accounts");
+    el.innerHTML = "";
 
     let total = 0;
-    let totalDaily = 0;
-    let totalDD = 0;
+    let d = 0;
+    let dd = 0;
 
     accounts.forEach((a,i)=>{
 
         let b = num(a.balance);
-        let m = getMultiplier(b);
-        let d = m * 800;
-        let dd = b * 0.4;
 
         total += b;
-        totalDaily += d;
-        totalDD += dd;
+        d += daily(b);
+        dd += b * 0.4;
 
-        container.innerHTML += `
-        <div class="account" onclick="openAccount(${i})">
+        el.innerHTML += `
+        <div class="account" onclick="openA(${i})">
             <b>${a.name}</b><br>
             <span class="small">$${b}</span><br>
-            <span class="small lime">Daily $${d.toFixed(0)}</span>
+            <span class="small green">Daily $${daily(b).toFixed(0)}</span>
         </div>`;
     });
 
-    document.getElementById("totalBalance").innerText = "$" + total.toFixed(0);
-    document.getElementById("totalDaily").innerText = totalDaily.toFixed(0);
-    document.getElementById("totalDD").innerText = totalDD.toFixed(0);
+    document.getElementById("total").innerText = "$" + total.toFixed(0);
+    document.getElementById("daily").innerText = "$" + d.toFixed(0);
+    document.getElementById("dd").innerText = "$" + dd.toFixed(0);
 }
 
 /* =========================
-   ACCOUNT
+   OPEN ACCOUNT
 ========================= */
 
-function openAccount(i){
-    currentIndex = i;
-    show('detail');
+function openA(i){
+
+    current = i;
+    document.getElementById("detail").classList.remove("hidden");
 
     let a = accounts[i];
 
-    document.getElementById("accName").innerText = a.name;
-    document.getElementById("editBalance").value = num(a.balance);
+    document.getElementById("name").innerText = a.name;
+    document.getElementById("balance").value = num(a.balance);
 
     updateAccount();
 }
 
+/* =========================
+   UPDATE ACCOUNT
+========================= */
+
 function updateAccount(){
 
-    if(currentIndex === null || !accounts[currentIndex]) return;
+    if(current === null) return;
 
-    let b = num(document.getElementById("editBalance").value);
+    let b = num(document.getElementById("balance").value);
 
-    accounts[currentIndex].balance = b;
+    accounts[current].balance = b;
     localStorage.setItem("accounts", JSON.stringify(accounts));
 
-    let m = getMultiplier(b);
-    let d = m * 800;
+    let m = multiplier(b);
+    let d = daily(b);
 
     document.getElementById("mult").innerText = m.toFixed(2) + "x";
-    document.getElementById("daily").innerText = "$" + d.toFixed(0);
+    document.getElementById("dailyp").innerText = "$" + d.toFixed(0);
     document.getElementById("weekly").innerText = "$" + (d*7).toFixed(0);
     document.getElementById("monthly").innerText = "$" + (d*30).toFixed(0);
-    document.getElementById("dd").innerText = "$" + (b*0.4).toFixed(0);
+
+    render();
 }
 
 /* =========================
-   JOURNAL (SAFE)
+   BACK
 ========================= */
 
-function renderJournal(){
-
-    let y = viewDate.getFullYear();
-    let m = viewDate.getMonth();
-
-    document.getElementById("monthLabel").innerText =
-        viewDate.toLocaleString('default',{month:'long',year:'numeric'});
-
-    let html = "";
-    let total = 0;
-
-    for(let d=1; d<=31; d++){
-
-        let date = new Date(y,m,d);
-        if(date.getMonth() !== m) break;
-
-        let key = `${y}-${m+1}-${d}`;
-        let val = num(journal[key]);
-
-        total += val;
-
-        html += `
-        <div class="day"
-            onclick="selectDay('${key}')"
-            style="background:rgba(34,197,94,${Math.min(val/500,0.8)})">
-            ${d}<br>
-            <span class="small">$${val.toFixed(0)}</span>
-        </div>`;
-    }
-
-    document.getElementById("calendar").innerHTML = html;
-    document.getElementById("monthlyPL").innerText = "$" + total.toFixed(0);
-}
-
-function changeMonth(dir){
-    viewDate.setMonth(viewDate.getMonth() + dir);
-    renderJournal();
-}
-
-function selectDay(k){
-    selectedDate = k;
-    document.getElementById("selectedDay").innerText = k;
-    document.getElementById("profitInput").value = num(journal[k]);
-}
-
-function saveDay(){
-
-    if(!selectedDate) return;
-
-    journal[selectedDate] = num(document.getElementById("profitInput").value);
-    localStorage.setItem("journal", JSON.stringify(journal));
-
-    renderJournal();
+function back(){
+    document.getElementById("detail").classList.add("hidden");
 }
 
 /* INIT */
-renderHome();
+render();
 
 </script>
 
