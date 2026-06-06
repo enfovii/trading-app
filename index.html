@@ -6,62 +6,117 @@
 
 <style>
 body {
-    font-family: Arial;
-    background: #0f0f0f;
-    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+    background: radial-gradient(circle at top, #0f1b33, #070b14);
+    color: #e6eaf2;
     margin: 0;
     padding: 20px;
+    -webkit-font-smoothing: antialiased;
 }
 
+/* HEADER */
+h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    letter-spacing: 0.4px;
+}
+
+/* GLASS CARD */
 .card {
-    background: #1c1c1c;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     padding: 16px;
     margin-top: 12px;
-    border-radius: 10px;
+    border-radius: 18px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+    transition: 0.2s ease;
 }
 
+.card:active {
+    transform: scale(0.99);
+}
+
+/* BUTTON */
 button {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     margin-top: 10px;
-    background: #333;
+    background: linear-gradient(135deg, #2f81f7, #22c55e);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 14px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    box-shadow: 0 8px 20px rgba(47,129,247,0.25);
 }
 
+button:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+}
+
+/* INPUT */
 input {
     width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
+    padding: 14px;
+    font-size: 15px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
     margin-top: 8px;
+    background: rgba(255,255,255,0.04);
+    color: white;
+    outline: none;
 }
 
+input:focus {
+    border-color: rgba(47,129,247,0.6);
+    box-shadow: 0 0 0 3px rgba(47,129,247,0.15);
+}
+
+/* BIG NUMBERS */
 .big {
-    font-size: 22px;
-    font-weight: bold;
+    font-size: 26px;
+    font-weight: 800;
 }
 
-.lime { color: lime; }
-.red { color: red; }
+.lime { color: #22c55e; }
+.red { color: #ff4d4d; }
 
+/* SMALL TEXT */
 .small {
-    font-size: 13px;
-    color: #aaa;
-    margin-top: 4px;
+    font-size: 12px;
+    color: rgba(230,234,242,0.6);
+    margin-top: 6px;
     display: block;
 }
 
+/* ACCOUNT */
+.account {
+    padding: 14px;
+    background: rgba(255,255,255,0.03);
+    margin-top: 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: 0.15s ease;
+}
+
+.account:hover {
+    border-color: rgba(47,129,247,0.3);
+}
+
+.account:active {
+    transform: scale(0.99);
+}
+
+/* UTIL */
 .hidden { display: none; }
 
-.account {
-    padding: 12px;
-    background: #222;
-    margin-top: 10px;
-    border-radius: 8px;
-    cursor: pointer;
+* {
+    -webkit-tap-highlight-color: transparent;
 }
 </style>
 </head>
@@ -84,7 +139,7 @@ input {
 <div id="totalBalance" class="big lime">$0</div>
 
 <div class="small">Portfolio Daily Profit: $<span id="portfolioDaily">0</span></div>
-<div class="small">Max Portfolio Drawdown (40%): $<span id="portfolioDD">0</span></div>
+<div class="small">Portfolio Max Drawdown (40%): $<span id="portfolioDD">0</span></div>
 </div>
 
 </div>
@@ -113,7 +168,7 @@ input {
 </div>
 
 <div class="card">
-<div>Daily Profit</div>
+<div>Daily Profit Range</div>
 <div id="daily" class="big lime">$0</div>
 </div>
 
@@ -142,23 +197,17 @@ input {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let currentIndex = null;
 
-/* -------------------------
-   SETTINGS
---------------------------*/
+/* SETTINGS */
 const MIN_PER_X = 800;
 const MAX_PER_X = 1000;
 const DD_RATE = 0.40;
 
-/* -------------------------
-   SAVE
---------------------------*/
+/* SAVE */
 function save() {
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* -------------------------
-   MULTIPLIER
---------------------------*/
+/* MULTIPLIER MODEL */
 function getMultiplier(b) {
     if (b <= 90000) return b / 30000;
     if (b <= 140000) return 3 + ((b - 90000) / 100000);
@@ -167,9 +216,7 @@ function getMultiplier(b) {
     return 5;
 }
 
-/* -------------------------
-   PROFIT MODEL
---------------------------*/
+/* PROFIT */
 function getProfit(mult) {
     return {
         dailyMin: mult * MIN_PER_X,
@@ -177,16 +224,12 @@ function getProfit(mult) {
     };
 }
 
-/* -------------------------
-   DRAWDOWN
---------------------------*/
+/* DRAW DOWN */
 function getDD(balance) {
     return balance * DD_RATE;
 }
 
-/* -------------------------
-   HOME
---------------------------*/
+/* HOME */
 function renderHome() {
 
     document.getElementById("home").classList.remove("hidden");
@@ -196,9 +239,9 @@ function renderHome() {
     let container = document.getElementById("accounts");
     container.innerHTML = "";
 
-    let totalBalance = 0;
-    let portfolioDaily = 0;
-    let portfolioDD = 0;
+    let total = 0;
+    let daily = 0;
+    let ddTotal = 0;
 
     accounts.forEach((a, i) => {
 
@@ -207,27 +250,25 @@ function renderHome() {
         let profit = getProfit(mult);
         let dd = getDD(b);
 
-        totalBalance += b;
-        portfolioDaily += profit.dailyMin;
-        portfolioDD += dd;
+        total += b;
+        daily += profit.dailyMin;
+        ddTotal += dd;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
                 <b>${a.name}</b><br>
                 $${b.toLocaleString()}<br>
-                <span class="small">${mult.toFixed(2)}x | $${profit.dailyMin.toFixed(0)}/day</span>
+                <span class="small">${mult.toFixed(2)}x • $${profit.dailyMin.toFixed(0)}/day</span>
             </div>
         `;
     });
 
-    document.getElementById("totalBalance").innerText = "$" + totalBalance.toLocaleString();
-    document.getElementById("portfolioDaily").innerText = portfolioDaily.toFixed(0);
-    document.getElementById("portfolioDD").innerText = portfolioDD.toFixed(0);
+    document.getElementById("totalBalance").innerText = "$" + total.toLocaleString();
+    document.getElementById("portfolioDaily").innerText = daily.toFixed(0);
+    document.getElementById("portfolioDD").innerText = ddTotal.toFixed(0);
 }
 
-/* -------------------------
-   ADD
---------------------------*/
+/* ADD */
 function showAdd() {
     document.getElementById("home").classList.add("hidden");
     document.getElementById("addScreen").classList.remove("hidden");
@@ -252,9 +293,7 @@ function addAccount() {
     renderHome();
 }
 
-/* -------------------------
-   OPEN
---------------------------*/
+/* OPEN */
 function openAccount(i) {
     currentIndex = i;
 
@@ -269,9 +308,7 @@ function openAccount(i) {
     updateAccount();
 }
 
-/* -------------------------
-   UPDATE
---------------------------*/
+/* UPDATE */
 function updateAccount() {
 
     let b = parseFloat(document.getElementById("editBalance").value);
@@ -284,24 +321,27 @@ function updateAccount() {
     let dd = getDD(b);
 
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
-    document.getElementById("daily").innerText = "$" + profit.dailyMin.toFixed(0);
-    document.getElementById("weekly").innerText = "$" + (profit.dailyMin * 7).toFixed(0);
-    document.getElementById("monthly").innerText = "$" + (profit.dailyMin * 30).toFixed(0);
-    document.getElementById("dd").innerText = "$" + dd.toFixed(0);
+    document.getElementById("daily").innerText =
+        "$" + profit.dailyMin.toFixed(0) + " - $" + profit.dailyMax.toFixed(0);
+
+    document.getElementById("weekly").innerText =
+        "$" + (profit.dailyMin * 7).toFixed(0);
+
+    document.getElementById("monthly").innerText =
+        "$" + (profit.dailyMin * 30).toFixed(0);
+
+    document.getElementById("dd").innerText =
+        "$" + dd.toFixed(0);
 }
 
-/* -------------------------
-   DELETE
---------------------------*/
+/* DELETE */
 function deleteAccount() {
     accounts.splice(currentIndex, 1);
     save();
     renderHome();
 }
 
-/* -------------------------
-   BACK
---------------------------*/
+/* BACK */
 function back() {
     renderHome();
 }
