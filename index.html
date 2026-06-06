@@ -2,22 +2,28 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pro Trading Dashboard</title>
+<title>Trading Dashboard</title>
 
 <style>
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
-    background: #0a0f1a;
-    color: #e8ecf3;
+    background: #070b14;
+    color: #e6edf7;
     margin: 0;
     padding: 18px;
 }
 
-h2 { font-size: 22px; font-weight: 700; }
+/* TITLE */
+h2 {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+    color: #e6edf7;
+}
 
-.page { display:none; }
-.active { display:block; }
-
+/* TOP STATS */
 .topbar {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -25,72 +31,111 @@ h2 { font-size: 22px; font-weight: 700; }
 }
 
 .stat {
-    background: #111a2b;
-    border: 1px solid #1e2a3a;
+    background: #0e1626;
+    border: 1px solid #1b2a3d;
     padding: 14px;
     border-radius: 14px;
     text-align: center;
+    transition: 0.2s ease;
+}
+
+.stat:hover {
+    border-color: #2b4a6f;
 }
 
 .stat .label {
     font-size: 11px;
-    color: #93a4b8;
+    color: #8aa0b8;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
 }
 
 .stat .value {
     font-size: 18px;
     font-weight: 700;
+    color: #e6edf7;
 }
 
+/* CARDS */
 .card {
-    background: #111823;
-    border: 1px solid #1e2a3a;
+    background: #0e1626;
+    border: 1px solid #1b2a3d;
     padding: 16px;
     margin-top: 12px;
     border-radius: 14px;
 }
 
+/* ACCOUNTS */
 .account {
     padding: 14px;
-    background: #111823;
+    background: #0e1626;
     margin-top: 12px;
     border-radius: 14px;
-    border: 1px solid #1e2a3a;
+    border: 1px solid #1b2a3d;
     cursor: pointer;
+    transition: 0.2s ease;
 }
 
-.small { font-size: 12px; color: #93a4b8; }
-.big { font-size: 26px; font-weight: 700; }
+.account:hover {
+    border-color: #2b4a6f;
+    transform: translateY(-1px);
+}
 
-.green { color: #22c55e; }
-.red { color: #ef4444; }
+/* TEXT */
+.small {
+    font-size: 12px;
+    color: #8aa0b8;
+}
 
+.big {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+/* COLOURS */
+.green { color: #2ee59d; }
+.red { color: #ff5c7a; }
+
+/* INPUTS */
 input {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
-    border: 1px solid #263445;
+    border: 1px solid #1b2a3d;
     margin-top: 8px;
-    background: #0f1622;
-    color: #e8ecf3;
+    background: #0a1220;
+    color: #e6edf7;
+    outline: none;
 }
 
+input:focus {
+    border-color: #2b4a6f;
+}
+
+/* BUTTON */
 button {
     width: 100%;
     padding: 14px;
     margin-top: 10px;
-    background: #1f6feb;
-    color: white;
-    border: none;
+    background: linear-gradient(135deg, #1b4d6b, #14324a);
+    color: #e6edf7;
+    border: 1px solid #2b4a6f;
     border-radius: 12px;
     font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+button:hover {
+    border-color: #3b6b9c;
+    transform: translateY(-1px);
 }
 </style>
 </head>
 
 <body>
 
-<h2>📊 Pro Trading Dashboard</h2>
+<h2>Trading Dashboard</h2>
 
 <!-- HOME -->
 <div id="home" class="page active">
@@ -152,40 +197,19 @@ button {
 
 </div>
 
-<!-- HISTORY (EMPTY SAFE PAGE FOR NOW) -->
-<div id="history" class="page">
-
-<div class="card">
-    <div class="big">📒 History</div>
-    <div class="small">(Ready for future upgrade)</div>
-</div>
-
-<button onclick="show('home')">Back</button>
-
-</div>
-
 <script>
 
-/* =========================
-   DATA
-========================= */
-
+/* DATA */
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* =========================
-   SAFE NUM
-========================= */
-
+/* SAFE NUM */
 function num(v){
     v = Number(v);
     return isNaN(v) ? 0 : v;
 }
 
-/* =========================
-   LOGIC
-========================= */
-
+/* LOGIC */
 function mult(b){
     b = num(b);
     if (b < 90000) return b / 30000;
@@ -203,22 +227,15 @@ function dd(b){
     return b * 0.4;
 }
 
-/* =========================
-   NAVIGATION (FIXED)
-========================= */
-
+/* NAV */
 function show(page){
-
     document.querySelectorAll(".page")
         .forEach(p => p.classList.remove("active"));
 
     document.getElementById(page).classList.add("active");
 }
 
-/* =========================
-   HOME
-========================= */
-
+/* HOME */
 function render(){
 
     let el = document.getElementById("accounts");
@@ -247,55 +264,46 @@ function render(){
     document.getElementById("dd").innerText="$"+draw.toFixed(0);
 }
 
-/* =========================
-   OPEN ACCOUNT (REAL PAGE SWITCH)
-========================= */
-
+/* OPEN */
 function openAccount(i){
 
-    current = i;
+    current=i;
 
-    let a = accounts[i];
+    let a=accounts[i];
 
-    document.getElementById("name").innerText = a.name;
-    document.getElementById("balance").value = num(a.balance);
+    document.getElementById("name").innerText=a.name;
+    document.getElementById("balance").value=num(a.balance);
 
     show("account");
 
     updateAccount();
 }
 
-/* =========================
-   UPDATE ACCOUNT
-========================= */
-
+/* UPDATE */
 function updateAccount(){
 
-    if(current === null) return;
+    if(current===null) return;
 
-    let b = num(document.getElementById("balance").value);
+    let b=num(document.getElementById("balance").value);
 
-    accounts[current].balance = b;
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    accounts[current].balance=b;
+    localStorage.setItem("accounts",JSON.stringify(accounts));
 
-    let m = mult(b);
-    let d = daily(b);
+    let m=mult(b);
+    let d=daily(b);
 
-    document.getElementById("mult").innerText = m.toFixed(2) + "x";
-    document.getElementById("dailyP").innerText = "$" + d.toFixed(0);
-    document.getElementById("weekly").innerText = "$" + (d*7).toFixed(0);
-    document.getElementById("monthly").innerText = "$" + (d*30).toFixed(0);
-    document.getElementById("accdd").innerText = "$" + dd(b).toFixed(0);
+    document.getElementById("mult").innerText=m.toFixed(2)+"x";
+    document.getElementById("dailyP").innerText="$"+d.toFixed(0);
+    document.getElementById("weekly").innerText="$"+(d*7).toFixed(0);
+    document.getElementById("monthly").innerText="$"+(d*30).toFixed(0);
+    document.getElementById("accdd").innerText="$"+dd(b).toFixed(0);
 
     render();
 }
 
-/* =========================
-   BACK
-========================= */
-
+/* BACK */
 function back(){
-    current = null;
+    current=null;
     show("home");
 }
 
