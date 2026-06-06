@@ -175,29 +175,28 @@ function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* ================= FIXED MULTIPLIER ================= */
+/* ================= FIXED MULTIPLIER (CLEAN + STABLE) ================= */
 
 function getMultiplier(b) {
 
+    // ORIGINAL LOGIC (UNCHANGED)
     if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
     // =========================
-    // FIXED CLEAN 200K+ SYSTEM
+    // EXTENSION (SAFE TIER SYSTEM)
     // =========================
 
-    let base = 4;
-    let extra = b - 200000;
+    if (b < 240000) return 4.5;
+    if (b < 280000) return 5;
+    if (b < 320000) return 5.5;
+    if (b < 360000) return 6;
+    if (b < 400000) return 6.5;
 
-    // convert everything into 20k blocks
-    let halfBlocks = Math.floor(extra / 20000);
-
-    let fullSteps = Math.floor(halfBlocks / 2); // 2 half blocks = 1x
-    let remainingHalf = halfBlocks % 2;
-
-    return base + fullSteps + (remainingHalf * 0.5);
+    let extra = Math.floor((b - 400000) / 40000);
+    return 6.5 + extra;
 }
 
 /* HOME */
@@ -281,10 +280,14 @@ function getNextTier(b){
     if (b < 160000) return "$160,000";
     if (b < 200000) return "$200,000";
 
-    let steps = Math.ceil((b - 200000) / 20000);
-    let next = 200000 + (steps * 20000);
+    if (b < 240000) return "$240,000";
+    if (b < 280000) return "$280,000";
+    if (b < 320000) return "$320,000";
+    if (b < 360000) return "$360,000";
+    if (b < 400000) return "$400,000";
 
-    return "$" + next.toLocaleString();
+    let steps = Math.ceil((b - 400000) / 40000);
+    return "$" + (400000 + steps * 40000).toLocaleString();
 }
 
 /* JOURNAL (UNCHANGED) */
