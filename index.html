@@ -137,6 +137,10 @@ button {
     padding: 16px;
     border-radius: 14px;
 }
+
+.danger {
+    background: #ff5c7a !important;
+}
 </style>
 </head>
 
@@ -170,7 +174,7 @@ button {
 
 </div>
 
-<!-- ACCOUNT PAGE -->
+<!-- ACCOUNT -->
 <div id="account" class="page">
 
 <div class="card">
@@ -204,6 +208,7 @@ button {
     </div>
 
     <button onclick="back()">Back</button>
+    <button class="danger" onclick="deleteAccount()">Delete Account</button>
 </div>
 
 </div>
@@ -211,7 +216,7 @@ button {
 <!-- ADD BUTTON -->
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
 
-<!-- ADD MODAL -->
+<!-- MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
 
@@ -227,27 +232,17 @@ button {
 
 <script>
 
-/* =========================
-   DATA
-========================= */
+/* DATA */
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* =========================
-   FIXED SAFE NUMBER INPUT
-========================= */
+/* NUMBER FIX */
 function num(v){
-    if(v === null || v === undefined) return 0;
-
+    if(!v) return 0;
     v = v.toString().toLowerCase().replace(/,/g,'');
 
-    if(v.includes("k")){
-        return parseFloat(v.replace("k","")) * 1000;
-    }
-
-    if(v.includes("m")){
-        return parseFloat(v.replace("m","")) * 1000000;
-    }
+    if(v.includes("k")) return parseFloat(v)*1000;
+    if(v.includes("m")) return parseFloat(v)*1000000;
 
     let n = Number(v);
     return isNaN(n) ? 0 : n;
@@ -257,9 +252,7 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* =========================
-   MULTIPLIER
-========================= */
+/* MULTIPLIER */
 function mult(b){
     b = num(b);
 
@@ -269,8 +262,7 @@ function mult(b){
     if (b < 200000) return 4;
 
     let base = 5;
-    let extraSteps = Math.floor((b - 200000) / 20000);
-    base += extraSteps * 0.5;
+    base += Math.floor((b - 200000) / 20000) * 0.5;
 
     return base;
 }
@@ -278,35 +270,30 @@ function mult(b){
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-/* =========================
-   SAFE PAGE SWITCH (FIXED)
-========================= */
+/* NAV */
 function show(page){
-
     document.querySelectorAll(".page")
         .forEach(p => p.classList.remove("active"));
 
     document.getElementById(page).classList.add("active");
 }
 
-/* =========================
-   RENDER HOME
-========================= */
+/* RENDER (FIXED ALWAYS RUNS) */
 function render(){
 
     let el = document.getElementById("accounts");
     el.innerHTML = "";
 
-    let t = 0, d = 0, draw = 0;
+    let t=0,d=0,draw=0;
 
     accounts.forEach((a,i)=>{
 
-        let b = num(a.balance);
-        let m = mult(b);
+        let b=num(a.balance);
+        let m=mult(b);
 
-        t += b;
-        d += daily(b);
-        draw += dd(b);
+        t+=b;
+        d+=daily(b);
+        draw+=dd(b);
 
         el.innerHTML += `
         <div class="account" onclick="openAccount(${i})">
@@ -322,82 +309,79 @@ function render(){
     document.getElementById("dd").innerText = money(draw.toFixed(0));
 }
 
-/* =========================
-   OPEN ACCOUNT (FIXED CLICK)
-========================= */
+/* OPEN */
 function openAccount(i){
+    current=i;
+    let a=accounts[i];
 
-    current = i;
-
-    let a = accounts[i];
-
-    document.getElementById("name").innerText = a.name;
-    document.getElementById("balance").value = num(a.balance);
+    document.getElementById("name").innerText=a.name;
+    document.getElementById("balance").value=num(a.balance);
 
     show("account");
     updateAccount();
 }
 
-/* =========================
-   UPDATE ACCOUNT
-========================= */
+/* UPDATE */
 function updateAccount(){
 
-    if(current === null) return;
+    if(current===null) return;
 
-    let b = num(document.getElementById("balance").value);
+    let b=num(document.getElementById("balance").value);
 
-    accounts[current].balance = b;
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    accounts[current].balance=b;
+    localStorage.setItem("accounts",JSON.stringify(accounts));
 
-    let m = mult(b);
-    let d = daily(b);
+    let m=mult(b);
+    let d=daily(b);
 
-    document.getElementById("mult").innerText = m.toFixed(2) + "x";
-    document.getElementById("dailyP").innerText = money(d);
-    document.getElementById("weekly").innerText = money(d*7);
-    document.getElementById("monthly").innerText = money(d*30);
-    document.getElementById("accdd").innerText = money(dd(b));
+    document.getElementById("mult").innerText=m.toFixed(2)+"x";
+    document.getElementById("dailyP").innerText=money(d);
+    document.getElementById("weekly").innerText=money(d*7);
+    document.getElementById("monthly").innerText=money(d*30);
+    document.getElementById("accdd").innerText=money(dd(b));
 
     render();
 }
 
-/* =========================
-   BACK
-========================= */
+/* BACK */
 function back(){
-    current = null;
+    current=null;
     show("home");
 }
 
-/* =========================
-   ADD ACCOUNT
-========================= */
-function openModal(){
-    document.getElementById("modal").style.display = "flex";
-}
-
-function closeModal(){
-    document.getElementById("modal").style.display = "none";
-}
+/* ADD */
+function openModal(){ document.getElementById("modal").style.display="flex"; }
+function closeModal(){ document.getElementById("modal").style.display="none"; }
 
 function createAccount(){
 
-    let name = document.getElementById("newName").value.trim();
-    let balance = num(document.getElementById("newBalance").value);
+    let name=document.getElementById("newName").value.trim();
+    let balance=num(document.getElementById("newBalance").value);
 
     if(!name) return;
 
     accounts.push({name,balance});
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    localStorage.setItem("accounts",JSON.stringify(accounts));
 
     closeModal();
+    render(); // FIX: ensures accounts always appear immediately
+}
+
+/* DELETE (FIXED) */
+function deleteAccount(){
+
+    if(current===null) return;
+
+    accounts.splice(current,1);
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    current=null;
+
+    show("home");
     render();
 }
 
-/* =========================
-   INIT (FIXED LOAD ORDER)
-========================= */
+/* INIT FIX */
 window.onload = function(){
     show("home");
     render();
