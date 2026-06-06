@@ -183,12 +183,12 @@ button {
 
         <div class="stat">
             <div class="small">Weekly</div>
-            <div class="big" id="weeklyHome">$0</div>
+            <div class="big green" id="weeklyHome">$0</div>
         </div>
 
         <div class="stat">
             <div class="small">Monthly</div>
-            <div class="big" id="monthlyHome">$0</div>
+            <div class="big green" id="monthlyHome">$0</div>
         </div>
 
     </div>
@@ -361,13 +361,12 @@ function render(){
     let el=document.getElementById("accounts");
     el.innerHTML="";
 
-    let t=0,d=0,draw=0;
+    let t=0,d=0;
 
     accounts.forEach((a,i)=>{
         let b=num(a.balance);
         t+=b;
         d+=daily(b);
-        draw+=dd(b);
 
         el.innerHTML+=`
         <div class="account" onclick="openAccount(${i})">
