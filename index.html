@@ -163,16 +163,21 @@ function renderHome(){
 
         let dd = b * 0.4;
 
+        let daily = mult * 800;
+        let weekly = daily * 7;
+        let monthly = daily * 30;
+
         total += b;
-        totalDaily += mult * 800;
-        totalWeekly += mult * 800 * 7;
+        totalDaily += daily;
+        totalWeekly += weekly;
         totalDD += dd;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
-                <span class="small">${mult.toFixed(2)}x</span>
+                <span class="small">${mult.toFixed(2)}x</span><br>
+                <span class="small lime">Daily: $${daily.toFixed(0)} • Weekly: $${weekly.toFixed(0)} • Monthly: $${monthly.toFixed(0)}</span>
             </div>
         `;
     });
@@ -212,16 +217,17 @@ function updateAccount(){
     else if (b < 200000) mult = 4;
     else mult = 5;
 
-    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
-    document.getElementById("daily").innerText = "$" + (mult*800).toFixed(0);
-    document.getElementById("weekly").innerText = "$" + (mult*800*7).toFixed(0);
-    document.getElementById("monthly").innerText = "$" + (mult*800*30).toFixed(0);
+    let daily = mult * 800;
 
+    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+    document.getElementById("daily").innerText = "$" + daily.toFixed(0);
+    document.getElementById("weekly").innerText = "$" + (daily*7).toFixed(0);
+    document.getElementById("monthly").innerText = "$" + (daily*30).toFixed(0);
     document.getElementById("nextTier").innerText = getNextTier(b);
     document.getElementById("dd").innerText = "$" + (b * 0.4).toFixed(0);
 }
 
-/* ✅ FIX ADDED */
+/* NEXT TIER */
 function getNextTier(b){
 
     if (b < 90000) return "$90,000";
