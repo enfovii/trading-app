@@ -42,8 +42,10 @@ input {
 .big {
     font-size: 22px;
     font-weight: bold;
-    color: lime;
 }
+
+.lime { color: lime; }
+.red { color: red; }
 
 .small {
     font-size: 13px;
@@ -66,9 +68,8 @@ input {
 
 <body>
 
-<h2>📊 Trading Accounts</h2>
+<h2>📊 Trading Dashboard</h2>
 
-<!-- HOME -->
 <div id="home">
 
 <div class="card">
@@ -78,9 +79,11 @@ input {
 <div id="accounts"></div>
 
 <div class="card">
-<div>Total Balance</div>
-<div id="totalBalance" class="big">£0</div>
-<div class="small">Total Multiplier: <span id="totalX">0x</span></div>
+<div>Total Portfolio Balance</div>
+<div id="totalBalance" class="big lime">£0</div>
+
+<div class="small">Portfolio Daily Profit: £<span id="portfolioDaily">0</span></div>
+<div class="small">Max Portfolio Drawdown (40%): £<span id="portfolioDD">0</span></div>
 </div>
 
 </div>
@@ -105,7 +108,27 @@ input {
 
 <div class="card">
 <div>Multiplier</div>
-<div id="mult" class="big">0x</div>
+<div id="mult" class="big lime">0x</div>
+</div>
+
+<div class="card">
+<div>Daily Profit</div>
+<div id="daily" class="big lime">£0</div>
+</div>
+
+<div class="card">
+<div>Weekly Profit</div>
+<div id="weekly" class="big lime">£0</div>
+</div>
+
+<div class="card">
+<div>Monthly Profit</div>
+<div id="monthly" class="big lime">£0</div>
+</div>
+
+<div class="card">
+<div>Max Drawdown (40%)</div>
+<div id="dd" class="big red">£0</div>
 </div>
 
 <button onclick="deleteAccount()">Delete Account</button>
@@ -119,10 +142,45 @@ let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let currentIndex = null;
 
 /* -------------------------
-   SAVE LOCAL
+   SETTINGS
+--------------------------*/
+const MIN_PER_X = 800;
+const MAX_PER_X = 1000;
+const DD_RATE = 0.40;
+
+/* -------------------------
+   SAVE
 --------------------------*/
 function save() {
     localStorage.setItem("accounts", JSON.stringify(accounts));
+}
+
+/* -------------------------
+   MULTIPLIER
+--------------------------*/
+function getMultiplier(b) {
+    if (b <= 90000) return b / 30000;
+    if (b <= 140000) return 3 + ((b - 90000) / 100000);
+    if (b <= 160000) return 3.5 + ((b - 140000) / 20000) * 0.5;
+    if (b <= 200000) return 4 + ((b - 160000) / 40000);
+    return 5;
+}
+
+/* -------------------------
+   PROJECTIONS
+--------------------------*/
+function getProfit(mult) {
+    return {
+        dailyMin: mult * MIN_PER_X,
+        dailyMax: mult * MAX_PER_X
+    };
+}
+
+/* -------------------------
+   DRAW DOWN
+--------------------------*/
+function getDD(balance) {
+    return balance * DD_RATE;
 }
 
 /* -------------------------
@@ -138,38 +196,32 @@ function renderHome() {
     container.innerHTML = "";
 
     let totalBalance = 0;
-    let totalX = 0;
+    let portfolioDaily = 0;
+    let portfolioDD = 0;
 
     accounts.forEach((a, i) => {
 
         let b = a.balance;
         let mult = getMultiplier(b);
+        let profit = getProfit(mult);
+        let dd = getDD(b);
 
         totalBalance += b;
-        totalX += mult;
+        portfolioDaily += profit.dailyMin;
+        portfolioDD += dd;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
                 <b>${a.name}</b><br>
                 £${b.toLocaleString()}<br>
-                <span class="small">${mult.toFixed(2)}x</span>
+                <span class="small">${mult.toFixed(2)}x | £${profit.dailyMin.toFixed(0)}+/day</span>
             </div>
         `;
     });
 
     document.getElementById("totalBalance").innerText = "£" + totalBalance.toLocaleString();
-    document.getElementById("totalX").innerText = totalX.toFixed(2) + "x";
-}
-
-/* -------------------------
-   MULTIPLIER
---------------------------*/
-function getMultiplier(b) {
-    if (b <= 90000) return b / 30000;
-    if (b <= 140000) return 3 + ((b - 90000) / 100000);
-    if (b <= 160000) return 3.5 + ((b - 140000) / 20000) * 0.5;
-    if (b <= 200000) return 4 + ((b - 160000) / 40000);
-    return 5;
+    document.getElementById("portfolioDaily").innerText = portfolioDaily.toFixed(0);
+    document.getElementById("portfolioDD").innerText = portfolioDD.toFixed(0);
 }
 
 /* -------------------------
@@ -183,7 +235,6 @@ function showAdd() {
 function addAccount() {
 
     let name = document.getElementById("name").value;
-
     let input = document.getElementById("balance").value.toLowerCase().trim();
 
     let b;
@@ -201,7 +252,7 @@ function addAccount() {
 }
 
 /* -------------------------
-   OPEN
+   OPEN ACCOUNT
 --------------------------*/
 function openAccount(i) {
     currentIndex = i;
@@ -218,19 +269,24 @@ function openAccount(i) {
 }
 
 /* -------------------------
-   UPDATE
+   UPDATE DETAIL
 --------------------------*/
 function updateAccount() {
 
-    let input = document.getElementById("editBalance").value;
-    let b = parseFloat(input);
-
+    let b = parseFloat(document.getElementById("editBalance").value);
     accounts[currentIndex].balance = b;
 
     save();
 
     let mult = getMultiplier(b);
+    let profit = getProfit(mult);
+    let dd = getDD(b);
+
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+    document.getElementById("daily").innerText = "£" + profit.dailyMin.toFixed(0);
+    document.getElementById("weekly").innerText = "£" + (profit.dailyMin * 7).toFixed(0);
+    document.getElementById("monthly").innerText = "£" + (profit.dailyMin * 30).toFixed(0);
+    document.getElementById("dd").innerText = "£" + dd.toFixed(0);
 }
 
 /* -------------------------
