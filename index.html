@@ -16,7 +16,6 @@ body {
 h2 {
     font-size: 22px;
     font-weight: 700;
-    margin-bottom: 10px;
 }
 
 .topbar {
@@ -57,6 +56,7 @@ h2 {
     margin-top: 12px;
     border-radius: 14px;
     border: 1px solid #1e2a3a;
+    cursor: pointer;
 }
 
 .green { color: #22c55e; }
@@ -75,7 +75,7 @@ button {
     font-weight: 600;
 }
 
-input {
+input, select {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
@@ -86,6 +86,15 @@ input {
 }
 
 .hidden { display:none; }
+
+.trade {
+    padding: 10px;
+    margin-top: 8px;
+    border-radius: 10px;
+    background: #0f1622;
+    border: 1px solid #1e2a3a;
+    font-size: 13px;
+}
 </style>
 </head>
 
@@ -129,19 +138,29 @@ input {
     </div>
 
     <div class="card">
-        <div class="small">Weekly Profit</div>
-        <div id="weekly"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Monthly Profit</div>
-        <div id="monthly"></div>
-    </div>
-
-    <!-- ✅ NEW: ACCOUNT DRAWDOWN -->
-    <div class="card">
         <div class="small">Account Drawdown</div>
         <div class="big red" id="accdd"></div>
+    </div>
+
+    <!-- TRADE LOGGER -->
+    <div class="card">
+        <div class="big">📒 Trade Logger</div>
+
+        <select id="type">
+            <option value="win">Win</option>
+            <option value="loss">Loss</option>
+        </select>
+
+        <input id="amount" placeholder="Profit / Loss amount">
+
+        <button onclick="addTrade()">Add Trade</button>
+
+        <div class="card">
+            <div class="small">Account P/L</div>
+            <div class="big" id="pl">$0</div>
+        </div>
+
+        <div id="trades"></div>
     </div>
 
     <button onclick="back()">Back</button>
@@ -152,14 +171,16 @@ input {
 <script>
 
 /* =========================
-   SAFE STORAGE
+   STORAGE
 ========================= */
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+let trades = JSON.parse(localStorage.getItem("trades") || "{}");
+
 let current = null;
 
 /* =========================
-   SAFE MATH
+   SAFE NUM
 ========================= */
 
 function num(v){
@@ -167,7 +188,7 @@ function num(v){
     return isNaN(v) ? 0 : v;
 }
 
-function multiplier(b){
+function mult(b){
     b = num(b);
     if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
@@ -177,15 +198,15 @@ function multiplier(b){
 }
 
 function daily(b){
-    return multiplier(b) * 800;
+    return mult(b) * 800;
 }
 
-function drawdown(b){
-    return num(b) * 0.4;
+function dd(b){
+    return b * 0.4;
 }
 
 /* =========================
-   HOME
+   RENDER ACCOUNTS
 ========================= */
 
 function render(){
@@ -193,29 +214,27 @@ function render(){
     let el = document.getElementById("accounts");
     el.innerHTML = "";
 
-    let total = 0;
-    let d = 0;
-    let dd = 0;
+    let total=0,d=0,draw=0;
 
     accounts.forEach((a,i)=>{
 
-        let b = num(a.balance);
+        let b=num(a.balance);
 
-        total += b;
-        d += daily(b);
-        dd += drawdown(b);
+        total+=b;
+        d+=daily(b);
+        draw+=dd(b);
 
-        el.innerHTML += `
+        el.innerHTML+=`
         <div class="account" onclick="openA(${i})">
             <b>${a.name}</b><br>
-            <span class="small">$${b}</span><br>
+            $${b}<br>
             <span class="small green">Daily $${daily(b).toFixed(0)}</span>
         </div>`;
     });
 
-    document.getElementById("total").innerText = "$" + total.toFixed(0);
-    document.getElementById("daily").innerText = "$" + d.toFixed(0);
-    document.getElementById("dd").innerText = "$" + dd.toFixed(0);
+    document.getElementById("total").innerText="$"+total.toFixed(0);
+    document.getElementById("daily").innerText="$"+d.toFixed(0);
+    document.getElementById("dd").innerText="$"+draw.toFixed(0);
 }
 
 /* =========================
@@ -223,44 +242,95 @@ function render(){
 ========================= */
 
 function openA(i){
-
-    current = i;
+    current=i;
     document.getElementById("detail").classList.remove("hidden");
 
-    let a = accounts[i];
+    let a=accounts[i];
 
-    document.getElementById("name").innerText = a.name;
-    document.getElementById("balance").value = num(a.balance);
+    document.getElementById("name").innerText=a.name;
+    document.getElementById("balance").value=num(a.balance);
 
-    updateAccount();
+    renderAccount();
 }
 
 /* =========================
-   UPDATE ACCOUNT
+   ACCOUNT UPDATE
 ========================= */
 
 function updateAccount(){
 
-    if(current === null) return;
+    if(current===null) return;
 
-    let b = num(document.getElementById("balance").value);
+    let b=num(document.getElementById("balance").value);
 
-    accounts[current].balance = b;
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    accounts[current].balance=b;
+    localStorage.setItem("accounts",JSON.stringify(accounts));
 
-    let m = multiplier(b);
-    let d = daily(b);
-
-    document.getElementById("mult").innerText = m.toFixed(2) + "x";
-    document.getElementById("dailyp").innerText = "$" + d.toFixed(0);
-    document.getElementById("weekly").innerText = "$" + (d*7).toFixed(0);
-    document.getElementById("monthly").innerText = "$" + (d*30).toFixed(0);
-
-    // ✅ NEW: per-account drawdown
-    document.getElementById("accdd").innerText =
-        "$" + drawdown(b).toFixed(0);
-
+    renderAccount();
     render();
+}
+
+/* =========================
+   TRADE SYSTEM
+========================= */
+
+function addTrade(){
+
+    if(current===null) return;
+
+    let type=document.getElementById("type").value;
+    let amount=num(document.getElementById("amount").value);
+
+    if(!trades[current]) trades[current]=[];
+
+    trades[current].push({
+        type,
+        amount,
+        time:new Date().toLocaleString()
+    });
+
+    localStorage.setItem("trades",JSON.stringify(trades));
+
+    document.getElementById("amount").value="";
+
+    renderAccount();
+}
+
+/* =========================
+   ACCOUNT VIEW
+========================= */
+
+function renderAccount(){
+
+    let a=accounts[current];
+    let b=num(a.balance);
+
+    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
+    document.getElementById("dailyp").innerText="$"+daily(b).toFixed(0);
+    document.getElementById("accdd").innerText="$"+dd(b).toFixed(0);
+
+    // TRADE LOGS
+    let list=trades[current]||[];
+    let pl=0;
+
+    let html="";
+
+    list.forEach(t=>{
+
+        let val=num(t.amount);
+        if(t.type==="loss") val=-val;
+
+        pl+=val;
+
+        html+=`
+        <div class="trade">
+            ${t.type.toUpperCase()} $${t.amount}
+            <br><span class="small">${t.time}</span>
+        </div>`;
+    });
+
+    document.getElementById("pl").innerText="$"+pl.toFixed(0);
+    document.getElementById("trades").innerHTML=html;
 }
 
 /* =========================
@@ -269,6 +339,7 @@ function updateAccount(){
 
 function back(){
     document.getElementById("detail").classList.add("hidden");
+    current=null;
 }
 
 /* INIT */
