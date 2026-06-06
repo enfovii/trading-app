@@ -70,6 +70,7 @@ input {
 
 <h2>📊 Trading Dashboard</h2>
 
+<!-- HOME -->
 <div id="home">
 
 <div class="card">
@@ -80,10 +81,10 @@ input {
 
 <div class="card">
 <div>Total Portfolio Balance</div>
-<div id="totalBalance" class="big lime">£0</div>
+<div id="totalBalance" class="big lime">$0</div>
 
-<div class="small">Portfolio Daily Profit: £<span id="portfolioDaily">0</span></div>
-<div class="small">Max Portfolio Drawdown (40%): £<span id="portfolioDD">0</span></div>
+<div class="small">Portfolio Daily Profit: $<span id="portfolioDaily">0</span></div>
+<div class="small">Max Portfolio Drawdown (40%): $<span id="portfolioDD">0</span></div>
 </div>
 
 </div>
@@ -113,22 +114,22 @@ input {
 
 <div class="card">
 <div>Daily Profit</div>
-<div id="daily" class="big lime">£0</div>
+<div id="daily" class="big lime">$0</div>
 </div>
 
 <div class="card">
 <div>Weekly Profit</div>
-<div id="weekly" class="big lime">£0</div>
+<div id="weekly" class="big lime">$0</div>
 </div>
 
 <div class="card">
 <div>Monthly Profit</div>
-<div id="monthly" class="big lime">£0</div>
+<div id="monthly" class="big lime">$0</div>
 </div>
 
 <div class="card">
 <div>Max Drawdown (40%)</div>
-<div id="dd" class="big red">£0</div>
+<div id="dd" class="big red">$0</div>
 </div>
 
 <button onclick="deleteAccount()">Delete Account</button>
@@ -167,7 +168,7 @@ function getMultiplier(b) {
 }
 
 /* -------------------------
-   PROJECTIONS
+   PROFIT MODEL
 --------------------------*/
 function getProfit(mult) {
     return {
@@ -177,14 +178,14 @@ function getProfit(mult) {
 }
 
 /* -------------------------
-   DRAW DOWN
+   DRAWDOWN
 --------------------------*/
 function getDD(balance) {
     return balance * DD_RATE;
 }
 
 /* -------------------------
-   RENDER HOME
+   HOME
 --------------------------*/
 function renderHome() {
 
@@ -213,13 +214,13 @@ function renderHome() {
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
                 <b>${a.name}</b><br>
-                £${b.toLocaleString()}<br>
-                <span class="small">${mult.toFixed(2)}x | £${profit.dailyMin.toFixed(0)}+/day</span>
+                $${b.toLocaleString()}<br>
+                <span class="small">${mult.toFixed(2)}x | $${profit.dailyMin.toFixed(0)}/day</span>
             </div>
         `;
     });
 
-    document.getElementById("totalBalance").innerText = "£" + totalBalance.toLocaleString();
+    document.getElementById("totalBalance").innerText = "$" + totalBalance.toLocaleString();
     document.getElementById("portfolioDaily").innerText = portfolioDaily.toFixed(0);
     document.getElementById("portfolioDD").innerText = portfolioDD.toFixed(0);
 }
@@ -252,7 +253,7 @@ function addAccount() {
 }
 
 /* -------------------------
-   OPEN ACCOUNT
+   OPEN
 --------------------------*/
 function openAccount(i) {
     currentIndex = i;
@@ -269,7 +270,7 @@ function openAccount(i) {
 }
 
 /* -------------------------
-   UPDATE DETAIL
+   UPDATE
 --------------------------*/
 function updateAccount() {
 
@@ -283,10 +284,10 @@ function updateAccount() {
     let dd = getDD(b);
 
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
-    document.getElementById("daily").innerText = "£" + profit.dailyMin.toFixed(0);
-    document.getElementById("weekly").innerText = "£" + (profit.dailyMin * 7).toFixed(0);
-    document.getElementById("monthly").innerText = "£" + (profit.dailyMin * 30).toFixed(0);
-    document.getElementById("dd").innerText = "£" + dd.toFixed(0);
+    document.getElementById("daily").innerText = "$" + profit.dailyMin.toFixed(0);
+    document.getElementById("weekly").innerText = "$" + (profit.dailyMin * 7).toFixed(0);
+    document.getElementById("monthly").innerText = "$" + (profit.dailyMin * 30).toFixed(0);
+    document.getElementById("dd").innerText = "$" + dd.toFixed(0);
 }
 
 /* -------------------------
