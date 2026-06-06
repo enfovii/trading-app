@@ -14,29 +14,20 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
-/* HEADER */
 h2 {
     font-size: 22px;
     font-weight: 800;
     margin-bottom: 16px;
-    letter-spacing: 0.4px;
 }
 
-/* GLASS CARD */
+/* CARD */
 .card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
     backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
     padding: 16px;
     margin-top: 12px;
     border-radius: 18px;
-    box-shadow: 0 12px 35px rgba(0,0,0,0.4);
-    transition: 0.2s ease;
-}
-
-.card:active {
-    transform: scale(0.99);
 }
 
 /* BUTTON */
@@ -49,13 +40,6 @@ button {
     border: none;
     border-radius: 14px;
     font-weight: 600;
-    letter-spacing: 0.3px;
-    box-shadow: 0 8px 20px rgba(47,129,247,0.25);
-}
-
-button:active {
-    transform: scale(0.97);
-    opacity: 0.9;
 }
 
 /* INPUT */
@@ -68,30 +52,13 @@ input {
     margin-top: 8px;
     background: rgba(255,255,255,0.04);
     color: white;
-    outline: none;
 }
 
-input:focus {
-    border-color: rgba(47,129,247,0.6);
-    box-shadow: 0 0 0 3px rgba(47,129,247,0.15);
-}
-
-/* BIG NUMBERS */
-.big {
-    font-size: 26px;
-    font-weight: 800;
-}
-
+/* TEXT */
+.big { font-size: 26px; font-weight: 800; }
 .lime { color: #22c55e; }
 .red { color: #ff4d4d; }
-
-/* SMALL TEXT */
-.small {
-    font-size: 12px;
-    color: rgba(230,234,242,0.6);
-    margin-top: 6px;
-    display: block;
-}
+.small { font-size: 12px; color: rgba(230,234,242,0.6); }
 
 /* ACCOUNT */
 .account {
@@ -101,22 +68,24 @@ input:focus {
     border-radius: 16px;
     cursor: pointer;
     border: 1px solid rgba(255,255,255,0.06);
-    transition: 0.15s ease;
 }
 
-.account:hover {
-    border-color: rgba(47,129,247,0.3);
+.hidden { display:none; }
+
+/* PROGRESS BAR */
+.progress-wrap {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    height: 10px;
+    overflow: hidden;
 }
 
-.account:active {
-    transform: scale(0.99);
-}
-
-/* UTIL */
-.hidden { display: none; }
-
-* {
-    -webkit-tap-highlight-color: transparent;
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2f81f7, #22c55e);
+    transition: 0.3s ease;
 }
 </style>
 </head>
@@ -139,7 +108,7 @@ input:focus {
 <div id="totalBalance" class="big lime">$0</div>
 
 <div class="small">Portfolio Daily Profit: $<span id="portfolioDaily">0</span></div>
-<div class="small">Portfolio Max Drawdown (40%): $<span id="portfolioDD">0</span></div>
+<div class="small">Portfolio Max Drawdown: $<span id="portfolioDD">0</span></div>
 </div>
 
 </div>
@@ -162,13 +131,19 @@ input:focus {
 
 <input id="editBalance" oninput="updateAccount()">
 
+<!-- PROGRESS BAR (ONLY DETAIL PAGE) -->
+<div class="small">Progress to next X tier</div>
+<div class="progress-wrap">
+    <div id="progressBar" class="progress-bar"></div>
+</div>
+
 <div class="card">
 <div>Multiplier</div>
 <div id="mult" class="big lime">0x</div>
 </div>
 
 <div class="card">
-<div>Daily Profit Range</div>
+<div>Daily Profit</div>
 <div id="daily" class="big lime">$0</div>
 </div>
 
@@ -183,12 +158,13 @@ input:focus {
 </div>
 
 <div class="card">
-<div>Max Drawdown (40%)</div>
+<div>Max Drawdown</div>
 <div id="dd" class="big red">$0</div>
 </div>
 
 <button onclick="deleteAccount()">Delete Account</button>
 <button onclick="back()">Back</button>
+
 </div>
 </div>
 
@@ -203,21 +179,41 @@ const MAX_PER_X = 1000;
 const DD_RATE = 0.40;
 
 /* SAVE */
-function save() {
+function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* MULTIPLIER MODEL */
+/* MULTIPLIER SYSTEM (FIXED TIERS) */
 function getMultiplier(b) {
-    if (b <= 90000) return b / 30000;
-    if (b <= 140000) return 3 + ((b - 90000) / 100000);
-    if (b <= 160000) return 3.5 + ((b - 140000) / 20000) * 0.5;
-    if (b <= 200000) return 4 + ((b - 160000) / 40000);
-    return 5;
+    if (b < 90000) return b / 30000;
+    if (b < 140000) return 3;
+    if (b < 160000) return 3.5;
+    return 4 + ((b - 160000) / 40000);
+}
+
+/* NEXT TIER LOGIC */
+function getNextTier(b) {
+    if (b < 90000) return 90000;
+    if (b < 140000) return 140000;
+    if (b < 160000) return 160000;
+    return null;
+}
+
+/* PROGRESS % */
+function getProgress(b) {
+    let next = getNextTier(b);
+    if (!next) return 100;
+
+    let prev =
+        next === 90000 ? 0 :
+        next === 140000 ? 90000 :
+        next === 160000 ? 140000 : 160000;
+
+    return Math.min(100, ((b - prev) / (next - prev)) * 100);
 }
 
 /* PROFIT */
-function getProfit(mult) {
+function getProfit(mult){
     return {
         dailyMin: mult * MIN_PER_X,
         dailyMax: mult * MAX_PER_X
@@ -225,12 +221,12 @@ function getProfit(mult) {
 }
 
 /* DRAW DOWN */
-function getDD(balance) {
-    return balance * DD_RATE;
+function getDD(b){
+    return b * DD_RATE;
 }
 
 /* HOME */
-function renderHome() {
+function renderHome(){
 
     document.getElementById("home").classList.remove("hidden");
     document.getElementById("addScreen").classList.add("hidden");
@@ -243,7 +239,7 @@ function renderHome() {
     let daily = 0;
     let ddTotal = 0;
 
-    accounts.forEach((a, i) => {
+    accounts.forEach((a,i)=>{
 
         let b = a.balance;
         let mult = getMultiplier(b);
@@ -269,32 +265,28 @@ function renderHome() {
 }
 
 /* ADD */
-function showAdd() {
+function showAdd(){
     document.getElementById("home").classList.add("hidden");
     document.getElementById("addScreen").classList.remove("hidden");
 }
 
-function addAccount() {
+function addAccount(){
 
     let name = document.getElementById("name").value;
-    let input = document.getElementById("balance").value.toLowerCase().trim();
+    let input = document.getElementById("balance").value.toLowerCase();
 
-    let b;
+    let b = input.includes("k")
+        ? parseFloat(input.replace("k","")) * 1000
+        : parseFloat(input);
 
-    if (input.includes("k")) {
-        b = parseFloat(input.replace("k", "")) * 1000;
-    } else {
-        b = parseFloat(input);
-    }
-
-    accounts.push({ name, balance: b });
-
+    accounts.push({name, balance:b});
     save();
     renderHome();
 }
 
 /* OPEN */
-function openAccount(i) {
+function openAccount(i){
+
     currentIndex = i;
 
     document.getElementById("home").classList.add("hidden");
@@ -309,7 +301,7 @@ function openAccount(i) {
 }
 
 /* UPDATE */
-function updateAccount() {
+function updateAccount(){
 
     let b = parseFloat(document.getElementById("editBalance").value);
     accounts[currentIndex].balance = b;
@@ -321,6 +313,7 @@ function updateAccount() {
     let dd = getDD(b);
 
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+
     document.getElementById("daily").innerText =
         "$" + profit.dailyMin.toFixed(0) + " - $" + profit.dailyMax.toFixed(0);
 
@@ -332,21 +325,24 @@ function updateAccount() {
 
     document.getElementById("dd").innerText =
         "$" + dd.toFixed(0);
+
+    /* PROGRESS BAR */
+    document.getElementById("progressBar").style.width =
+        getProgress(b) + "%";
 }
 
 /* DELETE */
-function deleteAccount() {
-    accounts.splice(currentIndex, 1);
+function deleteAccount(){
+    accounts.splice(currentIndex,1);
     save();
     renderHome();
 }
 
 /* BACK */
-function back() {
+function back(){
     renderHome();
 }
 
-/* INIT */
 renderHome();
 
 </script>
