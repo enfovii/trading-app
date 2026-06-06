@@ -144,47 +144,51 @@ input {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let currentIndex = null;
 
-const MIN_PER_X = 800;
-const MAX_PER_X = 1000;
-const DD_RATE = 0.40;
-
 /* SAVE */
 function save(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 }
 
-/* FIXED + CORRECT TIERS (NO MISALIGNMENT) */
+/* =========================
+   YOUR FULL SYSTEM LOGIC
+   ========================= */
+
 function getMultiplier(b) {
-    if (b < 140000) return 3.5;
-    if (b < 160000) return 4;
-    if (b < 200000) return 4.5;
-    if (b < 240000) return 5;
+
+    // 0 - 90k: smooth scaling (30k = 1x)
+    if (b < 90000) {
+        return b / 30000;
+    }
+
+    // locked tiers
+    if (b < 140000) return 3;
+    if (b < 160000) return 3.5;
+    if (b < 200000) return 4;
+
     return 5;
 }
 
-function getTierTop(b){
-    if (b < 140000) return 140000;
-    if (b < 160000) return 160000;
-    if (b < 200000) return 200000;
-    if (b < 240000) return 240000;
-    return b;
-}
+function getProfit(mult, balance){
 
-/* NEXT TIER */
-function getNextMilestone(b){
-    return "$" + getTierTop(b).toLocaleString();
-}
+    let perX = balance < 90000 ? 30000 : 40000;
 
-/* PROFIT */
-function getProfit(mult){
     return {
-        dailyMin: mult * MIN_PER_X,
-        dailyMax: mult * MAX_PER_X
+        dailyMin: mult * perX * 0.8,
+        dailyMax: mult * perX
     };
 }
 
 function getDD(b){
-    return b * DD_RATE;
+    return b * 0.40;
+}
+
+function getNextMilestone(b){
+
+    if (b < 90000) return "£90,000 (3x lock)";
+    if (b < 140000) return "£140,000 (3.5x)";
+    if (b < 160000) return "£160,000 (4x)";
+    if (b < 200000) return "£200,000 (5x)";
+    return "Max tier";
 }
 
 /* HOME */
@@ -205,7 +209,7 @@ function renderHome(){
 
         let b = a.balance;
         let mult = getMultiplier(b);
-        let profit = getProfit(mult);
+        let profit = getProfit(mult, b);
 
         total += b;
         totalDaily += profit.dailyMin;
@@ -274,7 +278,7 @@ function updateAccount(){
     save();
 
     let mult = getMultiplier(b);
-    let profit = getProfit(mult);
+    let profit = getProfit(mult, b);
     let dd = getDD(b);
 
     document.getElementById("mult").innerText =
