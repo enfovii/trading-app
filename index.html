@@ -68,6 +68,10 @@ input {
 
 <h2>📊 Trading Dashboard</h2>
 
+<div class="card">
+<button onclick="showHome()">🏠 Accounts</button>
+</div>
+
 <!-- HOME -->
 <div id="home">
 
@@ -179,7 +183,7 @@ function renderHome(){
     document.getElementById("totalDD").innerText = totalDD.toFixed(0);
 }
 
-/* OPEN ACCOUNT */
+/* DETAIL */
 function openAccount(i){
     currentIndex = i;
 
@@ -194,7 +198,6 @@ function openAccount(i){
     updateAccount();
 }
 
-/* UPDATE */
 function updateAccount(){
 
     let b = parseFloat(document.getElementById("editBalance").value);
@@ -213,11 +216,26 @@ function updateAccount(){
     document.getElementById("daily").innerText = "$" + (mult*800).toFixed(0);
     document.getElementById("weekly").innerText = "$" + (mult*800*7).toFixed(0);
     document.getElementById("monthly").innerText = "$" + (mult*800*30).toFixed(0);
-    document.getElementById("nextTier").innerText = "Next tier logic active";
+
+    document.getElementById("nextTier").innerText = getNextTier(b);
     document.getElementById("dd").innerText = "$" + (b * 0.4).toFixed(0);
 }
 
-/* BACK (FIXED) */
+/* ✅ FIX ADDED */
+function getNextTier(b){
+
+    if (b < 90000) return "$90,000";
+    if (b < 140000) return "$140,000";
+    if (b < 160000) return "$160,000";
+    if (b < 200000) return "$200,000";
+
+    let steps = Math.floor((b - 200000) / 20000) + 1;
+    let next = 200000 + (steps * 20000);
+
+    return "$" + next.toLocaleString();
+}
+
+/* BACK */
 function back(){
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("home").classList.remove("hidden");
