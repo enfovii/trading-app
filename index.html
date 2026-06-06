@@ -177,7 +177,7 @@ button {
 <div id="accounts"></div>
 </div>
 
-<!-- PORTFOLIO PAGE -->
+<!-- PORTFOLIO -->
 <div id="portfolio" class="page">
     <div class="card">
         <h3>Portfolio Overview</h3>
@@ -192,19 +192,24 @@ button {
             <div class="big green" id="p_daily"></div>
         </div>
 
-        <div class="card">
-            <div class="small">Weekly</div>
-            <div id="p_weekly"></div>
-        </div>
+        <!-- NEW ROW: 3 COLUMNS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;">
 
-        <div class="card">
-            <div class="small">Monthly</div>
-            <div id="p_monthly"></div>
-        </div>
+            <div class="card" style="margin:0;">
+                <div class="small">Daily</div>
+                <div class="green" id="p_day"></div>
+            </div>
 
-        <div class="card">
-            <div class="small">Drawdown</div>
-            <div class="big red" id="p_dd"></div>
+            <div class="card" style="margin:0;">
+                <div class="small">Weekly</div>
+                <div id="p_week"></div>
+            </div>
+
+            <div class="card" style="margin:0;">
+                <div class="small">Monthly</div>
+                <div id="p_month"></div>
+            </div>
+
         </div>
 
         <button onclick="backHome()">Back</button>
@@ -213,7 +218,6 @@ button {
 
 <!-- ACCOUNT -->
 <div id="account" class="page">
-
 <div class="card">
     <h3 id="name"></h3>
 
@@ -247,13 +251,10 @@ button {
     <button onclick="back()">Back</button>
     <button class="danger" onclick="confirmDelete()">Delete Account</button>
 </div>
-
 </div>
 
-<!-- ADD BUTTON -->
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
 
-<!-- MODALS -->
 <div class="modal" id="modal">
     <div class="modal-content">
         <div class="big">Add Account</div>
@@ -308,9 +309,7 @@ function dd(b){ return b*0.4; }
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
-
-    const addBtn = document.querySelector(".addBtn");
-    addBtn.style.display = (page === "home") ? "block" : "none";
+    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
 }
 
 /* PORTFOLIO */
@@ -321,20 +320,20 @@ function openPortfolio(){
 
 function renderPortfolio(){
 
-    let t=0,d=0,draw=0;
+    let t=0,d=0;
 
     accounts.forEach(a=>{
         let b=num(a.balance);
         t+=b;
         d+=daily(b);
-        draw+=dd(b);
     });
 
     document.getElementById("p_total").innerText = money(t.toFixed(0));
     document.getElementById("p_daily").innerText = money(d.toFixed(0));
-    document.getElementById("p_weekly").innerText = money((d*7).toFixed(0));
-    document.getElementById("p_monthly").innerText = money((d*30).toFixed(0));
-    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+
+    document.getElementById("p_day").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*7).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*30).toFixed(0));
 }
 
 /* HOME */
@@ -346,9 +345,7 @@ function render(){
     let t=0,d=0,draw=0;
 
     accounts.forEach((a,i)=>{
-
         let b=num(a.balance);
-
         t+=b;
         d+=daily(b);
         draw+=dd(b);
@@ -371,10 +368,8 @@ function render(){
 function openAccount(i){
     current=i;
     let a=accounts[i];
-
     document.getElementById("name").innerText=a.name;
     document.getElementById("balance").value=num(a.balance);
-
     show("account");
     updateAccount();
 }
@@ -383,7 +378,6 @@ function updateAccount(){
     if(current===null) return;
 
     let b=num(document.getElementById("balance").value);
-
     accounts[current].balance=b;
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
@@ -400,13 +394,13 @@ function updateAccount(){
 function back(){ current=null; show("home"); }
 function backHome(){ show("home"); }
 
+/* MODALS */
 function openModal(){ document.getElementById("modal").style.display="flex"; }
 function closeModal(){ document.getElementById("modal").style.display="none"; }
 
 function createAccount(){
     let name=document.getElementById("newName").value.trim();
     let balance=num(document.getElementById("newBalance").value);
-
     if(!name) return;
 
     accounts.push({name,balance});
@@ -421,12 +415,9 @@ function confirmDelete(){ document.getElementById("deleteModal").style.display="
 function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
 
 function deleteAccount(){
-
     if(current===null) return;
-
     accounts.splice(current,1);
     localStorage.setItem("accounts",JSON.stringify(accounts));
-
     current=null;
     closeDeleteModal();
     show("home");
