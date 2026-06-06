@@ -11,7 +11,6 @@ body {
     padding: 14px;
     color: #e8ecf3;
     overflow-x: hidden;
-    -webkit-text-size-adjust: 100%;
 }
 
 body::before {
@@ -98,7 +97,7 @@ input {
     box-sizing: border-box;
 }
 
-/* ✅ FIXED BUTTON SPACING FOR iPHONE */
+/* BUTTON FIX STILL INCLUDED */
 button {
     width: calc(100% - 24px);
     margin-left: 12px;
@@ -111,6 +110,35 @@ button {
     border-radius: 12px;
     font-weight: 600;
     box-sizing: border-box;
+}
+
+/* ADD BUTTON */
+.addBtn {
+    position: fixed;
+    bottom: 18px;
+    left: 12px;
+    right: 12px;
+}
+
+/* MODAL */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+    padding: 16px;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(17,24,35,0.85);
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(14px);
+    padding: 16px;
+    border-radius: 14px;
 }
 </style>
 </head>
@@ -183,11 +211,30 @@ button {
 
 </div>
 
+<!-- ADD ACCOUNT BUTTON -->
+<button class="addBtn" onclick="openModal()">+ Add Account</button>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+
+        <div class="big">Add Account</div>
+
+        <input id="newName" placeholder="Account name">
+        <input id="newBalance" placeholder="Starting balance">
+
+        <button onclick="createAccount()">Create</button>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
+
+    </div>
+</div>
+
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
+/* MONEY */
 function money(v){
     return "$" + Number(v).toLocaleString();
 }
@@ -196,6 +243,7 @@ function num(v){
     return isNaN(Number(v)) ? 0 : Number(v);
 }
 
+/* LOGIC */
 function mult(b){
     b=num(b);
     if(b<90000) return b/30000;
@@ -208,12 +256,14 @@ function mult(b){
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
+/* NAV */
 function show(page){
     document.querySelectorAll(".page")
         .forEach(p=>p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
 }
 
+/* RENDER */
 function render(){
 
     let el=document.getElementById("accounts");
@@ -242,6 +292,7 @@ function render(){
     document.getElementById("dd").innerText = money(draw.toFixed(0));
 }
 
+/* OPEN */
 function openAccount(i){
     current=i;
     let a=accounts[i];
@@ -253,6 +304,7 @@ function openAccount(i){
     updateAccount();
 }
 
+/* UPDATE */
 function updateAccount(){
 
     if(current===null) return;
@@ -274,9 +326,36 @@ function updateAccount(){
     render();
 }
 
+/* BACK */
 function back(){
     current=null;
     show("home");
+}
+
+/* MODAL */
+function openModal(){
+    document.getElementById("modal").style.display="flex";
+}
+
+function closeModal(){
+    document.getElementById("modal").style.display="none";
+}
+
+function createAccount(){
+
+    let name=document.getElementById("newName").value.trim();
+    let balance=num(document.getElementById("newBalance").value);
+
+    if(!name) return;
+
+    accounts.push({name,balance});
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    document.getElementById("newName").value="";
+    document.getElementById("newBalance").value="";
+
+    closeModal();
+    render();
 }
 
 show("home");
