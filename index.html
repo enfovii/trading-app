@@ -47,7 +47,6 @@ input {
 
 .big { font-size: 26px; font-weight: 800; }
 .lime { color: #22c55e; }
-.red { color: #ff4d4d; }
 .small { font-size: 12px; color: rgba(230,234,242,0.6); }
 
 .hidden { display:none; }
@@ -176,7 +175,7 @@ function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* ================= MULTIPLIER (ONLY FIXED EXTENSION) ================= */
+/* ================= FIXED MULTIPLIER ================= */
 
 function getMultiplier(b) {
 
@@ -185,19 +184,32 @@ function getMultiplier(b) {
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
-    // =========================
-    // 200k+ EXTENSION (ADDED ONLY)
-    // =========================
+    // ===== FIXED 200K+ SYSTEM =====
 
     let base = 4;
     let extra = b - 200000;
 
     let fullSteps = Math.floor(extra / 40000);   // +1x per 40k
-    let halfSteps = Math.floor(extra / 20000);   // +0.5x per 20k
+    let remainder = extra % 40000;
 
-    let remainingHalfSteps = halfSteps - (fullSteps * 2);
+    let halfSteps = Math.floor(remainder / 20000); // +0.5x per 20k
 
-    return base + (fullSteps * 1) + (remainingHalfSteps * 0.5);
+    return base + fullSteps + (halfSteps * 0.5);
+}
+
+/* ================= FIXED NEXT TIER ================= */
+
+function getNextTier(b){
+
+    if (b < 90000) return "$90,000";
+    if (b < 140000) return "$140,000";
+    if (b < 160000) return "$160,000";
+    if (b < 200000) return "$200,000";
+
+    let steps = Math.ceil((b - 200000) / 20000);
+    let next = 200000 + (steps * 20000);
+
+    return "$" + next.toLocaleString();
 }
 
 /* HOME */
@@ -274,18 +286,8 @@ function updateAccount(){
         getNextTier(b);
 }
 
-function getNextTier(b){
+/* JOURNAL (UNCHANGED) */
 
-    if (b < 90000) return "$90,000";
-    if (b < 140000) return "$140,000";
-    if (b < 160000) return "$160,000";
-    if (b < 200000) return "$200,000";
-
-    let extra = Math.ceil((b - 200000) / 20000) * 20000 + 200000;
-    return "$" + extra.toLocaleString();
-}
-
-/* JOURNAL */
 function showJournal(){
     renderCalendar();
     document.getElementById("home").classList.add("hidden");
