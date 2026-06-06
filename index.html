@@ -71,15 +71,11 @@ input {
 .day {
     padding: 10px;
     border-radius: 10px;
-    background: #0f1622;
     border: 1px solid #1e2a3a;
     text-align: center;
     font-size: 12px;
     cursor: pointer;
-}
-
-.day.has-data {
-    border-color: #1f6feb;
+    transition: 0.2s;
 }
 </style>
 </head>
@@ -178,7 +174,7 @@ input {
 <script>
 
 /* =========================
-   STORAGE LAYER
+   STORAGE
 ========================= */
 
 const Store = {
@@ -259,7 +255,6 @@ const Accounts = {
 
     open(i){
         this.currentIndex = i;
-
         UI.show('detail');
 
         let acc = this.data[i];
@@ -289,7 +284,7 @@ const Accounts = {
 };
 
 /* =========================
-   JOURNAL MODULE
+   JOURNAL (FULL FIXED SYSTEM)
 ========================= */
 
 const Journal = {
@@ -299,6 +294,18 @@ const Journal = {
 
     save(){
         Store.set("journal", this.data);
+    },
+
+    safe(n){
+        n = Number(n);
+        return isNaN(n) ? 0 : n;
+    },
+
+    getColor(v){
+        v = this.safe(v);
+        if(v > 0) return `rgba(34,197,94,${Math.min(v/500,1)})`;
+        if(v < 0) return `rgba(239,68,68,${Math.min(Math.abs(v)/500,1)})`;
+        return "#0f1622";
     },
 
     changeMonth(dir){
@@ -326,13 +333,16 @@ const Journal = {
             if(day === 0 || day === 6) continue;
 
             let key = `${y}-${m+1}-${d}`;
-            let val = this.data[key] ?? 0;
+            let val = this.safe(this.data[key]);
 
-            total += Number(val);
+            total += val;
 
             html += `
-            <div class="day ${val?'has-data':''}" onclick="Journal.selectDay('${key}')">
-                ${d}<br><span class="small">$${val}</span>
+            <div class="day ${val ? 'has-data' : ''}"
+                 onclick="Journal.selectDay('${key}')"
+                 style="background:${this.getColor(val)}">
+                ${d}<br>
+                <span class="small">$${val}</span>
             </div>`;
         }
 
@@ -343,14 +353,14 @@ const Journal = {
     selectDay(key){
         this.selectedDate = key;
         document.getElementById("selectedDay").innerText = "Selected: " + key;
-        document.getElementById("profitInput").value = this.data[key] || "";
+        document.getElementById("profitInput").value = this.safe(this.data[key]);
     },
 
     saveDay(){
         if(!this.selectedDate) return;
 
         this.data[this.selectedDate] =
-            parseFloat(document.getElementById("profitInput").value) || 0;
+            this.safe(document.getElementById("profitInput").value);
 
         this.save();
         this.render();
