@@ -184,32 +184,20 @@ function getMultiplier(b) {
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
-    // ===== FIXED 200K+ SYSTEM =====
+    // =========================
+    // FIXED 200K+ STACKING SYSTEM
+    // =========================
 
     let base = 4;
     let extra = b - 200000;
 
-    let fullSteps = Math.floor(extra / 40000);   // +1x per 40k
-    let remainder = extra % 40000;
+    let fullSteps = Math.floor(extra / 40000); // +1x per 40k
+
+    let remainder = extra - (fullSteps * 40000); // clean leftover
 
     let halfSteps = Math.floor(remainder / 20000); // +0.5x per 20k
 
     return base + fullSteps + (halfSteps * 0.5);
-}
-
-/* ================= FIXED NEXT TIER ================= */
-
-function getNextTier(b){
-
-    if (b < 90000) return "$90,000";
-    if (b < 140000) return "$140,000";
-    if (b < 160000) return "$160,000";
-    if (b < 200000) return "$200,000";
-
-    let steps = Math.ceil((b - 200000) / 20000);
-    let next = 200000 + (steps * 20000);
-
-    return "$" + next.toLocaleString();
 }
 
 /* HOME */
@@ -284,6 +272,19 @@ function updateAccount(){
 
     document.getElementById("nextTier").innerText =
         getNextTier(b);
+}
+
+function getNextTier(b){
+
+    if (b < 90000) return "$90,000";
+    if (b < 140000) return "$140,000";
+    if (b < 160000) return "$160,000";
+    if (b < 200000) return "$200,000";
+
+    let steps = Math.ceil((b - 200000) / 20000);
+    let next = 200000 + (steps * 20000);
+
+    return "$" + next.toLocaleString();
 }
 
 /* JOURNAL (UNCHANGED) */
