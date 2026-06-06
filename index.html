@@ -13,10 +13,7 @@ body {
     padding: 18px;
 }
 
-h2 {
-    font-size: 22px;
-    font-weight: 700;
-}
+h2 { font-size: 22px; font-weight: 700; }
 
 .card {
     background: #111823;
@@ -58,6 +55,7 @@ input {
 }
 
 .lime { color: #22c55e; }
+.red { color: #ef4444; }
 
 .hidden { display:none; }
 
@@ -83,16 +81,12 @@ input {
     background: #0f1622;
     border: 1px solid #1e2a3a;
     text-align: center;
-    cursor: pointer;
     font-size: 12px;
+    cursor: pointer;
 }
 
 .day.has-data {
     border-color: #1f6feb;
-}
-
-.day:hover {
-    transform: scale(1.03);
 }
 
 </style>
@@ -113,6 +107,10 @@ input {
 <div class="card">
 <div>Total Portfolio Balance</div>
 <div id="totalBalance" class="big">$0</div>
+
+<div class="small">Daily: $<span id="totalDaily">0</span></div>
+<div class="small">Weekly: $<span id="totalWeekly">0</span></div>
+<div class="small red">Drawdown: $<span id="totalDD">0</span></div>
 </div>
 
 <div id="accounts"></div>
@@ -121,6 +119,7 @@ input {
 
 <!-- DETAIL -->
 <div id="detail" class="hidden">
+
 <div class="card">
 <h3 id="accName"></h3>
 
@@ -132,12 +131,32 @@ input {
 </div>
 
 <div class="card">
+<div>Daily Profit</div>
+<div id="daily"></div>
+</div>
+
+<div class="card">
+<div>Weekly Profit</div>
+<div id="weekly"></div>
+</div>
+
+<div class="card">
+<div>Monthly Profit</div>
+<div id="monthly"></div>
+</div>
+
+<div class="card">
 <div>Next Tier</div>
 <div id="nextTier"></div>
 </div>
 
-<button onclick="back()">Back</button>
+<div class="card">
+<div>Drawdown</div>
+<div id="dd" class="big red"></div>
 </div>
+
+<button onclick="back()">Back</button>
+
 </div>
 
 <!-- JOURNAL -->
@@ -155,7 +174,6 @@ input {
 </div>
 
 <div id="calendar" class="calendar-grid"></div>
-
 </div>
 
 <div class="card">
@@ -192,10 +210,14 @@ function showJournal(){
 
 /* HOME */
 function renderHome(){
+
     let container = document.getElementById("accounts");
     container.innerHTML = "";
 
     let total = 0;
+    let totalDaily = 0;
+    let totalWeekly = 0;
+    let totalDD = 0;
 
     accounts.forEach((a,i)=>{
 
@@ -203,27 +225,46 @@ function renderHome(){
 
         let mult = getMultiplier(b);
 
+        let daily = mult * 800;
+        let weekly = daily * 7;
+        let monthly = daily * 30;
+        let dd = b * 0.4;
+
         total += b;
+        totalDaily += daily;
+        totalWeekly += weekly;
+        totalDD += dd;
 
         container.innerHTML += `
             <div class="account" onclick="openAccount(${i})">
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
-                <span class="small">${mult.toFixed(2)}x</span>
+                <span class="small">${mult.toFixed(2)}x</span><br>
+                <span class="small lime">
+                    Daily $${daily.toFixed(0)} • Weekly $${weekly.toFixed(0)} • Monthly $${monthly.toFixed(0)}
+                </span><br>
+                <span class="small red">
+                    DD $${dd.toFixed(0)}
+                </span>
             </div>
         `;
     });
 
     document.getElementById("totalBalance").innerText = "$" + total.toLocaleString();
+    document.getElementById("totalDaily").innerText = totalDaily.toFixed(0);
+    document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
+    document.getElementById("totalDD").innerText = totalDD.toFixed(0);
 }
 
 /* ACCOUNT */
 function openAccount(i){
     currentIndex = i;
+
     document.getElementById("home").classList.add("hidden");
     document.getElementById("detail").classList.remove("hidden");
 
     let acc = accounts[i];
+
     document.getElementById("accName").innerText = acc.name;
     document.getElementById("editBalance").value = acc.balance;
 
@@ -234,10 +275,18 @@ function updateAccount(){
 
     let b = parseFloat(document.getElementById("editBalance").value);
     accounts[currentIndex].balance = b;
+
     localStorage.setItem("accounts", JSON.stringify(accounts));
 
-    document.getElementById("mult").innerText = getMultiplier(b).toFixed(2) + "x";
+    let mult = getMultiplier(b);
+    let daily = mult * 800;
+
+    document.getElementById("mult").innerText = mult.toFixed(2) + "x";
+    document.getElementById("daily").innerText = "$" + daily.toFixed(0);
+    document.getElementById("weekly").innerText = "$" + (daily*7).toFixed(0);
+    document.getElementById("monthly").innerText = "$" + (daily*30).toFixed(0);
     document.getElementById("nextTier").innerText = getNextTier(b);
+    document.getElementById("dd").innerText = "$" + (b * 0.4).toFixed(0);
 }
 
 /* LOGIC */
@@ -273,32 +322,31 @@ function changeMonth(dir){
 
 function renderCalendar(){
 
-    let year = viewDate.getFullYear();
-    let month = viewDate.getMonth();
+    let y = viewDate.getFullYear();
+    let m = viewDate.getMonth();
 
     document.getElementById("monthLabel").innerText =
-        viewDate.toLocaleString('default', { month:'long', year:'numeric' });
+        viewDate.toLocaleString('default',{month:'long',year:'numeric'});
 
     let html = "";
     let total = 0;
 
     for(let d=1; d<=31; d++){
 
-        let date = new Date(year, month, d);
-        if(date.getMonth() !== month) break;
+        let date = new Date(y,m,d);
+        if(date.getMonth() !== m) break;
 
         let day = date.getDay();
         if(day === 0 || day === 6) continue;
 
-        let key = `${year}-${month+1}-${d}`;
+        let key = `${y}-${m+1}-${d}`;
         let val = journal[key] || 0;
 
         total += Number(val);
 
         html += `
-        <div class="day ${val ? 'has-data' : ''}" onclick="selectDay('${key}')">
-            ${d}<br>
-            <span class="small">$${val}</span>
+        <div class="day ${val?'has-data':''}" onclick="selectDay('${key}')">
+            ${d}<br><span class="small">$${val}</span>
         </div>`;
     }
 
@@ -320,6 +368,8 @@ function saveDay(){
 
     renderCalendar();
 }
+
+renderHome();
 
 </script>
 
