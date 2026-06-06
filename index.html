@@ -181,12 +181,12 @@ function saveJournal(){
     localStorage.setItem("journal", JSON.stringify(journal));
 }
 
-/* NAV FIX (ADDED ONLY CHANGE) */
+/* NAV */
 function showHome(){
     renderHome();
 }
 
-/* MULTIPLIER */
+/* MULTIPLIER (UNCHANGED) */
 function getMultiplier(b) {
 
     if (b < 90000) return b / 30000;
@@ -200,7 +200,7 @@ function getMultiplier(b) {
     return 5 + (steps * 0.5);
 }
 
-/* NEXT TIER */
+/* NEXT TIER (UNCHANGED) */
 function getNextTier(b){
 
     if (b < 90000) return "$90,000";
@@ -291,13 +291,15 @@ function updateAccount(){
         getNextTier(b);
 }
 
-/* JOURNAL (UNCHANGED) */
-
+/* JOURNAL FIX */
 function showJournal(){
-    renderCalendar();
     document.getElementById("home").classList.add("hidden");
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.remove("hidden");
+
+    setTimeout(() => {
+        renderCalendar();
+    }, 0);
 }
 
 function changeMonth(dir){
@@ -370,7 +372,7 @@ function renderCalendar(){
     document.getElementById("calendar").innerHTML = cal;
 }
 
-function selectDay(key, day){
+function selectDay(key){
     selectedDate = key;
     document.getElementById("selectedDay").innerText = key;
     document.getElementById("dayProfit").value = journal[key] || "";
@@ -388,6 +390,7 @@ function back(){
 }
 
 renderHome();
+renderCalendar();
 
 </script>
 
