@@ -66,7 +66,7 @@ input {
 
 <body>
 
-<!-- 🔥 STEP 7: LOADING SCREEN -->
+<!-- LOADING SCREEN -->
 <div id="loadingScreen" style="
     position: fixed;
     top: 0; left: 0;
@@ -165,11 +165,11 @@ const auth = firebase.auth();
 
 ---
 
-# 🔥 APP LOGIC (STEP 7 STABLE VERSION)
+# 🔥 APP LOGIC (STEP 8 INSTANT MODE)
 
 <script>
 
-let accounts = [];
+let accounts = JSON.parse(localStorage.getItem("accounts_cache") || "[]");
 let currentIndex = null;
 
 let userId = null;
@@ -188,40 +188,48 @@ auth.signInAnonymously()
     });
 
 /* -------------------------
-   LOAD DATA
+   INSTANT LOAD (CACHE FIRST)
 --------------------------*/
 function loadAccounts() {
     if (!userId) return;
 
-    db.collection("users").doc(userId).get().then(doc => {
+    isReady = true;
 
+    // hide loading instantly
+    document.getElementById("loadingScreen").style.display = "none";
+
+    // render from cache immediately
+    renderHome();
+
+    // sync Firebase in background
+    db.collection("users").doc(userId).get().then(doc => {
         if (doc.exists) {
             accounts = doc.data().accounts || [];
-        } else {
-            accounts = [];
+
+            localStorage.setItem("accounts_cache", JSON.stringify(accounts));
+
+            renderHome();
         }
-
-        isReady = true;
-
-        document.getElementById("loadingScreen").style.display = "none";
-
-        renderHome();
     });
 }
 
 /* -------------------------
-   SAVE DATA
+   SAVE (CACHE + CLOUD)
 --------------------------*/
 function save() {
     if (!userId || !isReady) return;
 
+    // instant local save
+    localStorage.setItem("accounts_cache", JSON.stringify(accounts));
+
+    // cloud sync in background
     db.collection("users").doc(userId).set({
         accounts: accounts
     });
 }
 
 /* -------------------------
-   RENDER UI
+   UI RENDER
 --------------------------*/
 function renderHome() {
     if (!isReady) return;
