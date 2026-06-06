@@ -11,9 +11,9 @@ body {
     padding: 14px;
     color: #e8ecf3;
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
 }
 
-/* BACKGROUND */
 body::before {
     content: "";
     position: fixed;
@@ -25,7 +25,6 @@ body::before {
     z-index: -1;
 }
 
-/* TITLE */
 .title {
     display: flex;
     justify-content: center;
@@ -39,7 +38,9 @@ h2 {
     text-align: center;
 }
 
-/* TOPBAR */
+.page { display:none; }
+.active { display:block; }
+
 .topbar {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -50,7 +51,6 @@ h2 {
     grid-column: 1 / -1;
 }
 
-/* STAT */
 .stat {
     background: rgba(17,24,35,0.55);
     border: 1px solid rgba(120,170,255,0.18);
@@ -65,10 +65,8 @@ h2 {
 .big {
     font-size: 24px;
     font-weight: 700;
-    transition: all 0.3s ease;
 }
 
-/* CARDS */
 .card {
     background: rgba(17,24,35,0.55);
     border: 1px solid rgba(120,170,255,0.18);
@@ -78,7 +76,6 @@ h2 {
     border-radius: 14px;
 }
 
-/* ACCOUNT */
 .account {
     padding: 14px;
     margin-top: 10px;
@@ -87,11 +84,9 @@ h2 {
     border: 1px solid rgba(120,170,255,0.18);
 }
 
-/* COLORS */
 .green { color: #2ee59d; }
 .red { color: #ff5c7a; }
 
-/* INPUT */
 input {
     width: 100%;
     padding: 14px;
@@ -103,9 +98,11 @@ input {
     box-sizing: border-box;
 }
 
-/* BUTTON */
+/* ✅ FIXED BUTTON SPACING FOR iPHONE */
 button {
-    width: 100%;
+    width: calc(100% - 24px);
+    margin-left: 12px;
+    margin-right: 12px;
     padding: 14px;
     margin-top: 10px;
     background: linear-gradient(135deg, #1f6feb, #144a99);
@@ -113,25 +110,7 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
-}
-
-/* FLOAT BUTTON */
-.addBtn {
-    position: fixed;
-    bottom: 16px;
-    left: 16px;
-    right: 16px;
-}
-
-/* CURRENCY SWITCH */
-.currencyBtn {
-    position: fixed;
-    top: 16px;
-    right: 16px;
-    width: auto;
-    padding: 8px 12px;
-    font-size: 12px;
-    border-radius: 10px;
+    box-sizing: border-box;
 }
 </style>
 </head>
@@ -141,8 +120,6 @@ button {
 <div class="title">
     <h2>Pro Trading Dashboard</h2>
 </div>
-
-<button class="currencyBtn" onclick="toggleCurrency()" id="currencyBtn">$ USD</button>
 
 <!-- HOME -->
 <div id="home" class="page active">
@@ -206,73 +183,18 @@ button {
 
 </div>
 
-<!-- ADD -->
-<button class="addBtn" onclick="openModal()">+ Add Account</button>
-
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* =========================
-   CURRENCY SYSTEM
-========================= */
-
-let currency = localStorage.getItem("currency") || "USD";
-
-function toggleCurrency(){
-    currency = currency === "USD" ? "GBP" : "USD";
-    localStorage.setItem("currency", currency);
-    document.getElementById("currencyBtn").innerText =
-        currency === "USD" ? "$ USD" : "£ GBP";
-    render();
-}
-
-function symbol(){
-    return currency === "USD" ? "$" : "£";
-}
-
-/* FORMAT (with k/m support) */
 function money(v){
-
-    v = Number(v);
-
-    let abs = Math.abs(v);
-
-    if(abs >= 1000000){
-        return symbol() + (v/1000000).toFixed(2) + "m";
-    }
-
-    if(abs >= 1000){
-        return symbol() + (v/1000).toFixed(1) + "k";
-    }
-
-    return symbol() + v.toLocaleString();
+    return "$" + Number(v).toLocaleString();
 }
 
-/* ANIMATION */
-function animate(el, value){
-    let start = 0;
-    let end = Number(value);
-    let duration = 300;
-    let stepTime = 10;
-    let steps = duration / stepTime;
-    let inc = end / steps;
-
-    let i = 0;
-    let interval = setInterval(()=>{
-        i++;
-        start += inc;
-        if(i >= steps){
-            clearInterval(interval);
-            start = end;
-        }
-        el.innerText = money(start.toFixed(0));
-    }, stepTime);
+function num(v){
+    return isNaN(Number(v)) ? 0 : Number(v);
 }
-
-/* LOGIC */
-function num(v){ return isNaN(Number(v)) ? 0 : Number(v); }
 
 function mult(b){
     b=num(b);
@@ -286,15 +208,12 @@ function mult(b){
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-/* NAV */
 function show(page){
     document.querySelectorAll(".page")
         .forEach(p=>p.classList.remove("active"));
-
     document.getElementById(page).classList.add("active");
 }
 
-/* RENDER */
 function render(){
 
     let el=document.getElementById("accounts");
@@ -314,16 +233,15 @@ function render(){
         <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
             ${money(b)}<br>
-            <span class="small green">Daily ${money(daily(b))}</span>
+            <span class="green">Daily ${money(daily(b))}</span>
         </div>`;
     });
 
-    animate(document.getElementById("total"), t);
-    animate(document.getElementById("daily"), d);
-    animate(document.getElementById("dd"), draw);
+    document.getElementById("total").innerText = money(t.toFixed(0));
+    document.getElementById("daily").innerText = money(d.toFixed(0));
+    document.getElementById("dd").innerText = money(draw.toFixed(0));
 }
 
-/* OPEN */
 function openAccount(i){
     current=i;
     let a=accounts[i];
@@ -335,7 +253,6 @@ function openAccount(i){
     updateAccount();
 }
 
-/* UPDATE */
 function updateAccount(){
 
     if(current===null) return;
@@ -357,18 +274,10 @@ function updateAccount(){
     render();
 }
 
-/* BACK */
 function back(){
     current=null;
     show("home");
 }
-
-/* MODAL PLACEHOLDER */
-function openModal(){ alert("Add modal already in your full version"); }
-
-/* INIT */
-document.getElementById("currencyBtn").innerText =
-    currency === "USD" ? "$ USD" : "£ GBP";
 
 show("home");
 render();
