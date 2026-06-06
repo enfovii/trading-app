@@ -13,10 +13,10 @@ body {
     padding: 18px;
 }
 
-h2 {
-    font-size: 22px;
-    font-weight: 700;
-}
+h2 { font-size: 22px; font-weight: 700; }
+
+.page { display:none; }
+.active { display:block; }
 
 .topbar {
     display: grid;
@@ -59,10 +59,21 @@ h2 {
     cursor: pointer;
 }
 
-.green { color: #22c55e; }
-.red { color: #ef4444; }
 .small { font-size: 12px; color: #93a4b8; }
 .big { font-size: 26px; font-weight: 700; }
+
+.green { color: #22c55e; }
+.red { color: #ef4444; }
+
+input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid #263445;
+    margin-top: 8px;
+    background: #0f1622;
+    color: #e8ecf3;
+}
 
 button {
     width: 100%;
@@ -74,33 +85,15 @@ button {
     border-radius: 12px;
     font-weight: 600;
 }
-
-input, select {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    border: 1px solid #263445;
-    margin-top: 8px;
-    background: #0f1622;
-    color: #e8ecf3;
-}
-
-.hidden { display:none; }
-
-.trade {
-    padding: 10px;
-    margin-top: 8px;
-    border-radius: 10px;
-    background: #0f1622;
-    border: 1px solid #1e2a3a;
-    font-size: 13px;
-}
 </style>
 </head>
 
 <body>
 
 <h2>📊 Pro Trading Dashboard</h2>
+
+<!-- HOME -->
+<div id="home" class="page active">
 
 <div class="topbar">
     <div class="stat">
@@ -119,8 +112,10 @@ input, select {
 
 <div id="accounts"></div>
 
-<!-- DETAIL -->
-<div id="detail" class="hidden">
+</div>
+
+<!-- ACCOUNT PAGE -->
+<div id="account" class="page">
 
 <div class="card">
     <h3 id="name"></h3>
@@ -134,7 +129,17 @@ input, select {
 
     <div class="card">
         <div class="small">Daily Profit</div>
-        <div id="dailyp"></div>
+        <div id="dailyP"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Weekly Profit</div>
+        <div id="weekly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Monthly Profit</div>
+        <div id="monthly"></div>
     </div>
 
     <div class="card">
@@ -142,41 +147,30 @@ input, select {
         <div class="big red" id="accdd"></div>
     </div>
 
-    <!-- TRADE LOGGER -->
-    <div class="card">
-        <div class="big">📒 Trade Logger</div>
-
-        <select id="type">
-            <option value="win">Win</option>
-            <option value="loss">Loss</option>
-        </select>
-
-        <input id="amount" placeholder="Profit / Loss amount">
-
-        <button onclick="addTrade()">Add Trade</button>
-
-        <div class="card">
-            <div class="small">Account P/L</div>
-            <div class="big" id="pl">$0</div>
-        </div>
-
-        <div id="trades"></div>
-    </div>
-
     <button onclick="back()">Back</button>
 </div>
+
+</div>
+
+<!-- HISTORY (EMPTY SAFE PAGE FOR NOW) -->
+<div id="history" class="page">
+
+<div class="card">
+    <div class="big">📒 History</div>
+    <div class="small">(Ready for future upgrade)</div>
+</div>
+
+<button onclick="show('home')">Back</button>
 
 </div>
 
 <script>
 
 /* =========================
-   STORAGE
+   DATA
 ========================= */
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-let trades = JSON.parse(localStorage.getItem("trades") || "{}");
-
 let current = null;
 
 /* =========================
@@ -187,6 +181,10 @@ function num(v){
     v = Number(v);
     return isNaN(v) ? 0 : v;
 }
+
+/* =========================
+   LOGIC
+========================= */
 
 function mult(b){
     b = num(b);
@@ -206,7 +204,19 @@ function dd(b){
 }
 
 /* =========================
-   RENDER ACCOUNTS
+   NAVIGATION (FIXED)
+========================= */
+
+function show(page){
+
+    document.querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document.getElementById(page).classList.add("active");
+}
+
+/* =========================
+   HOME
 ========================= */
 
 function render(){
@@ -214,123 +224,70 @@ function render(){
     let el = document.getElementById("accounts");
     el.innerHTML = "";
 
-    let total=0,d=0,draw=0;
+    let t=0,d=0,draw=0;
 
     accounts.forEach((a,i)=>{
 
         let b=num(a.balance);
 
-        total+=b;
+        t+=b;
         d+=daily(b);
         draw+=dd(b);
 
         el.innerHTML+=`
-        <div class="account" onclick="openA(${i})">
+        <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
             $${b}<br>
             <span class="small green">Daily $${daily(b).toFixed(0)}</span>
         </div>`;
     });
 
-    document.getElementById("total").innerText="$"+total.toFixed(0);
+    document.getElementById("total").innerText="$"+t.toFixed(0);
     document.getElementById("daily").innerText="$"+d.toFixed(0);
     document.getElementById("dd").innerText="$"+draw.toFixed(0);
 }
 
 /* =========================
-   OPEN ACCOUNT
+   OPEN ACCOUNT (REAL PAGE SWITCH)
 ========================= */
 
-function openA(i){
-    current=i;
-    document.getElementById("detail").classList.remove("hidden");
+function openAccount(i){
 
-    let a=accounts[i];
+    current = i;
 
-    document.getElementById("name").innerText=a.name;
-    document.getElementById("balance").value=num(a.balance);
+    let a = accounts[i];
 
-    renderAccount();
+    document.getElementById("name").innerText = a.name;
+    document.getElementById("balance").value = num(a.balance);
+
+    show("account");
+
+    updateAccount();
 }
 
 /* =========================
-   ACCOUNT UPDATE
+   UPDATE ACCOUNT
 ========================= */
 
 function updateAccount(){
 
-    if(current===null) return;
+    if(current === null) return;
 
-    let b=num(document.getElementById("balance").value);
+    let b = num(document.getElementById("balance").value);
 
-    accounts[current].balance=b;
-    localStorage.setItem("accounts",JSON.stringify(accounts));
+    accounts[current].balance = b;
+    localStorage.setItem("accounts", JSON.stringify(accounts));
 
-    renderAccount();
+    let m = mult(b);
+    let d = daily(b);
+
+    document.getElementById("mult").innerText = m.toFixed(2) + "x";
+    document.getElementById("dailyP").innerText = "$" + d.toFixed(0);
+    document.getElementById("weekly").innerText = "$" + (d*7).toFixed(0);
+    document.getElementById("monthly").innerText = "$" + (d*30).toFixed(0);
+    document.getElementById("accdd").innerText = "$" + dd(b).toFixed(0);
+
     render();
-}
-
-/* =========================
-   TRADE SYSTEM
-========================= */
-
-function addTrade(){
-
-    if(current===null) return;
-
-    let type=document.getElementById("type").value;
-    let amount=num(document.getElementById("amount").value);
-
-    if(!trades[current]) trades[current]=[];
-
-    trades[current].push({
-        type,
-        amount,
-        time:new Date().toLocaleString()
-    });
-
-    localStorage.setItem("trades",JSON.stringify(trades));
-
-    document.getElementById("amount").value="";
-
-    renderAccount();
-}
-
-/* =========================
-   ACCOUNT VIEW
-========================= */
-
-function renderAccount(){
-
-    let a=accounts[current];
-    let b=num(a.balance);
-
-    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
-    document.getElementById("dailyp").innerText="$"+daily(b).toFixed(0);
-    document.getElementById("accdd").innerText="$"+dd(b).toFixed(0);
-
-    // TRADE LOGS
-    let list=trades[current]||[];
-    let pl=0;
-
-    let html="";
-
-    list.forEach(t=>{
-
-        let val=num(t.amount);
-        if(t.type==="loss") val=-val;
-
-        pl+=val;
-
-        html+=`
-        <div class="trade">
-            ${t.type.toUpperCase()} $${t.amount}
-            <br><span class="small">${t.time}</span>
-        </div>`;
-    });
-
-    document.getElementById("pl").innerText="$"+pl.toFixed(0);
-    document.getElementById("trades").innerHTML=html;
 }
 
 /* =========================
@@ -338,8 +295,8 @@ function renderAccount(){
 ========================= */
 
 function back(){
-    document.getElementById("detail").classList.add("hidden");
-    current=null;
+    current = null;
+    show("home");
 }
 
 /* INIT */
