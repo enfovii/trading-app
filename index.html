@@ -97,7 +97,6 @@ input {
     box-sizing: border-box;
 }
 
-/* BUTTON FIX STILL INCLUDED */
 button {
     width: calc(100% - 24px);
     margin-left: 12px;
@@ -207,12 +206,13 @@ button {
     </div>
 
     <button onclick="back()">Back</button>
+    <button style="background:#ff5c7a;" onclick="deleteAccount()">Delete Account</button>
 </div>
 
 </div>
 
-<!-- ADD ACCOUNT BUTTON -->
-<button class="addBtn" onclick="openModal()">+ Add Account</button>
+<!-- ADD BUTTON -->
+<button class="addBtn" id="addBtn" onclick="openModal()">+ Add Account</button>
 
 <!-- MODAL -->
 <div class="modal" id="modal">
@@ -261,6 +261,10 @@ function show(page){
     document.querySelectorAll(".page")
         .forEach(p=>p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
+
+    // ✅ hide add button on account page
+    document.getElementById("addBtn").style.display =
+        page === "home" ? "block" : "none";
 }
 
 /* RENDER */
@@ -326,6 +330,20 @@ function updateAccount(){
     render();
 }
 
+/* DELETE ACCOUNT */
+function deleteAccount(){
+
+    if(current===null) return;
+
+    accounts.splice(current,1);
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    current=null;
+
+    show("home");
+    render();
+}
+
 /* BACK */
 function back(){
     current=null;
@@ -358,6 +376,7 @@ function createAccount(){
     render();
 }
 
+/* INIT */
 show("home");
 render();
 
