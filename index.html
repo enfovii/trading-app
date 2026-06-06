@@ -109,7 +109,6 @@ input {
 <div id="totalBalance" class="big">$0</div>
 
 <div class="small">Daily: $<span id="totalDaily">0</span></div>
-<div class="small">Weekly: $<span id="totalWeekly">0</span></div>
 <div class="small red">Drawdown: $<span id="totalDD">0</span></div>
 </div>
 
@@ -133,16 +132,6 @@ input {
 <div class="card">
 <div>Daily Profit</div>
 <div id="daily"></div>
-</div>
-
-<div class="card">
-<div>Weekly Profit</div>
-<div id="weekly"></div>
-</div>
-
-<div class="card">
-<div>Monthly Profit</div>
-<div id="monthly"></div>
 </div>
 
 <div class="card">
@@ -205,6 +194,8 @@ function showJournal(){
     document.getElementById("home").classList.add("hidden");
     document.getElementById("detail").classList.add("hidden");
     document.getElementById("journal").classList.remove("hidden");
+
+    selectedDate = null;
     renderCalendar();
 }
 
@@ -216,7 +207,6 @@ function renderHome(){
 
     let total = 0;
     let totalDaily = 0;
-    let totalWeekly = 0;
     let totalDD = 0;
 
     accounts.forEach((a,i)=>{
@@ -224,15 +214,11 @@ function renderHome(){
         let b = a.balance;
 
         let mult = getMultiplier(b);
-
         let daily = mult * 800;
-        let weekly = daily * 7;
-        let monthly = daily * 30;
         let dd = b * 0.4;
 
         total += b;
         totalDaily += daily;
-        totalWeekly += weekly;
         totalDD += dd;
 
         container.innerHTML += `
@@ -240,19 +226,14 @@ function renderHome(){
                 <b>${a.name}</b><br>
                 <span class="small">$${b.toLocaleString()}</span><br>
                 <span class="small">${mult.toFixed(2)}x</span><br>
-                <span class="small lime">
-                    Daily $${daily.toFixed(0)} • Weekly $${weekly.toFixed(0)} • Monthly $${monthly.toFixed(0)}
-                </span><br>
-                <span class="small red">
-                    DD $${dd.toFixed(0)}
-                </span>
+                <span class="small lime">Daily $${daily.toFixed(0)}</span><br>
+                <span class="small red">Drawdown $${dd.toFixed(0)}</span>
             </div>
         `;
     });
 
     document.getElementById("totalBalance").innerText = "$" + total.toLocaleString();
     document.getElementById("totalDaily").innerText = totalDaily.toFixed(0);
-    document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
     document.getElementById("totalDD").innerText = totalDD.toFixed(0);
 }
 
@@ -283,8 +264,6 @@ function updateAccount(){
 
     document.getElementById("mult").innerText = mult.toFixed(2) + "x";
     document.getElementById("daily").innerText = "$" + daily.toFixed(0);
-    document.getElementById("weekly").innerText = "$" + (daily*7).toFixed(0);
-    document.getElementById("monthly").innerText = "$" + (daily*30).toFixed(0);
     document.getElementById("nextTier").innerText = getNextTier(b);
     document.getElementById("dd").innerText = "$" + (b * 0.4).toFixed(0);
 }
@@ -315,6 +294,14 @@ function back(){
 }
 
 /* JOURNAL */
+function showJournal(){
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("detail").classList.add("hidden");
+    document.getElementById("journal").classList.remove("hidden");
+    selectedDate = null;
+    renderCalendar();
+}
+
 function changeMonth(dir){
     viewDate.setMonth(viewDate.getMonth() + dir);
     renderCalendar();
@@ -369,6 +356,7 @@ function saveDay(){
     renderCalendar();
 }
 
+/* INIT */
 renderHome();
 
 </script>
