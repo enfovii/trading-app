@@ -190,8 +190,10 @@ function getMultiplier(b) {
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
 
-    // 200k BASE ANCHOR = 4x
+    // FIX: clean anchor at 200k
     let extra = b - 200000;
+
+    if (extra <= 0) return 4;
 
     let halfSteps = Math.floor(extra / 20000);
 
@@ -235,7 +237,7 @@ function renderHome(){
     document.getElementById("totalWeekly").innerText = totalWeekly.toFixed(0);
 }
 
-/* OPEN ACCOUNT */
+/* DETAIL */
 function openAccount(i){
     currentIndex = i;
 
@@ -250,13 +252,12 @@ function openAccount(i){
     updateAccount();
 }
 
-/* UPDATE ACCOUNT (FIXED SAVE) */
 function updateAccount(){
 
     let b = parseFloat(document.getElementById("editBalance").value);
     accounts[currentIndex].balance = b;
 
-    save(); // ✅ FIX: persist balance on change
+    save();
 
     let mult = getMultiplier(b);
 
@@ -287,7 +288,8 @@ function getNextTier(b){
     return "$" + (200000 + steps * 20000).toLocaleString();
 }
 
-/* JOURNAL */
+/* JOURNAL (UNCHANGED) */
+
 function showJournal(){
     renderCalendar();
     document.getElementById("home").classList.add("hidden");
