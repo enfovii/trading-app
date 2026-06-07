@@ -253,8 +253,8 @@ button {
 <div class="card">
     <h3 id="name"></h3>
 
-    <!-- ONLY CHANGE IS HERE -->
-    <input id="balance" inputmode="decimal" pattern="[0-9]*" oninput="updateAccount()">
+    <!-- UPDATED INPUT ONLY -->
+    <input id="balance" inputmode="text" oninput="formatBalanceInput(this)">
 
     <div class="card">
         <div class="small">Multiplier</div>
@@ -322,6 +322,20 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
+/* NEW FORMATTING FUNCTION */
+function formatBalanceInput(el){
+    let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
+
+    if(raw === ''){
+        updateAccount();
+        return;
+    }
+
+    el.value = Number(raw).toLocaleString('en-US');
+    updateAccount();
+}
+
+/* EVERYTHING ELSE UNCHANGED */
 function tier(b){
     if (b < 90000) return 3;
     if (b < 140000) return 3;
@@ -366,7 +380,6 @@ function renderPortfolio(){
 }
 
 function render(){
-
     let el=document.getElementById("accounts");
 
     let html = "";
@@ -437,16 +450,8 @@ function openAccount(i){
     setTimeout(() => {
         let input = document.getElementById("balance");
         input.focus();
-
-        input.setSelectionRange(
-            input.value.length,
-            input.value.length
-        );
-
-        input.scrollIntoView({
-            behavior: "smooth",
-            block: "center"
-        });
+        input.setSelectionRange(input.value.length, input.value.length);
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 100);
 }
 
