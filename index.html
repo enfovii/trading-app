@@ -636,9 +636,10 @@ function money(v){
     return "$" + n.toLocaleString();
 }
 
-    function bonus(v){
+   function bonus(v){
     let n = Number(v) / 100;
-    return "(" + money(n.toFixed(0)) + ")";
+    let formatted = money(n.toFixed(0));
+    return "(" + formatted + ")";
 }
 
 
