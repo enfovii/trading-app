@@ -629,24 +629,21 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* STEP 1 GOES HERE */
-function autoFont(el, base=20, min=11){
+function fitText(el, min=10, max=22){
     if(!el) return;
 
     requestAnimationFrame(() => {
-        let text = el.innerText || "";
-        let len = text.replace(/[^0-9]/g,'').length;
+        let parentWidth = el.parentElement.offsetWidth;
 
-        let size = base;
-
-        if(len > 6) size = base - 2;
-        if(len > 8) size = base - 4;
-        if(len > 10) size = base - 6;
-
-        if(size < min) size = min;
-
+        let size = max;
         el.style.fontSize = size + "px";
+
+        while(el.scrollWidth > parentWidth && size > min){
+            size--;
+            el.style.fontSize = size + "px";
+        }
     });
+}
 }
 
     function autoFont(el, base=20, min=11){
@@ -885,6 +882,12 @@ function render(){
     el.innerHTML = html;
 
     setTimeout(() => {
+    document.querySelectorAll(".accountRow .value, .accountBalance").forEach(el => {
+        fitText(el, 10, 16);
+    });
+}, 0);
+
+    setTimeout(() => {
     document.querySelectorAll(".accountRow .value").forEach(el => {
         autoFont(el, 16, 11);
     });
@@ -907,6 +910,11 @@ document.querySelectorAll(".accountBalance").forEach(el=>{
     document.getElementById("weeklyHome").innerText = money((d*5).toFixed(0));
     document.getElementById("monthlyHome").innerText = money((d*22).toFixed(0));
 }
+    fitText(document.getElementById("total"), 12, 22);
+
+fitText(document.getElementById("daily"), 11, 20);
+fitText(document.getElementById("weeklyHome"), 11, 20);
+fitText(document.getElementById("monthlyHome"), 11, 20);
 
     autoFont(document.getElementById("total"), 22, 12);
 
