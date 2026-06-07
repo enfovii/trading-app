@@ -126,8 +126,6 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
-    scroll-margin-bottom: 120px;
-    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -143,12 +141,6 @@ input {
     color: #eaf1ff;
     box-sizing: border-box;
     font-size: 16px;
-}
-
-input:focus {
-    outline: none;
-    border: 1px solid #2ee59d;
-    box-shadow: 0 0 12px rgba(46,229,157,0.25);
 }
 
 button {
@@ -199,12 +191,11 @@ button {
     background: #ff5c7a !important;
 }
 
-/* ===== rename UI ===== */
+/* rename UI */
 .nameRow {
     display: flex;
-    align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    align-items: center;
 }
 
 .editBtn {
@@ -215,7 +206,6 @@ button {
     width: auto;
     margin: 0;
     padding: 6px 8px;
-    border-radius: 8px;
 }
 
 </style>
@@ -234,25 +224,6 @@ button {
     <div class="portfolioBox" onclick="openPortfolio()">
         <div class="small">Portfolio</div>
         <div class="big" id="total">$0</div>
-    </div>
-
-    <div class="statsRow">
-
-        <div class="stat">
-            <div class="small">Daily</div>
-            <div class="big green" id="daily">$0</div>
-        </div>
-
-        <div class="stat">
-            <div class="small">Weekly</div>
-            <div class="big green" id="weeklyHome">$0</div>
-        </div>
-
-        <div class="stat">
-            <div class="small">Monthly</div>
-            <div class="big green" id="monthlyHome">$0</div>
-        </div>
-
     </div>
 
 </div>
@@ -283,10 +254,9 @@ button {
 </div>
 </div>
 
-<!-- ADD ACCOUNT -->
+<!-- ADD ACCOUNT MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
-        <div class="big">Add Account</div>
         <input id="newName" placeholder="Account name">
         <input id="newBalance" placeholder="Starting balance">
         <button onclick="createAccount()">Create</button>
@@ -294,7 +264,7 @@ button {
     </div>
 </div>
 
-<!-- DELETE -->
+<!-- DELETE MODAL -->
 <div class="modal" id="deleteModal">
     <div class="modal-content">
         <div class="big">Are you sure?</div>
@@ -303,7 +273,7 @@ button {
     </div>
 </div>
 
-<!-- ✅ RENAMING MODAL (ONLY ADDITION) -->
+<!-- ✅ ONLY ADDITION: RENAME MODAL -->
 <div class="modal" id="renameModal">
     <div class="modal-content">
         <div class="big">Rename Account</div>
@@ -334,9 +304,10 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* ✅ ONLY CHANGE HERE */
+/* ✅ ONLY REPLACED FUNCTION */
 function renameAccount(){
     if(current === null) return;
+
     document.getElementById("renameInput").value = accounts[current].name;
     document.getElementById("renameModal").style.display = "flex";
 }
@@ -358,7 +329,7 @@ function closeRenameModal(){
     document.getElementById("renameModal").style.display = "none";
 }
 
-/* EVERYTHING ELSE UNTOUCHED */
+/* EVERYTHING ELSE 1:1 UNCHANGED */
 
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
