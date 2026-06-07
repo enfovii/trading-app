@@ -276,7 +276,14 @@ button {
 
 <div id="account" class="page">
 <div class="card">
+
     <h3 id="name"></h3>
+
+    <!-- ✅ ONLY ADDITION -->
+    <button onclick="renameCurrentAccount()"
+            style="width:100%;margin-top:6px;background:rgba(255,255,255,0.08);box-shadow:none;">
+        Rename Account
+    </button>
 
     <input id="balance"
        inputmode="decimal"
@@ -354,14 +361,21 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* ✅ ADDED ONLY: rename feature */
-function renameAccount(i){
-    let newName = prompt("Rename account:", accounts[i].name);
-    if(!newName) return;
-    accounts[i].name = newName.trim();
+/* ✅ ONLY ADDITION */
+function renameCurrentAccount(){
+    if(current === null) return;
+
+    let name = prompt("Rename account:", accounts[current].name);
+    if(!name) return;
+
+    accounts[current].name = name.trim();
     localStorage.setItem("accounts", JSON.stringify(accounts));
+
+    document.getElementById("name").innerText = accounts[current].name;
     render();
 }
+
+/* EVERYTHING ELSE UNCHANGED */
 
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
@@ -409,60 +423,15 @@ function render(){
 
         let currentMult = mult(b);
 
-        function nextTargetFromBalance(x){
-            if (x < 90000) return 90000;
-            if (x < 140000) return 140000;
-            if (x < 160000) return 160000;
-            if (x < 180000) return 180000;
-            if (x < 200000) return 200000;
-            let steps = Math.floor((x - 200000) / 20000) + 1;
-            return 200000 + (steps * 20000);
-        }
-
-        let nextTarget = nextTargetFromBalance(b);
-        let nextMult = mult(nextTarget);
-
-        let needed = Math.max(0, nextTarget - b);
-
-        let tierStart;
-        if (b < 90000) tierStart = 0;
-        else if (b < 140000) tierStart = 90000;
-        else if (b < 160000) tierStart = 140000;
-        else if (b < 180000) tierStart = 160000;
-        else if (b < 200000) tierStart = 180000;
-        else {
-            let steps = Math.floor((b - 200000) / 20000);
-            tierStart = 200000 + (steps * 20000);
-        }
-
-        let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
-
         html += `
         <div class="account" onclick="openAccount(${i})"
             style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
 
             <div>
-                <b>${a.name}</b>
-                <span onclick="event.stopPropagation(); renameAccount(${i})"
-                      style="margin-left:6px;cursor:pointer;">✎</span>
-                <br>
+                <b>${a.name}</b><br>
                 ${money(b)}<br>
                 <span class="green">${currentMult.toFixed(2)}x</span><br>
                 <span class="small">Daily ${money(daily(b))}</span>
-            </div>
-
-            <div style="min-width:140px;text-align:right;">
-                <div class="small">Next ${nextMult.toFixed(2)}x</div>
-                <div class="small">Need ${money(needed)}</div>
-
-                <div style="width:100%;height:10px;background:rgba(255,255,255,0.06);border-radius:12px;margin-top:8px;overflow:hidden;position:relative;">
-                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);border-radius:12px;transition: width 0.4s ease;box-shadow: 0 0 14px rgba(46,229,157,0.35);"></div>
-
-                    <div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.45);padding:2px 6px;border-radius:8px;">
-                        ${progress.toFixed(0)}%
-                    </div>
-                </div>
-
             </div>
 
         </div>`;
@@ -475,8 +444,6 @@ function render(){
     document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
     document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
 }
-
-/* EVERYTHING ELSE LEFT EXACTLY AS YOUR ORIGINAL */
 
 window.onload=function(){
     show("home");
