@@ -217,17 +217,72 @@ button {
 </div>
 
 <div id="portfolio" class="page">
-<!-- unchanged -->
+<div class="card">
+    <h3>Portfolio Overview</h3>
+
+    <div class="card">
+        <div class="small">Total Balance</div>
+        <div class="big" id="p_total"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Daily Profit</div>
+        <div class="big green" id="p_daily"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Weekly</div>
+        <div class="big green" id="p_week"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Monthly</div>
+        <div class="big green" id="p_month"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Drawdown</div>
+        <div class="big red" id="p_dd"></div>
+    </div>
+
+    <button onclick="backHome()">Back</button>
+</div>
 </div>
 
 <div id="account" class="page">
 <div class="card">
     <h3 id="name"></h3>
 
-    <!-- ONLY CHANGE -->
-    <input id="balance" oninput="formatInput(this); updateAccount();">
+    <!-- ONLY CHANGE IS HERE -->
+    <input id="balance" inputmode="decimal" pattern="[0-9]*" oninput="updateAccount()">
+
+    <div class="card">
+        <div class="small">Multiplier</div>
+        <div class="big green" id="mult"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Daily Profit</div>
+        <div id="dailyP"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Weekly</div>
+        <div id="weekly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Monthly</div>
+        <div id="monthly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Drawdown</div>
+        <div class="big red" id="accdd"></div>
+    </div>
 
     <button onclick="back()">Back</button>
+    <button class="danger" onclick="confirmDelete()">Delete Account</button>
 </div>
 </div>
 
@@ -252,15 +307,8 @@ button {
 </div>
 
 <script>
-
-function formatInput(el){
-    el.value = el.value.replace(/[^0-9kKmM.]/g,'');
-}
-
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
-
-/* EVERYTHING BELOW IS YOUR ORIGINAL CODE UNTOUCHED */
 
 function num(v){
     if(!v) return 0;
@@ -295,25 +343,170 @@ function show(page){
     document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
 }
 
-function openPortfolio(){ /* original */ }
-function renderPortfolio(){ /* original */ }
-function render(){ /* original */ }
-function openAccount(i){ /* original */ }
-function updateAccount(){ /* original */ }
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
+
+function renderPortfolio(){
+    let t=0,d=0,draw=0;
+
+    accounts.forEach(a=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+        draw+=dd(b);
+    });
+
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+}
+
+function render(){
+
+    let el=document.getElementById("accounts");
+
+    let html = "";
+    let t=0,d=0;
+
+    accounts.forEach((a,i)=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+
+        let currentMult = mult(b);
+
+        function nextTargetFromBalance(x){
+            if (x < 90000) return 90000;
+            if (x < 140000) return 140000;
+            if (x < 160000) return 160000;
+            if (x < 180000) return 180000;
+            if (x < 200000) return 200000;
+            let steps = Math.floor((x - 200000) / 20000) + 1;
+            return 200000 + (steps * 20000);
+        }
+
+        let nextTarget = nextTargetFromBalance(b);
+        let nextMult = mult(nextTarget);
+
+        let progress = Math.min(100, (b / nextTarget) * 100);
+        let needed = Math.max(0, nextTarget - b);
+
+        html += `
+        <div class="account" onclick="openAccount(${i})"
+            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+
+            <div>
+                <b>${a.name}</b><br>
+                ${money(b)}<br>
+                <span class="green">${currentMult.toFixed(2)}x</span><br>
+                <span class="small">Daily ${money(daily(b))}</span>
+            </div>
+
+            <div style="min-width:140px;text-align:right;">
+                <div class="small">Next ${nextMult.toFixed(2)}x</div>
+                <div class="small">Need ${money(needed)}</div>
+
+                <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
+                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
+                </div>
+            </div>
+
+        </div>`;
+    });
+
+    el.innerHTML = html;
+
+    document.getElementById("total").innerText=money(t.toFixed(0));
+    document.getElementById("daily").innerText=money(d.toFixed(0));
+    document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
+    document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
+}
+
+function openAccount(i){
+    current=i;
+    let a=accounts[i];
+    document.getElementById("name").innerText=a.name;
+    document.getElementById("balance").value=num(a.balance);
+    show("account");
+    updateAccount();
+
+    setTimeout(() => {
+        let input = document.getElementById("balance");
+        input.focus();
+
+        input.setSelectionRange(
+            input.value.length,
+            input.value.length
+        );
+
+        input.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }, 100);
+}
+
+function updateAccount(){
+    if(current===null) return;
+
+    let inputEl = document.getElementById("balance");
+    let raw = inputEl.value;
+
+    if(raw === "" || raw === null) return;
+
+    let b = num(raw);
+
+    accounts[current].balance = b;
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
+    document.getElementById("dailyP").innerText=money(daily(b));
+    document.getElementById("weekly").innerText=money(daily(b)*5);
+    document.getElementById("monthly").innerText=money(daily(b)*22);
+    document.getElementById("accdd").innerText=money(dd(b));
+
+    render();
+}
+
 function back(){ current=null; show("home"); }
 function backHome(){ show("home"); }
+
 function openModal(){ document.getElementById("modal").style.display="flex"; }
 function closeModal(){ document.getElementById("modal").style.display="none"; }
-function createAccount(){ /* original */ }
+
+function createAccount(){
+    let name=document.getElementById("newName").value.trim();
+    let balance=num(document.getElementById("newBalance").value);
+    if(!name) return;
+
+    accounts.push({name,balance});
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    closeModal();
+    render();
+}
+
 function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
 function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
-function deleteAccount(){ /* original */ }
+
+function deleteAccount(){
+    if(current===null) return;
+    accounts.splice(current,1);
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+    current=null;
+    closeDeleteModal();
+    show("home");
+    render();
+}
 
 window.onload=function(){
     show("home");
     render();
 };
-
 </script>
 
 </body>
