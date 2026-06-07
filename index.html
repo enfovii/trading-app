@@ -9,13 +9,12 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
     padding: 14px;
-    padding-bottom: 90px; /* FIX 2 */
+    padding-bottom: 90px;
     color: #eaf1ff;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 
-/* PREMIUM DARK BLUE BACKGROUND */
 body::before {
     content: "";
     position: fixed;
@@ -318,6 +317,7 @@ function mult(b){
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
     if (b < 200000) return 4;
+
     let base = 5;
     base += Math.floor((b - 200000) / 20000) * 0.5;
     return base;
@@ -368,7 +368,6 @@ function render(){
 
         let currentMult = mult(b);
 
-        // ✅ FIXED LOGIC
         let nextTarget;
 
         if (b < 90000) {
@@ -384,7 +383,8 @@ function render(){
             nextTarget = 200000;
         } 
         else {
-            nextTarget = 200000 + 20000;
+            let steps = Math.floor((b - 200000) / 20000) + 1;
+            nextTarget = 200000 + (steps * 20000);
         }
 
         let nextMult = mult(nextTarget);
