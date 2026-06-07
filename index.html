@@ -619,7 +619,16 @@ function num(v){
 }
 
 function money(v){
-    return "$" + Number(v).toLocaleString();
+    let n = Number(v);
+
+    if (Math.abs(n) >= 1000000) {
+        let m = n / 1000000;
+
+        // clean formatting (e.g. 1.2m, 3m, 10.5m)
+        return "$" + (Number.isInteger(m) ? m : m.toFixed(2)) + "m";
+    }
+
+    return "$" + n.toLocaleString();
 }
 
 /* unchanged logic */
