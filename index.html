@@ -365,7 +365,18 @@ button {
     <div class="modal-content">
         <div class="big">Add Account</div>
         <input id="newName" placeholder="Account name">
-        <input id="newBalance" placeholder="Starting balance">
+        <input
+    id="newBalance"
+    placeholder="Starting balance"
+    inputmode="decimal"
+    pattern="[0-9]*"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="none"
+    spellcheck="false"
+    onfocus="this.select()"
+    oninput="formatBalanceInput(this)"
+>
         <button onclick="createAccount()">Create</button>
         <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
