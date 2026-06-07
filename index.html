@@ -9,26 +9,29 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
     padding: 14px;
-    color: #e8ecf3;
+    padding-bottom: 90px; /* FIX 2 */
+    color: #eaf1ff;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 
+/* PREMIUM DARK BLUE BACKGROUND */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at 20% 20%, rgba(60,120,255,0.18), transparent 40%),
-        radial-gradient(circle at 80% 30%, rgba(0,180,255,0.10), transparent 45%),
-        #070b14;
+        radial-gradient(circle at 15% 20%, rgba(0,140,255,0.20), transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(80,180,255,0.12), transparent 50%),
+        radial-gradient(circle at 50% 90%, rgba(0,90,255,0.10), transparent 55%),
+        #050913;
     z-index: -1;
 }
 
 .title {
     display: flex;
     justify-content: center;
-    margin: 10px 0 14px;
+    margin: 12px 0 16px;
 }
 
 h2 {
@@ -36,6 +39,7 @@ h2 {
     font-weight: 700;
     margin: 0;
     text-align: center;
+    letter-spacing: 0.5px;
 }
 
 .page { display:none; }
@@ -44,31 +48,32 @@ h2 {
 .topbar {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .portfolioBox {
-    background: rgba(17,24,35,0.55);
-    border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(12px);
+    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
     padding: 18px;
-    border-radius: 16px;
+    border-radius: 18px;
     text-align: center;
     cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
 .statsRow {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .stat {
-    background: rgba(17,24,35,0.55);
+    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
     border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
     padding: 12px;
-    border-radius: 14px;
+    border-radius: 16px;
     text-align: center;
 }
 
@@ -77,27 +82,25 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
 .card {
-    background: rgba(17,24,35,0.55);
+    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
     border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
     padding: 14px;
     margin-top: 10px;
-    border-radius: 14px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
 .account {
     padding: 14px;
     margin-top: 10px;
-    border-radius: 14px;
-    background: rgba(17,24,35,0.55);
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
-
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
 }
 
 .green { color: #2ee59d; }
@@ -109,8 +112,8 @@ input {
     border-radius: 12px;
     border: 1px solid rgba(120,170,255,0.25);
     margin-top: 8px;
-    background: rgba(10,18,32,0.6);
-    color: #e8ecf3;
+    background: rgba(8,12,25,0.65);
+    color: #eaf1ff;
     box-sizing: border-box;
 }
 
@@ -125,6 +128,7 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
 .addBtn {
@@ -133,6 +137,7 @@ button {
     left: 12px;
     right: 12px;
     z-index: 10;
+    backdrop-filter: blur(12px); /* FIX 2 */
 }
 
 .modal {
@@ -141,7 +146,7 @@ button {
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.65);
     padding: 16px;
     z-index: 20;
 }
@@ -149,11 +154,11 @@ button {
 .modal-content {
     width: 100%;
     max-width: 360px;
-    background: rgba(17,24,35,0.85);
+    background: rgba(15,20,35,0.9);
     border: 1px solid rgba(120,170,255,0.25);
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(16px);
     padding: 16px;
-    border-radius: 14px;
+    border-radius: 16px;
 }
 
 .danger {
@@ -238,7 +243,6 @@ button {
 
 <!-- ACCOUNT -->
 <div id="account" class="page">
-
 <div class="card">
     <h3 id="name"></h3>
 
@@ -272,7 +276,6 @@ button {
     <button onclick="back()">Back</button>
     <button class="danger" onclick="confirmDelete()">Delete Account</button>
 </div>
-
 </div>
 
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
@@ -325,63 +328,57 @@ function mult(b){
 }
 
 function daily(b){ return mult(b)*800; }
+function dd(b){ return b*0.4; }
 
-function getNextTier(b){
-    if(b < 90000) return 90000;
-    if(b < 140000) return 140000;
-    if(b < 160000) return 160000;
-    if(b < 200000) return 200000;
-    return b + 20000;
-}
-
-/* NAV */
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
+    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
 }
 
-function openPortfolio(){ show("portfolio"); }
-function back(){ show("home"); }
-function backHome(){ show("home"); }
+/* PORTFOLIO */
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
 
-/* RENDER (ONLY CHANGE IS NEXT TIER PANEL) */
+function renderPortfolio(){
+
+    let t=0,d=0,draw=0;
+
+    accounts.forEach(a=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+        draw+=dd(b);
+    });
+
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+}
+
+/* HOME - FIXED RENDER (no += loop) */
 function render(){
 
     let el=document.getElementById("accounts");
-    let html="";
 
+    let html = "";
     let t=0,d=0;
 
     accounts.forEach((a,i)=>{
-
-        let b = num(a.balance);
-        t += b;
-        d += daily(b);
-
-        let next = getNextTier(b);
-        let needed = Math.max(next - b, 0);
-        let progress = Math.min((b / next) * 100, 100);
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
 
         html += `
         <div class="account" onclick="openAccount(${i})">
-
-            <div>
-                <b>${a.name}</b><br>
-                ${money(b)}<br>
-                <span class="green">${mult(b).toFixed(2)}x</span><br>
-                <span class="small">Daily ${money(daily(b))}</span>
-            </div>
-
-            <div style="text-align:right; min-width:120px;">
-                <div class="small">Next scaling</div>
-                <div class="small">${money(next)}</div>
-                <div class="green">${money(needed.toFixed(0))}</div>
-
-                <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
-                    <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
-                </div>
-            </div>
-
+            <b>${a.name}</b><br>
+            ${money(b)}<br>
+            <span class="green">${mult(b).toFixed(2)}x</span><br>
+            <span class="small">Daily ${money(daily(b))}</span>
         </div>`;
     });
 
@@ -393,8 +390,7 @@ function render(){
     document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
 }
 
-/* REST OF YOUR ORIGINAL FUNCTIONS (UNCHANGED) */
-
+/* ACCOUNT */
 function openAccount(i){
     current=i;
     let a=accounts[i];
@@ -415,8 +411,42 @@ function updateAccount(){
     document.getElementById("dailyP").innerText=money(daily(b));
     document.getElementById("weekly").innerText=money(daily(b)*5);
     document.getElementById("monthly").innerText=money(daily(b)*22);
-    document.getElementById("accdd").innerText=money(b*0.4);
+    document.getElementById("accdd").innerText=money(dd(b));
 
+    render();
+}
+
+/* NAV */
+function back(){ current=null; show("home"); }
+function backHome(){ show("home"); }
+
+/* MODAL */
+function openModal(){ document.getElementById("modal").style.display="flex"; }
+function closeModal(){ document.getElementById("modal").style.display="none"; }
+
+function createAccount(){
+    let name=document.getElementById("newName").value.trim();
+    let balance=num(document.getElementById("newBalance").value);
+    if(!name) return;
+
+    accounts.push({name,balance});
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    closeModal();
+    render();
+}
+
+/* DELETE */
+function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
+function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
+
+function deleteAccount(){
+    if(current===null) return;
+    accounts.splice(current,1);
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+    current=null;
+    closeDeleteModal();
+    show("home");
     render();
 }
 
