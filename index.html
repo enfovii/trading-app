@@ -324,7 +324,7 @@ button {
     display: grid;
     grid-template-columns: 1.8fr 1fr 1fr 1.2fr 1.6fr;
     gap: 12px;
-    align-items: start;
+    align-items: center;
     padding: 14px 12px;
 }
 
@@ -354,12 +354,14 @@ button {
 .cellValue {
     font-size: 12.5px;
     font-weight: 500;
-    margin-top: 6px;
+    margin-top: 3px;
+    line-height: 1.2;
 }
 
 .cellStrong {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 700;
+    line-height: 1.2;
 }
     
 </style>
@@ -761,7 +763,7 @@ function render(){
     </div>
 
     <!-- PROGRESS -->
-    <div class="cell" style="width:100%;">
+<div style="min-width:140px; width:100%;">
 
         <div style="height:10px; background:rgba(255,255,255,0.05);
                     border-radius:999px; overflow:hidden; position:relative;">
