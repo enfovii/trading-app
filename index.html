@@ -82,7 +82,6 @@ h2 {
     text-align: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    will-change: transform;
 }
 
 .statsRow {
@@ -98,7 +97,6 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
-    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -106,7 +104,6 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: 0.3px;
 }
 
 .card {
@@ -116,8 +113,6 @@ h2 {
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    will-change: transform;
 }
 
 .account {
@@ -126,8 +121,6 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
-    scroll-margin-bottom: 120px;
-    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -156,7 +149,6 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
-    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
 .addBtn {
@@ -164,63 +156,40 @@ button {
     bottom: 18px;
     left: 12px;
     right: 12px;
-    z-index: 10;
-}
-
-.modal {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.65);
-    padding: 16px;
-    z-index: 20;
-}
-
-.modal-content {
-    width: 100%;
-    max-width: 360px;
-    background: rgba(15,20,35,0.9);
-    border: 1px solid rgba(120,170,255,0.25);
-    backdrop-filter: blur(16px);
-    padding: 16px;
-    border-radius: 16px;
 }
 
 .danger {
     background: #ff5c7a !important;
 }
 
-/* ===== INLINE RENAME (ADDED ONLY) ===== */
+/* ===== RENAMING ===== */
 
-.nameWrap {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
+.nameWrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
 }
 
-#name {
-    outline: none;
-}
-
-#name[contenteditable="true"] {
+.renameInput{
+    font-size:20px;
+    font-weight:700;
     background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(120,170,255,0.25);
-    border-radius: 6px;
-    padding: 2px 6px;
+    border: 1px solid rgba(120,170,255,0.3);
+    color:#eaf1ff;
+    border-radius:8px;
+    padding:4px 8px;
+    width:100%;
 }
 
-.editBtn {
-    background: transparent;
-    border: none;
-    color: #93a4b8;
-    font-size: 18px;
-    width: auto;
-    margin: 0;
-    padding: 6px;
-    cursor: pointer;
+.editBtn{
+    background:transparent;
+    border:none;
+    color:#93a4b8;
+    font-size:18px;
+    width:auto;
+    margin:0;
+    padding:6px;
 }
 
 </style>
@@ -265,20 +234,12 @@ button {
 <div id="accounts"></div>
 </div>
 
-<div id="portfolio" class="page">
-<div class="card">
-    <h3>Portfolio Overview</h3>
-    <button onclick="backHome()">Back</button>
-</div>
-</div>
-
 <div id="account" class="page">
 <div class="card">
 
-    <!-- ONLY CHANGE HERE -->
     <div class="nameWrap">
         <h3 id="name"></h3>
-        <button class="editBtn" onclick="enableRename()">✏️</button>
+        <button class="editBtn" onclick="startRename()">✏️</button>
     </div>
 
     <input id="balance"
@@ -292,7 +253,6 @@ button {
        oninput="formatBalanceInput(this)">
 
     <button onclick="back()">Back</button>
-
     <button class="danger" onclick="confirmDelete()">Delete Account</button>
 
 </div>
@@ -313,18 +273,24 @@ function num(v){
     return isNaN(Number(v)) ? 0 : Number(v);
 }
 
-/* ===== INLINE RENAME (ADDED) ===== */
-function enableRename(){
+/* ===== SAFE INLINE RENAME ===== */
+
+function startRename(){
     if(current === null) return;
 
-    const el = document.getElementById("name");
+    const nameEl = document.getElementById("name");
+    const oldName = accounts[current].name;
 
-    el.contentEditable = true;
-    el.focus();
-    document.execCommand("selectAll", false, null);
+    const input = document.createElement("input");
+    input.className = "renameInput";
+    input.value = oldName;
+
+    nameEl.replaceWith(input);
+    input.focus();
+    input.select();
 
     const save = () => {
-        let val = el.textContent.trim();
+        let val = input.value.trim();
 
         if(val){
             accounts[current].name = val;
@@ -332,25 +298,26 @@ function enableRename(){
             render();
         }
 
-        el.contentEditable = false;
-        el.removeEventListener("blur", save);
+        const h3 = document.createElement("h3");
+        h3.id = "name";
+        h3.textContent = accounts[current].name;
+
+        input.replaceWith(h3);
     };
 
-    el.addEventListener("blur", save);
+    input.addEventListener("blur", save);
 
-    el.onkeydown = (e) => {
-        if(e.key === "Enter"){
-            e.preventDefault();
-            el.blur();
-        }
+    input.addEventListener("keydown", (e) => {
+        if(e.key === "Enter") input.blur();
         if(e.key === "Escape"){
-            el.textContent = accounts[current].name;
-            el.blur();
+            input.value = oldName;
+            input.blur();
         }
-    };
+    });
 }
 
-/* ORIGINAL LOGIC UNCHANGED */
+/* ===== ORIGINAL LOGIC (UNCHANGED) ===== */
+
 function openAccount(i){
     current = i;
     let a = accounts[i];
