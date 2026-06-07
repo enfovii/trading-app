@@ -868,10 +868,14 @@ function render(){
     el.innerHTML = html;
 
     document.getElementById("total").innerText = money(t.toFixed(0));
-    document.getElementById("daily").innerText = money(d.toFixed(0));
-    document.getElementById("weeklyHome").innerText = money((d*5).toFixed(0));
-    document.getElementById("monthlyHome").innerText = money((d*22).toFixed(0));
-}
+    document.getElementById("daily").innerHTML =
+    money(d.toFixed(0)) + `<div class="small">${bonus(d)}</div>`;
+
+document.getElementById("weeklyHome").innerHTML =
+    money((d*5).toFixed(0)) + `<div class="small">${bonus(d*5)}</div>`;
+
+document.getElementById("monthlyHome").innerHTML =
+    money((d*22).toFixed(0)) + `<div class="small">${bonus(d*22)}</div>`;
 
 function openAccount(i){
     current=i;
