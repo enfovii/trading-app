@@ -382,87 +382,107 @@ function nextTargetFromBalance(x){
     return 200000 + (steps * 20000);
 }
 
-/* ONLY FIXED SECTION: progress bar rendering */
+/* SAFE RENDER (FIXED DASHBOARD ISSUE) */
 function render(){
-    let html="";
-    let t=0,d=0;
+    let html = "";
+    let t = 0, d = 0;
 
     accounts.forEach((a,i)=>{
-        let b=num(a.balance);
-        t+=b;
-        d+=daily(b);
+        try {
+            let b = num(a.balance);
+            t += b;
+            d += daily(b);
 
-        let currentMult = mult(b);
-        let nextTarget = nextTargetFromBalance(b);
-        let nextMult = mult(nextTarget);
-        let needed = Math.max(0, nextTarget - b);
+            let currentMult = mult(b);
+            let nextTarget = nextTargetFromBalance(b);
+            let nextMult = mult(nextTarget);
+            let needed = Math.max(0, nextTarget - b);
 
-        let tierStart = (b<90000)?0:(b<140000)?90000:(b<160000)?140000:(b<180000)?160000:(b<200000)?180000:200000;
+            let tierStart = 0;
+            if (b < 90000) tierStart = 0;
+            else if (b < 140000) tierStart = 90000;
+            else if (b < 160000) tierStart = 140000;
+            else if (b < 180000) tierStart = 160000;
+            else if (b < 200000) tierStart = 180000;
+            else {
+                let steps = Math.floor((b - 200000) / 20000);
+                tierStart = 200000 + (steps * 20000);
+            }
 
-        let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
-        let glow = progress >= 90 ? "0 0 18px rgba(46,229,157,0.55)" : "none";
+            let progress = ((b - tierStart) / (nextTarget - tierStart)) * 100;
+            progress = Math.max(0, Math.min(100, progress));
 
-        html += `
-        <div class="account" onclick="openAccount(${i})"
-            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+            let glow = progress >= 90 ? "0 0 18px rgba(46,229,157,0.55)" : "none";
 
-            <div>
-                <b>${a.name}</b><br>
-                ${money(b)}<br>
-                <span class="green">${currentMult.toFixed(2)}x</span><br>
-                <span class="small">Daily ${money(daily(b))}</span>
-            </div>
+            html += `
+            <div class="account" onclick="openAccount(${i})"
+                style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
 
-            <div style="min-width:140px;text-align:right;">
+                <div>
+                    <b>${a.name}</b><br>
+                    ${money(b)}<br>
+                    <span class="green">${currentMult.toFixed(2)}x</span><br>
+                    <span class="small">Daily ${money(daily(b))}</span>
+                </div>
 
-                <div class="small">Next ${nextMult.toFixed(2)}x</div>
-                <div class="small">Need ${money(needed)}</div>
+                <div style="min-width:140px;text-align:right;">
 
-                <div style="
-                    width:100%;
-                    height:10px;
-                    background:rgba(255,255,255,0.06);
-                    border-radius:12px;
-                    margin-top:8px;
-                    overflow:hidden;
-                    position:relative;
-                ">
+                    <div class="small">Next ${nextMult.toFixed(2)}x</div>
+                    <div class="small">Need ${money(needed)}</div>
+
                     <div style="
-                        width:${progress}%;
-                        height:100%;
-                        background:linear-gradient(90deg,#1f6feb,#2ee59d);
+                        width:100%;
+                        height:10px;
+                        background:rgba(255,255,255,0.06);
                         border-radius:12px;
-                        transition:width 0.4s ease;
-                        box-shadow:${glow};
+                        margin-top:8px;
+                        overflow:hidden;
                         position:relative;
                     ">
                         <div style="
-                            position:absolute;
-                            right:6px;
-                            top:50%;
-                            transform:translateY(-50%);
-                            font-size:10px;
-                            font-weight:700;
-                            color:#fff;
-                            background:rgba(0,0,0,0.45);
-                            padding:2px 6px;
-                            border-radius:8px;
-                            white-space:nowrap;
+                            width:${progress}%;
+                            height:100%;
+                            background:linear-gradient(90deg,#1f6feb,#2ee59d);
+                            border-radius:12px;
+                            transition:width 0.4s ease;
+                            box-shadow:${glow};
+                            position:relative;
                         ">
-                            ${progress.toFixed(0)}%
+                            <div style="
+                                position:absolute;
+                                right:6px;
+                                top:50%;
+                                transform:translateY(-50%);
+                                font-size:10px;
+                                font-weight:700;
+                                color:#fff;
+                                background:rgba(0,0,0,0.45);
+                                padding:2px 6px;
+                                border-radius:8px;
+                                white-space:nowrap;
+                            ">
+                                ${Math.round(progress)}%
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div style="font-size:11px;color:#93a4b8;margin-top:6px;">
-                    ETA: ${(needed / Math.max(daily(b),1)).toFixed(1)} days
-                </div>
+                    <div style="font-size:11px;color:#93a4b8;margin-top:6px;">
+                        ETA: ${(needed / Math.max(daily(b),1)).toFixed(1)} days
+                    </div>
 
-            </div>
-        </div>`;
+                </div>
+            </div>`;
+        } catch (e) {
+            console.log("Render error:", e);
+        }
     });
 
-    document.getElementById("accounts").innerHTML=html;
+    document.getElementById("accounts").innerHTML = html;
+
+    document.getElementById("total").innerText = money(t);
+    document.getElementById("daily").innerText = money(d);
+    document.getElementById("weeklyHome").innerText = money(d*5);
+    document.getElementById("monthlyHome").innerText = money(d*22);
 }
 </script>
 
