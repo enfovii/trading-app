@@ -437,7 +437,10 @@ function renameAccount(){
             document.getElementById("renameInput");
 
         input.focus();
-        input.select();
+
+        // Place cursor at end instead of highlighting
+        let length = input.value.length;
+        input.setSelectionRange(length, length);
     }, 100);
 }
 
