@@ -281,7 +281,7 @@ button {
 
     <!-- ✅ ONLY ADDITION -->
     <button onclick="renameCurrentAccount()"
-            style="width:100%;margin-top:6px;background:rgba(255,255,255,0.08);box-shadow:none;">
+        style="width:100%;margin-top:6px;background:rgba(255,255,255,0.08);box-shadow:none;">
         Rename Account
     </button>
 
@@ -372,6 +372,7 @@ function renameCurrentAccount(){
     localStorage.setItem("accounts", JSON.stringify(accounts));
 
     document.getElementById("name").innerText = accounts[current].name;
+
     render();
 }
 
@@ -408,6 +409,28 @@ function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
     document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
+}
+
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
+
+function renderPortfolio(){
+    let t=0,d=0,draw=0;
+
+    accounts.forEach(a=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+        draw+=dd(b);
+    });
+
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
 function render(){
