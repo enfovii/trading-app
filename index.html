@@ -725,16 +725,21 @@ function render(){
     </div>
 
     <!-- NEXT TARGET -->
-    <div style="text-align:center;">
-        <div class="small">Next target</div>
+<div style="text-align:center;">
 
-        <div style="margin-top:6px; font-weight:700;">
-            ${money(needed)}
-        </div>
+    <div class="small">Next target</div>
 
-        <div style="margin-top:4px; font-size:11px; color:#93a4b8;">
-        </div>
+    <!-- VALUE (same style as Daily / Multiplier) -->
+    <div style="margin-top:6px; font-size:13px; font-weight:500;">
+        ${money(needed)}
     </div>
+
+    <!-- MULTIPLIER UNDER IT -->
+    <div style="margin-top:4px; font-size:12px; color:#93a4b8; font-weight:500;">
+        ${nextMult.toFixed(2)}x
+    </div>
+
+</div>
 
     <!-- PROGRESS -->
     <div>
