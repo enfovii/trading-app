@@ -9,13 +9,12 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
     padding: 14px;
-    padding-bottom: 90px; /* FIX 2 */
+    padding-bottom: 90px;
     color: #eaf1ff;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
 }
 
-/* PREMIUM DARK BLUE BACKGROUND */
+/* Background */
 body::before {
     content: "";
     position: fixed;
@@ -23,7 +22,6 @@ body::before {
     background:
         radial-gradient(circle at 15% 20%, rgba(0,140,255,0.20), transparent 45%),
         radial-gradient(circle at 85% 25%, rgba(80,180,255,0.12), transparent 50%),
-        radial-gradient(circle at 50% 90%, rgba(0,90,255,0.10), transparent 55%),
         #050913;
     z-index: -1;
 }
@@ -39,11 +37,37 @@ h2 {
     font-weight: 700;
     margin: 0;
     text-align: center;
-    letter-spacing: 0.5px;
 }
 
 .page { display:none; }
 .active { display:block; }
+
+/* HOME LAYOUT (NEW) */
+.homeLayout{
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.mainLeft{
+    flex: 1;
+}
+
+.sidePanel{
+    width: 260px;
+    position: sticky;
+    top: 10px;
+}
+
+@media(max-width: 900px){
+    .homeLayout{
+        flex-direction: column;
+    }
+    .sidePanel{
+        width: 100%;
+        position: relative;
+    }
+}
 
 .topbar {
     display: flex;
@@ -54,12 +78,10 @@ h2 {
 .portfolioBox {
     background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
     border: 1px solid rgba(120,170,255,0.25);
-    backdrop-filter: blur(16px);
     padding: 18px;
     border-radius: 18px;
     text-align: center;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
 .statsRow {
@@ -69,9 +91,8 @@ h2 {
 }
 
 .stat {
-    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
+    background: rgba(20,30,50,0.55);
     border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(14px);
     padding: 12px;
     border-radius: 16px;
     text-align: center;
@@ -82,39 +103,57 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: 0.3px;
 }
 
 .card {
-    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
+    background: rgba(20,30,50,0.55);
     border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(14px);
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
-.account {
+/* SIDE PANEL CARD */
+.sideCard{
+    background: rgba(20,30,50,0.65);
+    border: 1px solid rgba(120,170,255,0.25);
     padding: 14px;
-    margin-top: 10px;
     border-radius: 16px;
-    background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
-    border: 1px solid rgba(120,170,255,0.18);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.progressBar{
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.progressFill{
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #1f6feb, #2ee59d);
 }
 
 .green { color: #2ee59d; }
 .red { color: #ff5c7a; }
 
-input {
-    width: 100%;
+.account {
     padding: 14px;
-    border-radius: 12px;
-    border: 1px solid rgba(120,170,255,0.25);
-    margin-top: 8px;
-    background: rgba(8,12,25,0.65);
-    color: #eaf1ff;
-    box-sizing: border-box;
+    margin-top: 10px;
+    border-radius: 16px;
+    background: rgba(20,30,50,0.55);
+    border: 1px solid rgba(120,170,255,0.18);
+}
+
+.addBtn {
+    position: fixed;
+    bottom: 18px;
+    left: 12px;
+    right: 12px;
+    z-index: 10;
 }
 
 button {
@@ -127,42 +166,6 @@ button {
     color: white;
     border: none;
     border-radius: 12px;
-    font-weight: 600;
-    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
-}
-
-.addBtn {
-    position: fixed;
-    bottom: 18px;
-    left: 12px;
-    right: 12px;
-    z-index: 10;
-    backdrop-filter: blur(12px); /* FIX 2 */
-}
-
-.modal {
-    position: fixed;
-    inset: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0,0,0,0.65);
-    padding: 16px;
-    z-index: 20;
-}
-
-.modal-content {
-    width: 100%;
-    max-width: 360px;
-    background: rgba(15,20,35,0.9);
-    border: 1px solid rgba(120,170,255,0.25);
-    backdrop-filter: blur(16px);
-    padding: 16px;
-    border-radius: 16px;
-}
-
-.danger {
-    background: #ff5c7a !important;
 }
 </style>
 </head>
@@ -176,127 +179,63 @@ button {
 <!-- HOME -->
 <div id="home" class="page active">
 
-<div class="topbar">
+<div class="homeLayout">
 
-    <div class="portfolioBox" onclick="openPortfolio()">
-        <div class="small">Portfolio</div>
-        <div class="big" id="total">$0</div>
-    </div>
+    <!-- LEFT -->
+    <div class="mainLeft">
 
-    <div class="statsRow">
+        <div class="topbar">
 
-        <div class="stat">
-            <div class="small">Daily</div>
-            <div class="big green" id="daily">$0</div>
+            <div class="portfolioBox" onclick="openPortfolio()">
+                <div class="small">Portfolio</div>
+                <div class="big" id="total">$0</div>
+            </div>
+
+            <div class="statsRow">
+
+                <div class="stat">
+                    <div class="small">Daily</div>
+                    <div class="big green" id="daily">$0</div>
+                </div>
+
+                <div class="stat">
+                    <div class="small">Weekly</div>
+                    <div class="big green" id="weeklyHome">$0</div>
+                </div>
+
+                <div class="stat">
+                    <div class="small">Monthly</div>
+                    <div class="big green" id="monthlyHome">$0</div>
+                </div>
+
+            </div>
+
         </div>
 
-        <div class="stat">
-            <div class="small">Weekly</div>
-            <div class="big green" id="weeklyHome">$0</div>
+        <div id="accounts"></div>
+
+    </div>
+
+    <!-- RIGHT SIDE PANEL (NEW FEATURE) -->
+    <div class="sidePanel">
+        <div class="sideCard">
+            <div class="small">NEXT MULTIPLIER</div>
+
+            <div class="big" id="curMult">--</div>
+            <div class="small" id="nextMult">--</div>
+
+            <br>
+
+            <div class="small">Balance needed</div>
+            <div class="big green" id="needed">$0</div>
+
+            <div class="progressBar">
+                <div class="progressFill" id="progress"></div>
+            </div>
         </div>
-
-        <div class="stat">
-            <div class="small">Monthly</div>
-            <div class="big green" id="monthlyHome">$0</div>
-        </div>
-
     </div>
 
 </div>
-
-<div id="accounts"></div>
-</div>
-
-<!-- PORTFOLIO -->
-<div id="portfolio" class="page">
-<div class="card">
-    <h3>Portfolio Overview</h3>
-
-    <div class="card">
-        <div class="small">Total Balance</div>
-        <div class="big" id="p_total"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Daily Profit</div>
-        <div class="big green" id="p_daily"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Weekly</div>
-        <div id="p_week"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Monthly</div>
-        <div id="p_month"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Drawdown</div>
-        <div class="big red" id="p_dd"></div>
-    </div>
-
-    <button onclick="backHome()">Back</button>
-</div>
-</div>
-
-<!-- ACCOUNT -->
-<div id="account" class="page">
-<div class="card">
-    <h3 id="name"></h3>
-
-    <input id="balance" oninput="updateAccount()">
-
-    <div class="card">
-        <div class="small">Multiplier</div>
-        <div class="big green" id="mult"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Daily Profit</div>
-        <div id="dailyP"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Weekly</div>
-        <div id="weekly"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Monthly</div>
-        <div id="monthly"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Drawdown</div>
-        <div class="big red" id="accdd"></div>
-    </div>
-
-    <button onclick="back()">Back</button>
-    <button class="danger" onclick="confirmDelete()">Delete Account</button>
-</div>
-</div>
-
-<button class="addBtn" onclick="openModal()">+ Add Account</button>
-
-<!-- MODAL -->
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <div class="big">Add Account</div>
-        <input id="newName" placeholder="Account name">
-        <input id="newBalance" placeholder="Starting balance">
-        <button onclick="createAccount()">Create</button>
-        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
-    </div>
-</div>
-
-<div class="modal" id="deleteModal">
-    <div class="modal-content">
-        <div class="big">Are you sure?</div>
-        <button class="danger" onclick="deleteAccount()">Yes, Delete</button>
-        <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
-    </div>
 </div>
 
 <script>
@@ -330,42 +269,45 @@ function mult(b){
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-function show(page){
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(page).classList.add("active");
-    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
+function getNextTierInfo(total){
+
+    let b = total;
+
+    if(b < 90000){
+        return {next:90000, label:"3.0x tier"};
+    }
+    if(b < 140000){
+        return {next:140000, label:"3.5x tier"};
+    }
+    if(b < 160000){
+        return {next:160000, label:"4.0x tier"};
+    }
+    if(b < 200000){
+        return {next:200000, label:"5.0x tier"};
+    }
+
+    return {next:b + 20000, label:"next scaling tier"};
 }
 
-/* PORTFOLIO */
-function openPortfolio(){
-    show("portfolio");
-    renderPortfolio();
+function updateSidePanel(total){
+
+    let cur = mult(total);
+    let nextInfo = getNextTierInfo(total);
+
+    let needed = Math.max(nextInfo.next - total, 0);
+    let progress = Math.min((total / nextInfo.next) * 100, 100);
+
+    document.getElementById("curMult").innerText = cur.toFixed(2) + "x";
+    document.getElementById("nextMult").innerText = "Next: " + nextInfo.label;
+    document.getElementById("needed").innerText = money(needed.toFixed(0));
+    document.getElementById("progress").style.width = progress + "%";
 }
 
-function renderPortfolio(){
-
-    let t=0,d=0,draw=0;
-
-    accounts.forEach(a=>{
-        let b=num(a.balance);
-        t+=b;
-        d+=daily(b);
-        draw+=dd(b);
-    });
-
-    document.getElementById("p_total").innerText = money(t.toFixed(0));
-    document.getElementById("p_daily").innerText = money(d.toFixed(0));
-    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
-    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
-    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
-}
-
-/* HOME - FIXED RENDER (no += loop) */
 function render(){
 
     let el=document.getElementById("accounts");
-
     let html = "";
+
     let t=0,d=0;
 
     accounts.forEach((a,i)=>{
@@ -388,70 +330,11 @@ function render(){
     document.getElementById("daily").innerText=money(d.toFixed(0));
     document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
     document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
-}
 
-/* ACCOUNT */
-function openAccount(i){
-    current=i;
-    let a=accounts[i];
-    document.getElementById("name").innerText=a.name;
-    document.getElementById("balance").value=num(a.balance);
-    show("account");
-    updateAccount();
-}
-
-function updateAccount(){
-    if(current===null) return;
-
-    let b=num(document.getElementById("balance").value);
-    accounts[current].balance=b;
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
-    document.getElementById("dailyP").innerText=money(daily(b));
-    document.getElementById("weekly").innerText=money(daily(b)*5);
-    document.getElementById("monthly").innerText=money(daily(b)*22);
-    document.getElementById("accdd").innerText=money(dd(b));
-
-    render();
-}
-
-/* NAV */
-function back(){ current=null; show("home"); }
-function backHome(){ show("home"); }
-
-/* MODAL */
-function openModal(){ document.getElementById("modal").style.display="flex"; }
-function closeModal(){ document.getElementById("modal").style.display="none"; }
-
-function createAccount(){
-    let name=document.getElementById("newName").value.trim();
-    let balance=num(document.getElementById("newBalance").value);
-    if(!name) return;
-
-    accounts.push({name,balance});
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    closeModal();
-    render();
-}
-
-/* DELETE */
-function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
-function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
-
-function deleteAccount(){
-    if(current===null) return;
-    accounts.splice(current,1);
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-    current=null;
-    closeDeleteModal();
-    show("home");
-    render();
+    updateSidePanel(t);
 }
 
 window.onload=function(){
-    show("home");
     render();
 };
 
