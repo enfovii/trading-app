@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <title>Pro Trading Dashboard</title>
 
 <style>
@@ -11,14 +9,13 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
     padding: 14px;
-    padding-bottom: 120px;
+    padding-bottom: 140px;
     color: #eaf1ff;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-text-size-adjust: 100%;
 }
 
-/* background */
 body::before {
     content: "";
     position: fixed;
@@ -31,95 +28,147 @@ body::before {
     z-index: -1;
 }
 
-.title { display:flex; justify-content:center; margin:12px 0 16px; }
+.title {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 16px;
+}
 
-h2 { font-size:20px; margin:0; text-align:center; }
+h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
 
 .page { display:none; }
 .active { display:block; }
 
-.portfolioBox, .stat, .card, .account {
-    background: rgba(20,30,50,0.55);
-    border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(14px);
-    border-radius: 16px;
+.topbar {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .portfolioBox {
+    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
     padding: 18px;
+    border-radius: 18px;
     text-align: center;
-    margin-bottom: 12px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
 .statsRow {
-    display:grid;
-    grid-template-columns: repeat(3,1fr);
-    gap:10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 }
 
-.stat { padding:12px; text-align:center; }
+.stat {
+    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
+    border: 1px solid rgba(120,170,255,0.18);
+    backdrop-filter: blur(14px);
+    padding: 12px;
+    border-radius: 16px;
+    text-align: center;
+}
 
-.small { font-size:11px; color:#93a4b8; }
-.big { font-size:20px; font-weight:700; }
+.small { font-size: 11px; color: #93a4b8; }
 
-.account { padding:14px; margin-top:10px; }
+.big {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.card {
+    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
+    border: 1px solid rgba(120,170,255,0.18);
+    backdrop-filter: blur(14px);
+    padding: 14px;
+    margin-top: 10px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.account {
+    padding: 14px;
+    margin-top: 10px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
+    border: 1px solid rgba(120,170,255,0.18);
+    scroll-margin-bottom: 120px;
+}
+
+.green { color: #2ee59d; }
+.red { color: #ff5c7a; }
 
 input {
     width: 100%;
     padding: 14px;
     border-radius: 12px;
     border: 1px solid rgba(120,170,255,0.25);
+    margin-top: 8px;
     background: rgba(8,12,25,0.65);
-    color: white;
+    color: #eaf1ff;
+    box-sizing: border-box;
     font-size: 18px;
 }
 
-/* hide native keyboard focus behaviour */
-input:focus {
-    outline:none;
-    box-shadow: 0 0 12px rgba(46,229,157,0.25);
-    border:1px solid #2ee59d;
-}
-
 button {
+    width: calc(100% - 24px);
+    margin-left: 12px;
+    margin-right: 12px;
     padding: 14px;
-    border-radius: 12px;
-    border: none;
-    background: #1f6feb;
-    color: white;
-    font-weight: 600;
     margin-top: 10px;
+    background: linear-gradient(135deg, #1f6feb, #144a99);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
-.green { color:#2ee59d; }
-.red { color:#ff5c7a; }
+.addBtn {
+    position: fixed;
+    bottom: 18px;
+    left: 12px;
+    right: 12px;
+    z-index: 10;
+    backdrop-filter: blur(12px);
+}
 
-/* keypad */
+/* ===================== KEYPAD ===================== */
+
 #keypad {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(10,15,30,0.95);
+    background: rgba(10,15,30,0.97);
     border-top: 1px solid rgba(120,170,255,0.2);
     display: none;
     padding: 10px;
-    z-index: 999;
+    z-index: 9999;
 }
 
 .keygrid {
-    display:grid;
-    grid-template-columns: repeat(3,1fr);
-    gap:8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
 }
 
 .key {
     padding: 18px;
-    text-align:center;
+    text-align: center;
     background: rgba(255,255,255,0.06);
     border-radius: 10px;
     font-size: 18px;
-    user-select:none;
+    user-select: none;
 }
 
 .key:active { background: rgba(255,255,255,0.15); }
@@ -132,42 +181,112 @@ button {
 
 <body>
 
-<div class="title"><h2>Pro Trading Dashboard</h2></div>
+<div class="title">
+    <h2>Pro Trading Dashboard</h2>
+</div>
 
 <div id="home" class="page active">
 
-<div class="portfolioBox" onclick="openPortfolio()">
-    <div class="small">Portfolio</div>
-    <div class="big" id="total">$0</div>
-</div>
+<div class="topbar">
 
-<div class="statsRow">
-    <div class="stat"><div class="small">Daily</div><div class="big green" id="daily">$0</div></div>
-    <div class="stat"><div class="small">Weekly</div><div class="big green" id="weeklyHome">$0</div></div>
-    <div class="stat"><div class="small">Monthly</div><div class="big green" id="monthlyHome">$0</div></div>
+    <div class="portfolioBox" onclick="openPortfolio()">
+        <div class="small">Portfolio</div>
+        <div class="big" id="total">$0</div>
+    </div>
+
+    <div class="statsRow">
+
+        <div class="stat">
+            <div class="small">Daily</div>
+            <div class="big green" id="daily">$0</div>
+        </div>
+
+        <div class="stat">
+            <div class="small">Weekly</div>
+            <div class="big green" id="weeklyHome">$0</div>
+        </div>
+
+        <div class="stat">
+            <div class="small">Monthly</div>
+            <div class="big green" id="monthlyHome">$0</div>
+        </div>
+
+    </div>
+
 </div>
 
 <div id="accounts"></div>
 </div>
 
+<div id="portfolio" class="page">
+<div class="card">
+    <h3>Portfolio Overview</h3>
+
+    <div class="card">
+        <div class="small">Total Balance</div>
+        <div class="big" id="p_total"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Daily Profit</div>
+        <div class="big green" id="p_daily"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Weekly</div>
+        <div class="big green" id="p_week"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Monthly</div>
+        <div class="big green" id="p_month"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Drawdown</div>
+        <div class="big red" id="p_dd"></div>
+    </div>
+
+    <button onclick="backHome()">Back</button>
+</div>
+</div>
+
 <div id="account" class="page">
-<div class="card" style="padding:14px;">
+<div class="card">
     <h3 id="name"></h3>
 
-    <!-- IMPORTANT: no native keyboard -->
-    <input id="balance" readonly onclick="openKeypad()">
+    <input id="balance" onfocus="openKeypad()" readonly>
 
-    <div class="card"><div class="small">Multiplier</div><div class="big green" id="mult"></div></div>
-    <div class="card"><div class="small">Daily</div><div id="dailyP"></div></div>
-    <div class="card"><div class="small">Weekly</div><div id="weekly"></div></div>
-    <div class="card"><div class="small">Monthly</div><div id="monthly"></div></div>
-    <div class="card"><div class="small">Drawdown</div><div class="big red" id="accdd"></div></div>
+    <div class="card">
+        <div class="small">Multiplier</div>
+        <div class="big green" id="mult"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Daily Profit</div>
+        <div id="dailyP"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Weekly</div>
+        <div id="weekly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Monthly</div>
+        <div id="monthly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Drawdown</div>
+        <div class="big red" id="accdd"></div>
+    </div>
 
     <button onclick="back()">Back</button>
 </div>
 </div>
 
-<!-- KEYPAD -->
+<!-- ================= KEYPAD ================= -->
 <div id="keypad">
     <div class="keygrid">
 
@@ -198,6 +317,7 @@ button {
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
+let activeInput = null;
 
 function num(v){
     if(!v) return 0;
@@ -254,18 +374,16 @@ function updateAccount(){
     document.getElementById("accdd").innerText=money(dd(b));
 }
 
-/* ===================== KEYPAD ===================== */
-
-let activeInput = null;
+/* ================= KEYBOARD ================= */
 
 function openKeypad(){
     activeInput = document.getElementById("balance");
     document.getElementById("keypad").style.display="block";
 }
 
-function press(val){
+function press(v){
     if(!activeInput) return;
-    activeInput.value += val;
+    activeInput.value += v;
     updateAccount();
 }
 
@@ -286,7 +404,7 @@ function done(){
     activeInput = null;
 }
 
-/* ===================== NAV ===================== */
+/* ================= NAV ================= */
 
 function back(){
     current=null;
