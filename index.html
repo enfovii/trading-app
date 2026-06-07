@@ -384,6 +384,9 @@ button {
     line-height: 1.2;
     font-size: 14px;
 }
+    .dailyLarge {
+    transform: translateX(-10px);
+}
 
 .accountBalance {
     font-size: 14px;
@@ -810,11 +813,13 @@ function render(){
         <div class="accountBalance">${money(b)}</div>
     </div>
 
-    <!-- DAILY -->
-    <div class="col num">
-        <div class="label">Daily</div>
-        <div class="value">${money(daily(b))}</div>
+   <!-- DAILY -->
+<div class="col num">
+    <div class="label">Daily</div>
+    <div class="value ${daily(b) >= 100000 ? 'dailyLarge' : ''}">
+        ${money(daily(b))}
     </div>
+</div>
 
     <!-- MULTIPLIER -->
     <div class="col num">
