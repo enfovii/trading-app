@@ -427,6 +427,18 @@ button {
     white-space: nowrap;
     text-align: left;
 }
+    .big {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+    .bonus {
+    display: block;
+    font-size: 11px;
+    margin-top: 3px;
+    color: #93a4b8;
+    font-weight: 500;
+}
     
 </style>
 </head>
@@ -852,10 +864,27 @@ function render(){
     el.innerHTML = html;
 
     document.getElementById("total").innerText = money(t.toFixed(0));
-    document.getElementById("daily").innerText = money(d.toFixed(0));
-    document.getElementById("weeklyHome").innerText = money((d*5).toFixed(0));
-    document.getElementById("monthlyHome").innerText = money((d*22).toFixed(0));
-}
+    let dailyValue = d;
+let weeklyValue = d * 5;
+let monthlyValue = d * 22;
+
+document.getElementById("daily").innerHTML =
+    money(dailyValue) +
+    '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
+    money(dailyValue / 100) +
+    ')</div>';
+
+document.getElementById("weeklyHome").innerHTML =
+    money(weeklyValue) +
+    '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
+    money(weeklyValue / 100) +
+    ')</div>';
+
+document.getElementById("monthlyHome").innerHTML =
+    money(monthlyValue) +
+    '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
+    money(monthlyValue / 100) +
+    ')</div>';
 
 function openAccount(i){
     current=i;
