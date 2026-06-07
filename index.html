@@ -198,11 +198,18 @@ border: 1px solid var(--border);
 }
 
 .account {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr 1.2fr 1.6fr;
+    gap: 12px;
+    align-items: start;
+
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
+
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
+
     scroll-margin-bottom: 120px;
     will-change: transform;
 }
@@ -754,7 +761,7 @@ function render(){
     </div>
 
     <!-- PROGRESS -->
-    <div class="cell">
+    <div class="cell" style="width:100%;">
 
         <div style="height:10px; background:rgba(255,255,255,0.05);
                     border-radius:999px; overflow:hidden; position:relative;">
