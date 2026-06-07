@@ -321,7 +321,6 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* NEW: keeps commas visible consistently */
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
 
@@ -402,7 +401,6 @@ function render(){
 
         let nextTarget = nextTargetFromBalance(b);
         let nextMult = mult(nextTarget);
-
         let progress = Math.min(100, (b / nextTarget) * 100);
         let needed = Math.max(0, nextTarget - b);
 
@@ -421,9 +419,38 @@ function render(){
                 <div class="small">Next ${nextMult.toFixed(2)}x</div>
                 <div class="small">Need ${money(needed)}</div>
 
-                <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
-                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
+                <!-- UPGRADED PROGRESS BAR -->
+                <div style="
+                    width:100%;
+                    height:10px;
+                    background:rgba(255,255,255,0.06);
+                    border-radius:12px;
+                    margin-top:8px;
+                    overflow:hidden;
+                    position:relative;
+                ">
+                    <div style="
+                        width:${progress}%;
+                        height:100%;
+                        background:linear-gradient(90deg,#1f6feb,#2ee59d);
+                        border-radius:12px;
+                        transition: width 0.4s ease;
+                        box-shadow: 0 0 12px rgba(46,229,157,0.25);
+                    "></div>
+
+                    <div style="
+                        position:absolute;
+                        right:8px;
+                        top:50%;
+                        transform:translateY(-50%);
+                        font-size:10px;
+                        color:#cfe7ff;
+                        opacity:0.85;
+                    ">
+                        ${progress.toFixed(0)}%
+                    </div>
                 </div>
+
             </div>
 
         </div>`;
@@ -472,8 +499,8 @@ function updateAccount(){
     document.getElementById("monthly").innerText=money(daily(b)*22);
     document.getElementById("accdd").innerText=money(dd(b));
 
-    /* KEEP INPUT FORMATTED EVEN AFTER BLUR / UPDATES */
-    inputEl.value = Number(b).toLocaleString('en-US');
+    elInput = document.getElementById("balance");
+    elInput.value = Number(b).toLocaleString('en-US');
 
     render();
 }
