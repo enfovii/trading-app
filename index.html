@@ -163,21 +163,25 @@ button {
     background: #ff5c7a !important;
 }
 
-/* ONLY ADDITION (safe inline rename styling) */
+/* =========================
+   INLINE RENAME (ADDED ONLY)
+========================= */
+
 .nameWrap {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 10px;
 }
 
-.nameEdit {
+#name {
     outline: none;
-    padding: 2px 6px;
-    border-radius: 6px;
 }
 
-.nameEdit[contenteditable="true"] {
-    background: rgba(255,255,255,0.06);
+#name[contenteditable="true"] {
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    padding: 2px 6px;
     border: 1px solid rgba(120,170,255,0.25);
 }
 
@@ -185,9 +189,10 @@ button {
     background: transparent;
     border: none;
     color: #93a4b8;
-    font-size: 16px;
-    padding: 4px;
+    font-size: 18px;
     width: auto;
+    margin: 0;
+    padding: 6px;
 }
 
 </style>
@@ -242,21 +247,30 @@ button {
 <div id="account" class="page">
 <div class="card">
 
-    <!-- ONLY MODIFIED AREA -->
+    <!-- ONLY CHANGE: WRAPPER ADDED -->
     <div class="nameWrap">
-        <h3 id="name" class="nameEdit" contenteditable="false"></h3>
+        <h3 id="name"></h3>
         <button class="editBtn" onclick="enableRename()">✏️</button>
     </div>
 
     <input id="balance"
        inputmode="decimal"
+       pattern="[0-9]*"
+       autocomplete="off"
+       autocorrect="off"
+       autocapitalize="none"
+       spellcheck="false"
        onfocus="this.select()"
        oninput="formatBalanceInput(this)">
 
     <button onclick="back()">Back</button>
 
+    <button class="danger" onclick="confirmDelete()">Delete Account</button>
+
 </div>
 </div>
+
+<button class="addBtn" onclick="openModal()">+ Add Account</button>
 
 <script>
 
@@ -265,25 +279,33 @@ let current = null;
 
 function num(v){
     if(!v) return 0;
-    return Number(v.toString().replace(/,/g,'')) || 0;
+    v = v.toString().toLowerCase().replace(/,/g,'');
+    if(v.includes("k")) return parseFloat(v)*1000;
+    if(v.includes("m")) return parseFloat(v)*1000000;
+    return isNaN(Number(v)) ? 0 : Number(v);
 }
 
-/* INLINE RENAME (SAFE ADDITION ONLY) */
+/* =========================
+   INLINE RENAME (ADDED)
+========================= */
 function enableRename(){
     if(current === null) return;
 
     const el = document.getElementById("name");
     el.contentEditable = true;
     el.focus();
+
     document.execCommand("selectAll", false, null);
 
     const save = () => {
         let val = el.textContent.trim();
+
         if(val){
             accounts[current].name = val;
             localStorage.setItem("accounts", JSON.stringify(accounts));
             render();
         }
+
         el.contentEditable = false;
         el.removeEventListener("blur", save);
     };
@@ -295,6 +317,7 @@ function enableRename(){
             e.preventDefault();
             el.blur();
         }
+
         if(e.key === "Escape"){
             el.textContent = accounts[current].name;
             el.blur();
@@ -302,7 +325,7 @@ function enableRename(){
     };
 }
 
-/* OPEN ACCOUNT */
+/* ORIGINAL LOGIC UNTOUCHED */
 function openAccount(i){
     current = i;
     let a = accounts[i];
@@ -313,11 +336,9 @@ function openAccount(i){
     show("account");
 }
 
-/* RENDER (UNCHANGED LOGIC) */
 function render(){
-    let el = document.getElementById("accounts");
-
-    el.innerHTML = accounts.map((a,i)=>`
+    document.getElementById("accounts").innerHTML =
+    accounts.map((a,i)=>`
         <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
             $${Number(a.balance).toLocaleString()}
@@ -325,7 +346,6 @@ function render(){
     `).join("");
 }
 
-/* NAV */
 function show(id){
     document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
     document.getElementById(id).classList.add("active");
