@@ -98,6 +98,7 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
+    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -105,6 +106,7 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
 .card {
@@ -114,6 +116,8 @@ h2 {
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    will-change: transform;
 }
 
 .account {
@@ -122,6 +126,8 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
+    scroll-margin-bottom: 120px;
+    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -150,6 +156,7 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
 .addBtn {
@@ -157,15 +164,35 @@ button {
     bottom: 18px;
     left: 12px;
     right: 12px;
+    z-index: 10;
+}
+
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.65);
+    padding: 16px;
+    z-index: 20;
+}
+
+.modal-content {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(15,20,35,0.9);
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
+    padding: 16px;
+    border-radius: 16px;
 }
 
 .danger {
     background: #ff5c7a !important;
 }
 
-/* =========================
-   INLINE RENAME (ADDED ONLY)
-========================= */
+/* ===== INLINE RENAME (ADDED ONLY) ===== */
 
 .nameWrap {
     display: flex;
@@ -180,9 +207,9 @@ button {
 
 #name[contenteditable="true"] {
     background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(120,170,255,0.25);
     border-radius: 6px;
     padding: 2px 6px;
-    border: 1px solid rgba(120,170,255,0.25);
 }
 
 .editBtn {
@@ -193,6 +220,7 @@ button {
     width: auto;
     margin: 0;
     padding: 6px;
+    cursor: pointer;
 }
 
 </style>
@@ -247,7 +275,7 @@ button {
 <div id="account" class="page">
 <div class="card">
 
-    <!-- ONLY CHANGE: WRAPPER ADDED -->
+    <!-- ONLY CHANGE HERE -->
     <div class="nameWrap">
         <h3 id="name"></h3>
         <button class="editBtn" onclick="enableRename()">✏️</button>
@@ -285,16 +313,14 @@ function num(v){
     return isNaN(Number(v)) ? 0 : Number(v);
 }
 
-/* =========================
-   INLINE RENAME (ADDED)
-========================= */
+/* ===== INLINE RENAME (ADDED) ===== */
 function enableRename(){
     if(current === null) return;
 
     const el = document.getElementById("name");
+
     el.contentEditable = true;
     el.focus();
-
     document.execCommand("selectAll", false, null);
 
     const save = () => {
@@ -317,7 +343,6 @@ function enableRename(){
             e.preventDefault();
             el.blur();
         }
-
         if(e.key === "Escape"){
             el.textContent = accounts[current].name;
             el.blur();
@@ -325,7 +350,7 @@ function enableRename(){
     };
 }
 
-/* ORIGINAL LOGIC UNTOUCHED */
+/* ORIGINAL LOGIC UNCHANGED */
 function openAccount(i){
     current = i;
     let a = accounts[i];
