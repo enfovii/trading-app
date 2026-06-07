@@ -567,15 +567,23 @@ function render(){
 
         let currentMult = mult(b);
 
-        function nextTargetFromBalance(x){
-            if (x < 90000) return 90000;
-            if (x < 140000) return 140000;
-            if (x < 160000) return 160000;
-            if (x < 180000) return 180000;
-            if (x < 200000) return 200000;
-            let steps = Math.floor((x - 200000) / 20000) + 1;
-            return 200000 + (steps * 20000);
-        }
+        function nextTargetFromBalance(b){
+
+    if (b < 30000) return 30000;
+
+    if (b < 90000) {
+        let steps = Math.floor((b - 30000) / 15000) + 1;
+        return 30000 + (steps * 15000);
+    }
+
+    if (b < 140000) return 140000;
+    if (b < 160000) return 160000;
+    if (b < 180000) return 180000;
+    if (b < 200000) return 200000;
+
+    let steps = Math.floor((b - 200000) / 20000) + 1;
+    return 200000 + (steps * 20000);
+}
 
         let nextTarget = nextTargetFromBalance(b);
         let nextMult = mult(nextTarget);
