@@ -82,7 +82,6 @@ h2 {
     text-align: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    will-change: transform;
 }
 
 .statsRow {
@@ -98,7 +97,6 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
-    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -106,7 +104,6 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
-    letter-spacing: 0.3px;
 }
 
 .card {
@@ -116,8 +113,6 @@ h2 {
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    will-change: transform;
 }
 
 .account {
@@ -126,8 +121,6 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
-    scroll-margin-bottom: 120px;
-    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -143,12 +136,6 @@ input {
     color: #eaf1ff;
     box-sizing: border-box;
     font-size: 16px;
-}
-
-input:focus {
-    outline: none;
-    border: 1px solid #2ee59d;
-    box-shadow: 0 0 12px rgba(46,229,157,0.25);
 }
 
 button {
@@ -199,7 +186,7 @@ button {
     background: #ff5c7a !important;
 }
 
-/* rename UI */
+/* rename button */
 .nameRow {
     display: flex;
     justify-content: space-between;
@@ -300,11 +287,18 @@ button {
     </div>
 </div>
 
-<!-- ✅ ONLY ADDITION -->
+<!-- ✅ NEW RENAME MODAL -->
 <div class="modal" id="renameModal">
     <div class="modal-content">
         <div class="big">Rename Account</div>
-        <input id="renameInput" placeholder="Account name">
+
+        <input id="renameInput"
+               placeholder="Account name"
+               autocomplete="off"
+               autocorrect="off"
+               autocapitalize="none"
+               spellcheck="false">
+
         <button onclick="confirmRename()">Save</button>
         <button onclick="closeRenameModal()">Cancel</button>
     </div>
@@ -315,9 +309,7 @@ button {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* ===================== */
 /* ONLY RENAMING CHANGED */
-/* ===================== */
 
 function renameAccount(){
     if(current === null) return;
@@ -342,9 +334,7 @@ function closeRenameModal(){
     document.getElementById("renameModal").style.display = "none";
 }
 
-/* ===================== */
-/* ORIGINAL CODE UNTOUCHED */
-/* ===================== */
+/* ORIGINAL LOGIC UNTOUCHED */
 
 function num(v){
     if(!v) return 0;
@@ -357,8 +347,6 @@ function num(v){
 function money(v){
     return "$" + Number(v).toLocaleString();
 }
-
-/* everything else remains exactly as your original app */
 
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
