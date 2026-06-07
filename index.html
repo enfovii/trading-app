@@ -774,7 +774,7 @@ function render(){
                 let dp = daily(b);
                 if (dp <= 0) return "ETA --";
                 let days = needed / dp;
-                return isFinite(days) ? "~" + days.toFixed(1) : "~";
+                return isFinite(days) ? "~" + days.toFixed(1) + "d" : "~--";
             })()}
         </div>
 
