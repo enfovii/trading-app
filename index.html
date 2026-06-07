@@ -342,6 +342,33 @@ button {
 .accountHeaders div:nth-child(n+2) {
     text-align: right;
 }
+    .accountHeaders {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1fr 1.4fr;
+    gap: 12px;
+
+    margin-top: 10px;
+    margin-bottom: 4px;
+    padding: 6px 10px;
+
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+
+    color: rgba(147, 164, 184, 0.75);
+
+    background: transparent;
+    border: none;
+
+    backdrop-filter: none;
+}
+    .accountHeaders div {
+    opacity: 0.8;
+}
+
+.accountHeaders div:nth-child(n+2) {
+    text-align: center;
+}
     
 </style>
 </head>
