@@ -619,18 +619,7 @@ function num(v){
 }
 
 function money(v){
-    return compactMoney(v);
-}
-
-    function compactMoney(v){
-    let num = Number(v || 0);
-
-    if(num >= 1e12) return "$" + (num/1e12).toFixed(2) + "T";
-    if(num >= 1e9)  return "$" + (num/1e9).toFixed(2) + "B";
-    if(num >= 1e6)  return "$" + (num/1e6).toFixed(2) + "M";
-    if(num >= 1e3)  return "$" + (num/1e3).toFixed(2) + "K";
-
-    return "$" + num.toFixed(0);
+    return "$" + Number(v).toLocaleString();
 }
 
 /* unchanged logic */
@@ -747,11 +736,11 @@ function renderPortfolio(){
         draw+=dd(b);
     });
 
-    document.getElementById("p_total").innerText = money(t);
-document.getElementById("p_daily").innerText = money(d);
-document.getElementById("p_week").innerText = money(d * 5);
-document.getElementById("p_month").innerText = money(d * 22);
-document.getElementById("p_dd").innerText = money(draw);
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
 function render(){
