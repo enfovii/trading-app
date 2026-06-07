@@ -354,6 +354,10 @@ button {
     letter-spacing: 0.6px;
     text-transform: uppercase;
     opacity: 0.8;
+
+
+    white-space: nowrap;
+}
 }
 
 /* THIS replaces cellValue (KEEP IT — just renamed usage) */
@@ -761,13 +765,13 @@ function render(){
 
     <!-- MULTIPLIER -->
     <div class="col num">
-        <div class="label">Mult</div>
+        <div class="label">Multi</div>
         <div class="value">${currentMult.toFixed(2)}x</div>
     </div>
 
     <!-- TARGET -->
     <div class="col num">
-        <div class="label">Target</div>
+       <div class="label">Δ NEXT</div>
         <div class="value">${money(needed)}</div>
     </div>
 
