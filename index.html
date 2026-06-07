@@ -119,6 +119,53 @@ h2 {
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
     will-change: transform;
 }
+    /* ===== PREMIUM CARD UPGRADE (ADD ONLY) ===== */
+
+.portfolioBox,
+.stat,
+.card,
+.account {
+    position: relative;
+    overflow: hidden;
+}
+
+/* left accent strip */
+.portfolioBox::before,
+.stat::before,
+.card::before,
+.account::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #1f6feb, #2ee59d);
+    opacity: 0.9;
+}
+
+/* cleaner spacing rhythm */
+.card,
+.account {
+    margin-top: 12px;
+}
+
+/* tap feedback (does NOT affect functionality) */
+.card:active,
+.account:active,
+.stat:active,
+.portfolioBox:active {
+    transform: scale(0.99);
+    transition: transform 0.12s ease;
+}
+    .card,
+.account,
+.stat,
+.portfolioBox {
+    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+    border: 1px solid rgba(120,170,255,0.14);
+    backdrop-filter: blur(18px);
+}
 
 .account {
     padding: 14px;
