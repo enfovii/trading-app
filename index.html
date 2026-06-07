@@ -329,7 +329,7 @@ button {
         minmax(72px, 1fr)
         minmax(42px, 0.6fr);
 
-    gap: 6px;
+    gap: 4px;
     align-items: start;
 
     padding: 12px 6px;
@@ -353,7 +353,7 @@ button {
 .col.num {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: flex-start; /* 👈 KEY CHANGE */
     text-align: left;
     padding-top: 6px;
 }
@@ -379,14 +379,10 @@ button {
     font-size: 16px;
     font-weight: 700;
 }
- .value {
+   .value {
     margin-top: 16px;
     line-height: 1.2;
     font-size: 14px;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .accountBalance {
@@ -623,25 +619,8 @@ function num(v){
 }
 
 function money(v){
-    let n = Number(v);
-
-    if (Math.abs(n) >= 1000000) {
-        let m = n / 1000000;
-
-        // clean formatting (e.g. 1.2m, 3m, 10.5m)
-        return "$" + (Number.isInteger(m) ? m : m.toFixed(2)) + "m";
-    }
-
-
-    return "$" + n.toLocaleString();
+    return "$" + Number(v).toLocaleString();
 }
-
-   function bonus(v){
-    let n = Number(v) / 100;
-    let formatted = money(n.toFixed(0));
-    return "(" + formatted + ")";
-}
-
 
 /* unchanged logic */
 function renameAccount(){
@@ -757,20 +736,11 @@ function renderPortfolio(){
         draw+=dd(b);
     });
 
-    document.getElementById("p_total").innerHTML =
-    money(t.toFixed(0)) + `<div class="small">${bonus(t)}</div>`;
-
-document.getElementById("p_daily").innerHTML =
-    money(d.toFixed(0)) + `<div class="small">${bonus(d)}</div>`;
-
-document.getElementById("p_week").innerHTML =
-    money((d*5).toFixed(0)) + `<div class="small">${bonus(d*5)}</div>`;
-
-document.getElementById("p_month").innerHTML =
-    money((d*22).toFixed(0)) + `<div class="small">${bonus(d*22)}</div>`;
-
-document.getElementById("p_dd").innerHTML =
-    money(draw.toFixed(0)) + `<div class="small">${bonus(draw)}</div>`;
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
 function render(){
@@ -869,14 +839,10 @@ function render(){
     el.innerHTML = html;
 
     document.getElementById("total").innerText = money(t.toFixed(0));
-    document.getElementById("daily").innerHTML =
-    money(d.toFixed(0)) + `<div class="small">${bonus(d)}</div>`;
-
-document.getElementById("weeklyHome").innerHTML =
-    money((d*5).toFixed(0)) + `<div class="small">${bonus(d*5)}</div>`;
-
-document.getElementById("monthlyHome").innerHTML =
-    money((d*22).toFixed(0)) + `<div class="small">${bonus(d*22)}</div>`;
+    document.getElementById("daily").innerText = money(d.toFixed(0));
+    document.getElementById("weeklyHome").innerText = money((d*5).toFixed(0));
+    document.getElementById("monthlyHome").innerText = money((d*22).toFixed(0));
+}
 
 function openAccount(i){
     current=i;
