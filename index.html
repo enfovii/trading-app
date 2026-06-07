@@ -343,8 +343,10 @@ button {
 
 /* numeric columns */
 .col.num {
-    align-items: flex-end;
-    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* 👈 KEY CHANGE */
+    text-align: left;
 }
     .col.num .value {
     font-variant-numeric: tabular-nums;
@@ -368,6 +370,9 @@ button {
     font-size: 11.5px;
     font-weight: 500;
     margin-top: 3px;
+}
+    .value {
+    font-variant-numeric: tabular-nums;
 }
 
 /* THIS replaces cellStrong (KEEP IT) */
