@@ -134,9 +134,12 @@ h2 {
 .small { font-size: 11px; color: #93a4b8; }
 
 .big {
-    font-size: 20px;
+    font-size: clamp(12px, 4.5vw, 20px);
     font-weight: 700;
     letter-spacing: 0.3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card {
