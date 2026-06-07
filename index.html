@@ -313,6 +313,36 @@ button {
     color: #eaf1ff;
 }
 
+    .accountHeaders {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1.2fr 1.2fr;
+    gap: 10px;
+
+    margin-top: 14px;
+    margin-bottom: 6px;
+    padding: 10px 12px;
+
+    font-size: 11px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+
+    color: #93a4b8;
+
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(120,170,255,0.10);
+    border-radius: 12px;
+
+    backdrop-filter: blur(14px);
+}
+
+.accountHeaders div {
+    text-align: left;
+}
+
+.accountHeaders div:nth-child(n+2) {
+    text-align: right;
+}
+    
 </style>
 </head>
 
@@ -352,6 +382,14 @@ button {
 
 </div>
 
+    <div class="accountHeaders">
+    <div>Account</div>
+    <div>Daily Profit</div>
+    <div>Multiplier</div>
+    <div>Next Tier Target</div>
+    <div>Progress</div>
+</div>
+    
 <div id="accounts"></div>
 </div>
 
@@ -681,41 +719,66 @@ function render(){
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
 
         html += `
-        <div class="account" onclick="openAccount(${i})"
-            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+<div class="account"
+     onclick="openAccount(${i})"
+     style="display:grid;
+            grid-template-columns: 1.4fr 1fr 1fr 1.2fr 1.2fr;
+            gap:10px;
+            align-items:center;
+            padding:14px;">
 
-            <div>
-                <b>${a.name}</b><br>
-                ${money(b)}<br>
-                <span class="green">${currentMult.toFixed(2)}x</span><br>
-                <span class="small">Daily ${money(daily(b))}</span>
+    <!-- Account -->
+    <div>
+        <b>${a.name}</b>
+        <div class="small">${money(b)}</div>
+    </div>
+
+    <!-- Daily Profit -->
+    <div style="text-align:right;">
+        <span class="green">${money(daily(b))}</span>
+    </div>
+
+    <!-- Multiplier -->
+    <div style="text-align:right;">
+        <span class="green">${currentMult.toFixed(2)}x</span>
+    </div>
+
+    <!-- Next Tier Target -->
+    <div style="text-align:right;">
+        <div class="small">Need ${money(needed)}</div>
+        <div class="small">Next ${nextMult.toFixed(2)}x</div>
+    </div>
+
+    <!-- Progress -->
+    <div>
+        <div style="width:100%;
+                    height:10px;
+                    background:rgba(255,255,255,0.06);
+                    border-radius:12px;
+                    overflow:hidden;
+                    position:relative;">
+
+            <div style="width:${progress}%;
+                        height:100%;
+                        background:linear-gradient(90deg,#1f6feb,#2ee59d);
+                        border-radius:12px;"></div>
+
+            <div style="position:absolute;
+                        right:6px;
+                        top:50%;
+                        transform:translateY(-50%);
+                        font-size:10px;
+                        font-weight:700;
+                        color:#fff;
+                        background:rgba(0,0,0,0.45);
+                        padding:2px 6px;
+                        border-radius:8px;">
+                ${progress.toFixed(0)}%
             </div>
+        </div>
+    </div>
 
-            <div style="min-width:140px;text-align:right;">
-                <div class="small">Next ${nextMult.toFixed(2)}x</div>
-                <div class="small">Need ${money(needed)}</div>
-
-                <div style="width:100%;height:10px;background:rgba(255,255,255,0.06);border-radius:12px;margin-top:8px;overflow:hidden;position:relative;">
-                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);border-radius:12px;"></div>
-
-                    <div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.45);padding:2px 6px;border-radius:8px;">
-                        ${progress.toFixed(0)}%
-                    </div>
-                </div>
-
-                <div style="font-size:11px;color:#93a4b8;margin-top:6px;">
-                    ${(() => {
-                        let dp = daily(b);
-                        if (dp <= 0) return "ETA: --";
-                        let days = needed / dp;
-                        if (!isFinite(days) || days <= 0) return "ETA: 0 days";
-                        return "ETA: " + days.toFixed(1) + " days";
-                    })()}
-                </div>
-
-            </div>
-
-        </div>`;
+</div>`;
     });
 
     el.innerHTML = html;
