@@ -296,6 +296,7 @@ button {
 </div>
 
 <script>
+
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
@@ -354,6 +355,7 @@ function renderPortfolio(){
 }
 
 function render(){
+
     let el=document.getElementById("accounts");
 
     let html = "";
@@ -366,30 +368,26 @@ function render(){
 
         let currentMult = mult(b);
 
-        let nextMult;
+        // ✅ FIXED LOGIC
         let nextTarget;
 
         if (b < 90000) {
-            nextMult = 3;
             nextTarget = 90000;
         } 
         else if (b < 140000) {
-            nextMult = 3;
             nextTarget = 140000;
         } 
         else if (b < 160000) {
-            nextMult = 3.5;
             nextTarget = 160000;
         } 
         else if (b < 200000) {
-            nextMult = 4;
             nextTarget = 200000;
         } 
         else {
-            let steps = Math.floor((b - 200000) / 20000) + 1;
-            nextMult = 5 + (steps * 0.5);
-            nextTarget = 200000 + (steps * 20000);
+            nextTarget = 200000 + 20000;
         }
+
+        let nextMult = mult(nextTarget);
 
         let progress = Math.min(100, (b / nextTarget) * 100);
         let needed = Math.max(0, nextTarget - b);
@@ -485,6 +483,7 @@ window.onload=function(){
     show("home");
     render();
 };
+
 </script>
 
 </body>
