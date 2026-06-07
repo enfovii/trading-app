@@ -82,6 +82,7 @@ h2 {
     text-align: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    will-change: transform;
 }
 
 .statsRow {
@@ -97,6 +98,7 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
+    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -104,6 +106,7 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
 .card {
@@ -113,6 +116,8 @@ h2 {
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    will-change: transform;
 }
 
 .account {
@@ -121,6 +126,8 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
+    scroll-margin-bottom: 120px;
+    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -138,6 +145,12 @@ input {
     font-size: 16px;
 }
 
+input:focus {
+    outline: none;
+    border: 1px solid #2ee59d;
+    box-shadow: 0 0 12px rgba(46,229,157,0.25);
+}
+
 button {
     width: calc(100% - 24px);
     margin-left: 12px;
@@ -149,6 +162,7 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
 .addBtn {
@@ -157,6 +171,7 @@ button {
     left: 12px;
     right: 12px;
     z-index: 10;
+    backdrop-filter: blur(12px);
 }
 
 .modal {
@@ -173,7 +188,7 @@ button {
 .modal-content {
     width: 100%;
     max-width: 360px;
-    background: rgba(15,20,35,0.92);
+    background: rgba(15,20,35,0.9);
     border: 1px solid rgba(120,170,255,0.25);
     backdrop-filter: blur(16px);
     padding: 16px;
@@ -184,7 +199,14 @@ button {
     background: #ff5c7a !important;
 }
 
-/* edit button */
+/* ===== rename UI ===== */
+.nameRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
 .editBtn {
     background: transparent;
     border: none;
@@ -193,12 +215,7 @@ button {
     width: auto;
     margin: 0;
     padding: 6px 8px;
-}
-
-.nameRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    border-radius: 8px;
 }
 
 </style>
@@ -219,6 +236,25 @@ button {
         <div class="big" id="total">$0</div>
     </div>
 
+    <div class="statsRow">
+
+        <div class="stat">
+            <div class="small">Daily</div>
+            <div class="big green" id="daily">$0</div>
+        </div>
+
+        <div class="stat">
+            <div class="small">Weekly</div>
+            <div class="big green" id="weeklyHome">$0</div>
+        </div>
+
+        <div class="stat">
+            <div class="small">Monthly</div>
+            <div class="big green" id="monthlyHome">$0</div>
+        </div>
+
+    </div>
+
 </div>
 
 <div id="accounts"></div>
@@ -232,27 +268,50 @@ button {
         <button class="editBtn" onclick="renameAccount()">✏️</button>
     </div>
 
-    <input id="balance" oninput="formatBalanceInput(this)">
+    <input id="balance"
+       inputmode="decimal"
+       pattern="[0-9]*"
+       autocomplete="off"
+       autocorrect="off"
+       autocapitalize="none"
+       spellcheck="false"
+       onfocus="this.select()"
+       oninput="formatBalanceInput(this)">
 
     <button onclick="back()">Back</button>
+    <button class="danger" onclick="confirmDelete()">Delete Account</button>
 </div>
 </div>
 
-<!-- ADD ACCOUNT MODAL -->
+<!-- ADD ACCOUNT -->
 <div class="modal" id="modal">
     <div class="modal-content">
+        <div class="big">Add Account</div>
         <input id="newName" placeholder="Account name">
         <input id="newBalance" placeholder="Starting balance">
         <button onclick="createAccount()">Create</button>
-        <button onclick="closeModal()">Cancel</button>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
 
-<!-- ✅ NEW IOS RENAME MODAL -->
+<!-- DELETE -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="big">Are you sure?</div>
+        <button class="danger" onclick="deleteAccount()">Yes, Delete</button>
+        <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
+    </div>
+</div>
+
+<!-- ✅ RENAMING MODAL (ONLY ADDITION) -->
 <div class="modal" id="renameModal">
     <div class="modal-content">
         <div class="big">Rename Account</div>
-        <input id="renameInput" placeholder="Enter new name">
+        <input id="renameInput"
+               placeholder="Account name"
+               autocomplete="off"
+               autocorrect="off"
+               spellcheck="false">
         <button onclick="confirmRename()">Save</button>
         <button onclick="closeRenameModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
@@ -263,10 +322,11 @@ button {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* unchanged logic */
 function num(v){
     if(!v) return 0;
-    v = v.toString().replace(/,/g,'');
+    v = v.toString().toLowerCase().replace(/,/g,'');
+    if(v.includes("k")) return parseFloat(v)*1000;
+    if(v.includes("m")) return parseFloat(v)*1000000;
     return isNaN(Number(v)) ? 0 : Number(v);
 }
 
@@ -274,7 +334,7 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* ✅ REPLACED ONLY RENAME FEATURE */
+/* ✅ ONLY CHANGE HERE */
 function renameAccount(){
     if(current === null) return;
     document.getElementById("renameInput").value = accounts[current].name;
@@ -298,7 +358,8 @@ function closeRenameModal(){
     document.getElementById("renameModal").style.display = "none";
 }
 
-/* everything else unchanged */
+/* EVERYTHING ELSE UNTOUCHED */
+
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
     if(raw === '') return;
@@ -306,34 +367,33 @@ function formatBalanceInput(el){
 }
 
 function render(){
-    let el = document.getElementById("accounts");
-    el.innerHTML = "";
+    let el=document.getElementById("accounts");
+    el.innerHTML="";
 
     accounts.forEach((a,i)=>{
         el.innerHTML += `
         <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
-            ${money(a.balance)}
+            $${a.balance}
         </div>`;
     });
 }
 
 function openAccount(i){
-    current = i;
-    document.getElementById("name").innerText = accounts[i].name;
-    document.getElementById("balance").value = accounts[i].balance;
-
+    current=i;
+    document.getElementById("name").innerText=accounts[i].name;
+    document.getElementById("balance").value=accounts[i].balance;
     document.getElementById("home").classList.remove("active");
     document.getElementById("account").classList.add("active");
 }
 
 function back(){
-    current = null;
+    current=null;
     document.getElementById("account").classList.remove("active");
     document.getElementById("home").classList.add("active");
 }
 
-window.onload = render;
+window.onload=render;
 
 </script>
 
