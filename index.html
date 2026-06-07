@@ -320,14 +320,14 @@ button {
     color: #eaf1ff;
 }
 
-   .accountRow {
+ .accountRow {
     display: grid;
     grid-template-columns:
-        180px   /* Account */
-        110px   /* Daily */
-        110px   /* Mult */
-        140px   /* Delta Next */
-        140px;  /* ETA */
+        minmax(120px, 1.6fr)
+        minmax(70px, 1fr)
+        minmax(80px, 1fr)
+        minmax(100px, 1.2fr)
+        minmax(90px, 1.4fr);
 
     gap: 10px;
     align-items: start;
