@@ -322,46 +322,47 @@ button {
 
     .accountRow {
     display: grid;
-    grid-template-columns: 1.8fr 1fr 1fr 1.2fr 1.6fr;
+    grid-template-columns: 2.2fr 1fr 1fr 1.3fr 1fr;
     gap: 12px;
-    align-items: center;
-    padding: 14px 12px;
+    align-items: center; /* IMPORTANT */
 }
 
-.cell {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-}
-
+.cell,
 .cellLeft {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: center;
 }
 
+/* left column stays left aligned */
+.cellLeft {
+    align-items: flex-start;
+}
+
+/* all other columns center perfectly */
+.cell {
+    align-items: center;
+    text-align: center;
+}
+
+/* tighter, cleaner typography */
 .cellTitle {
     font-size: 10px;
     color: #93a4b8;
+    opacity: 0.8;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    opacity: 0.8;
-    white-space: nowrap;
 }
 
 .cellValue {
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 500;
-    margin-top: 3px;
-    line-height: 1.2;
+    margin-top: 4px;
 }
 
 .cellStrong {
     font-size: 15px;
     font-weight: 700;
-    line-height: 1.2;
 }
     
 </style>
@@ -734,7 +735,7 @@ function render(){
         html += `
 <div class="account accountRow" onclick="openAccount(${i})">
 
-    <!-- ACCOUNT -->
+    <!-- ACCOUNT (LEFT - ANCHOR COLUMN) -->
     <div class="cellLeft">
         <div class="cellTitle">Account</div>
         <div class="cellStrong">${a.name}</div>
@@ -757,26 +758,24 @@ function render(){
     <div class="cell">
         <div class="cellTitle">Next target</div>
         <div class="cellValue">${money(needed)}</div>
-        <div style="font-size:11px; color:#93a4b8; margin-top:4px;">
-            ${nextMult.toFixed(2)}x
+    </div>
+
+    <!-- ETA -->
+    <div class="cell">
+        <div class="cellTitle">ETA</div>
+        <div class="cellValue">
+            ${(() => {
+                let dp = daily(b);
+                if (dp <= 0) return "~";
+                let days = needed / dp;
+                return isFinite(days) ? "~" + days.toFixed(1) + "d" : "~";
+            })()}
         </div>
     </div>
 
-   <!-- ETA ONLY -->
-<div class="cell">
-    <div class="cellTitle">ETA</div>
-    <div class="cellValue">
-        ${(() => {
-            let dp = daily(b);
-            if (dp <= 0) return "~";
-            let days = needed / dp;
-            return isFinite(days) ? "~" + days.toFixed(1) + "d" : "~";
-        })()}
-    </div>
 </div>
-
-</div>`;
-    });
+`;
+            });
 
     el.innerHTML = html;
 
