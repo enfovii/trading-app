@@ -434,11 +434,14 @@ function openAccount(i){
     show("account");
     updateAccount();
 
-    // ✅ Feature 3 + 4
     setTimeout(() => {
         let input = document.getElementById("balance");
         input.focus();
-        input.select();
+
+        input.setSelectionRange(
+            input.value.length,
+            input.value.length
+        );
 
         input.scrollIntoView({
             behavior: "smooth",
@@ -450,8 +453,14 @@ function openAccount(i){
 function updateAccount(){
     if(current===null) return;
 
-    let b=num(document.getElementById("balance").value);
-    accounts[current].balance=b;
+    let inputEl = document.getElementById("balance");
+    let raw = inputEl.value;
+
+    if(raw === "" || raw === null) return;
+
+    let b = num(raw);
+
+    accounts[current].balance = b;
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
     document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
