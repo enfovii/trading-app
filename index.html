@@ -378,6 +378,33 @@ button {
         <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
+    <div class="modal" id="renameModal">
+    <div class="modal-content">
+        <div class="big">
+            Rename Account
+        </div>
+
+        <input
+            id="renameInput"
+            placeholder="Enter new name"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+        >
+
+        <button onclick="confirmRename()">
+            Save
+        </button>
+
+        <button
+            onclick="closeRenameModal()"
+            style="background:rgba(255,255,255,0.08);"
+        >
+            Cancel
+        </button>
+    </div>
+</div>
 
 <script>
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
@@ -399,13 +426,46 @@ function money(v){
 function renameAccount(){
     if(current === null) return;
 
-    let newName = prompt("Rename account:", accounts[current].name);
+    document.getElementById("renameInput").value =
+        accounts[current].name;
+
+    document.getElementById("renameModal")
+        .style.display = "flex";
+
+    setTimeout(() => {
+        let input =
+            document.getElementById("renameInput");
+
+        input.focus();
+        input.select();
+    }, 100);
+}
+
+function closeRenameModal(){
+    document.getElementById("renameModal")
+        .style.display = "none";
+}
+
+function confirmRename(){
+    if(current === null) return;
+
+    let newName =
+        document.getElementById("renameInput")
+        .value.trim();
+
     if(!newName) return;
 
-    accounts[current].name = newName.trim();
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    accounts[current].name = newName;
 
-    document.getElementById("name").innerText = accounts[current].name;
+    localStorage.setItem(
+        "accounts",
+        JSON.stringify(accounts)
+    );
+
+    document.getElementById("name")
+        .innerText = newName;
+
+    closeRenameModal();
     render();
 }
 
