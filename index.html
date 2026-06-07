@@ -103,6 +103,7 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
+    scroll-margin-bottom: 120px;
 }
 
 .green { color: #2ee59d; }
@@ -118,6 +119,12 @@ input {
     color: #eaf1ff;
     box-sizing: border-box;
     font-size: 16px;
+}
+
+input:focus {
+    outline: none;
+    border: 1px solid #2ee59d;
+    box-shadow: 0 0 12px rgba(46,229,157,0.25);
 }
 
 button {
@@ -300,8 +307,6 @@ button {
 
 <script>
 
-// EVERYTHING BELOW IS YOUR ORIGINAL JS UNCHANGED
-
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
@@ -428,6 +433,18 @@ function openAccount(i){
     document.getElementById("balance").value=num(a.balance);
     show("account");
     updateAccount();
+
+    // ✅ Feature 3 + 4
+    setTimeout(() => {
+        let input = document.getElementById("balance");
+        input.focus();
+        input.select();
+
+        input.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }, 100);
 }
 
 function updateAccount(){
