@@ -16,7 +16,23 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
+:root {
+    --bg: #050913;
 
+    --card: rgba(18, 28, 48, 0.70);
+    --card2: rgba(10, 14, 28, 0.55);
+
+    --primary: #4da3ff;
+    --accent: #38e6b0;
+
+    --profit: #2ee59d;
+    --loss: #ff5c7a;
+
+    --text: #eaf1ff;
+    --muted: #8ea2bb;
+
+    --border: rgba(120, 170, 255, 0.14);
+}
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
@@ -33,13 +49,27 @@ body::before {
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at 15% 20%, rgba(0,140,255,0.20), transparent 45%),
-        radial-gradient(circle at 85% 25%, rgba(80,180,255,0.12), transparent 50%),
-        radial-gradient(circle at 50% 90%, rgba(0,90,255,0.10), transparent 55%),
-        #050913;
+        radial-gradient(circle at 15% 20%, rgba(77,163,255,0.18), transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(56,230,176,0.10), transparent 50%),
+        radial-gradient(circle at 50% 90%, rgba(77,163,255,0.08), transparent 55%),
+        var(--bg);
     z-index: -1;
 }
+body {
+    color: var(--text);
+}
 
+.small {
+    color: var(--muted);
+}
+
+.green {
+    color: var(--profit);
+}
+
+.red {
+    color: var(--loss);
+}
 .title {
     display: flex;
     justify-content: center;
@@ -110,8 +140,8 @@ h2 {
 }
 
 .card {
-    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
-    border: 1px solid rgba(120,170,255,0.18);
+   background: linear-gradient(145deg, var(--card), var(--card2));
+border: 1px solid var(--border);
     backdrop-filter: blur(14px);
     padding: 14px;
     margin-top: 10px;
