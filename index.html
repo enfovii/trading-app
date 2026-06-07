@@ -320,20 +320,22 @@ button {
     color: #eaf1ff;
 }
 
- .accountRow {
+.accountRow {
     display: grid;
     grid-template-columns:
-        minmax(120px, 1.6fr)
-        minmax(70px, 1fr)
-        minmax(80px, 1fr)
-        minmax(100px, 1.2fr)
-        minmax(90px, 1.4fr);
+        minmax(140px, 2fr)   /* Account (anchor) */
+        minmax(70px, 1fr)    /* Daily */
+        minmax(80px, 1fr)    /* Mult */
+        minmax(110px, 1.2fr) /* Next */
+        minmax(90px, 1fr);   /* ETA */
 
     gap: 8px;
     align-items: start;
 
-    padding: 14px 10px;
+    padding: 12px 8px;
     box-sizing: border-box;
+
+    overflow: hidden;
 }
 
 /* NEW STRUCTURE (replace old cell system) */
@@ -394,10 +396,12 @@ button {
     color: #93a4b8;
     margin-top: 3px;
 }
-    .cell {
+   .cell {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    justify-content: flex-start;
+    min-width: 0;
 }
 
 .cellLeft {
@@ -407,8 +411,22 @@ button {
 }
 
 .cellValue {
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-top: 6px;
+    white-space: nowrap;
     font-variant-numeric: tabular-nums;
 }
+    .cellTitle {
+    font-size: 10px;
+    color: #93a4b8;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    white-space: nowrap;
+    text-align: left;
+}
+    
 </style>
 </head>
 
