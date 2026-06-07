@@ -137,7 +137,7 @@ button {
     left: 12px;
     right: 12px;
     z-index: 10;
-    backdrop-filter: blur(12px); /* FIX 2 */
+    backdrop-filter: blur(12px);
 }
 
 .modal {
@@ -356,7 +356,7 @@ function renderPortfolio(){
     document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
-/* HOME - UPDATED RENDER ONLY */
+/* HOME - ONLY RENDER UPDATED */
 function render(){
 
     let el=document.getElementById("accounts");
@@ -400,18 +400,25 @@ function render(){
         let needed = Math.max(0, nextTarget - b);
 
         html += `
-        <div class="account" onclick="openAccount(${i})">
-            <b>${a.name}</b><br>
-            ${money(b)}<br>
-            <span class="green">${currentMult.toFixed(2)}x</span><br>
-            <span class="small">Daily ${money(daily(b))}</span><br><br>
+        <div class="account" onclick="openAccount(${i})"
+            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
 
-            <div class="small">Next Tier: ${nextMult.toFixed(2)}x</div>
-            <div class="small">Need: ${money(needed)}</div>
-
-            <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
-                <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
+            <div>
+                <b>${a.name}</b><br>
+                ${money(b)}<br>
+                <span class="green">${currentMult.toFixed(2)}x</span><br>
+                <span class="small">Daily ${money(daily(b))}</span>
             </div>
+
+            <div style="min-width:140px;text-align:right;">
+                <div class="small">Next ${nextMult.toFixed(2)}x</div>
+                <div class="small">Need ${money(needed)}</div>
+
+                <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
+                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
+                </div>
+            </div>
+
         </div>`;
     });
 
@@ -433,6 +440,7 @@ function openAccount(i){
     updateAccount();
 }
 
+/* REST UNCHANGED */
 function updateAccount(){
     if(current===null) return;
 
@@ -449,11 +457,9 @@ function updateAccount(){
     render();
 }
 
-/* NAV */
 function back(){ current=null; show("home"); }
 function backHome(){ show("home"); }
 
-/* MODAL */
 function openModal(){ document.getElementById("modal").style.display="flex"; }
 function closeModal(){ document.getElementById("modal").style.display="none"; }
 
@@ -469,7 +475,6 @@ function createAccount(){
     render();
 }
 
-/* DELETE */
 function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
 function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
 
