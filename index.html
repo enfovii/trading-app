@@ -253,7 +253,6 @@ button {
 <div class="card">
     <h3 id="name"></h3>
 
-    <!-- UPDATED INPUT ONLY -->
     <input id="balance" inputmode="text" oninput="formatBalanceInput(this)">
 
     <div class="card">
@@ -322,7 +321,7 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* NEW FORMATTING FUNCTION */
+/* NEW: keeps commas visible consistently */
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
 
@@ -335,7 +334,6 @@ function formatBalanceInput(el){
     updateAccount();
 }
 
-/* EVERYTHING ELSE UNCHANGED */
 function tier(b){
     if (b < 90000) return 3;
     if (b < 140000) return 3;
@@ -473,6 +471,9 @@ function updateAccount(){
     document.getElementById("weekly").innerText=money(daily(b)*5);
     document.getElementById("monthly").innerText=money(daily(b)*22);
     document.getElementById("accdd").innerText=money(dd(b));
+
+    /* KEEP INPUT FORMATTED EVEN AFTER BLUR / UPDATES */
+    inputEl.value = Number(b).toLocaleString('en-US');
 
     render();
 }
