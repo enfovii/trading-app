@@ -311,18 +311,19 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-function mult(b){
-    b = num(b);
-    if (b < 90000) return b / 30000;
+/* ✅ SINGLE SOURCE OF TRUTH FOR TIERS */
+function tier(b){
+    if (b < 90000) return 3;
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
-    if (b < 180000) return 4.5;   // ✅ FIXED TIER
-    if (b < 200000) return 4;
-    let base = 5;
-    base += Math.floor((b - 200000) / 20000) * 0.5;
-    return base;
+    if (b < 180000) return 4;
+    if (b < 200000) return 4.5;
+
+    let steps = Math.floor((b - 200000) / 20000);
+    return 5 + (steps * 0.5);
 }
 
+function mult(b){ return tier(b); }
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
@@ -367,6 +368,7 @@ function render(){
         d+=daily(b);
 
         let currentMult = mult(b);
+        let nextMult = mult(b + 1); // next tier safely approximated
 
         let nextTarget;
 
@@ -379,8 +381,6 @@ function render(){
             let steps = Math.floor((b - 200000) / 20000) + 1;
             nextTarget = 200000 + (steps * 20000);
         }
-
-        let nextMult = mult(nextTarget);
 
         let progress = Math.min(100, (b / nextTarget) * 100);
         let needed = Math.max(0, nextTarget - b);
