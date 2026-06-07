@@ -373,27 +373,19 @@ button {
 }
 }
 
-/* THIS replaces cellValue (KEEP IT — just renamed usage) */
-.value {
-    font-size: 11.5px;
-    font-weight: 500;
-    margin-top: 3px;
-}
-    .value {
-    font-variant-numeric: tabular-nums;
-}
-
 /* THIS replaces cellStrong (KEEP IT) */
 .strong {
     font-size: 16px;
     font-weight: 700;
 }
 
-/* balance under account */
-.sub {
-    font-size: 11px;
-    color: #93a4b8;
-    margin-top: 3px;
+.accountBalance {
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 8px;
+    color: #eaf1ff;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
    .cell {
     display: flex;
@@ -410,11 +402,12 @@ button {
 }
 
 .cellValue {
-    font-size: 12.5px;
+    font-size: 11.5px;
     font-weight: 500;
-    margin-top: 6px;
+    margin-top: 10px;
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
+    line-height: 1.2;
 }
     .cellTitle {
     font-size: 10px;
@@ -800,7 +793,7 @@ function render(){
     <div class="col name">
         <div class="label">Account</div>
         <div class="value strong">${a.name}</div>
-        <div class="sub">${money(b)}</div>
+        <div class="accountBalance">${money(b)}</div>
     </div>
 
     <!-- DAILY -->
