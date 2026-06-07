@@ -336,6 +336,94 @@ input {
 .green {
     text-shadow: 0 0 18px var(--glow);
 }
+/* =========================
+   SAFE UI REDESIGN LAYER
+   (NO LOGIC CHANGES)
+========================= */
+
+/* cleaner header title */
+.title h2 {
+    font-size: 22px;
+    font-weight: 750;
+    letter-spacing: 0.6px;
+}
+
+/* portfolio box upgrade */
+.portfolioBox {
+    border-radius: 22px;
+    padding: 20px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.4);
+    transition: 0.2s ease;
+}
+
+.portfolioBox:active {
+    transform: scale(0.985);
+}
+
+/* stat cards modern feel */
+.stat {
+    border-radius: 18px;
+    transition: 0.2s ease;
+}
+
+.stat:active {
+    transform: scale(0.98);
+}
+
+/* =========================
+   ACCOUNT CARD UPGRADE ONLY
+========================= */
+
+.account {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+
+    border-radius: 20px;
+    padding: 16px;
+
+    background: linear-gradient(145deg, rgba(20,30,50,0.7), rgba(10,15,30,0.45));
+    border: 1px solid rgba(120,170,255,0.16);
+
+    box-shadow: 0 10px 28px rgba(0,0,0,0.3);
+    transition: 0.18s ease;
+}
+
+.account:active {
+    transform: scale(0.985);
+}
+
+/* left side text spacing */
+.account div:first-child {
+    line-height: 1.4;
+}
+
+/* right side cleaner alignment */
+.account div:last-child {
+    text-align: right;
+    min-width: 120px;
+}
+
+/* multiplier glow */
+.green {
+    text-shadow: 0 0 14px rgba(46,229,157,0.12);
+}
+
+/* buttons polish */
+button {
+    border-radius: 14px;
+    transition: 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* inputs smoother */
+input {
+    border-radius: 14px;
+}
     
 </style>
 </head>
