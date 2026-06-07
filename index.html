@@ -200,6 +200,7 @@ button {
     justify-content: space-between;
     align-items: center;
 }
+
 </style>
 </head>
 
@@ -237,22 +238,22 @@ button {
 </div>
 </div>
 
-<!-- ORIGINAL MODALS -->
+<!-- ADD ACCOUNT MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
-        <input id="newName">
-        <input id="newBalance">
+        <input id="newName" placeholder="Account name">
+        <input id="newBalance" placeholder="Starting balance">
         <button onclick="createAccount()">Create</button>
         <button onclick="closeModal()">Cancel</button>
     </div>
 </div>
 
-<!-- ✅ NEW CLEAN IOS RENAME MODAL -->
+<!-- ✅ NEW IOS RENAME MODAL -->
 <div class="modal" id="renameModal">
     <div class="modal-content">
         <div class="big">Rename Account</div>
-        <input id="renameInput" placeholder="Account name">
-        <button onclick="confirmRename()">Rename</button>
+        <input id="renameInput" placeholder="Enter new name">
+        <button onclick="confirmRename()">Save</button>
         <button onclick="closeRenameModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
@@ -273,10 +274,9 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
-/* ✅ UPDATED ONLY */
+/* ✅ REPLACED ONLY RENAME FEATURE */
 function renameAccount(){
     if(current === null) return;
-
     document.getElementById("renameInput").value = accounts[current].name;
     document.getElementById("renameModal").style.display = "flex";
 }
@@ -298,7 +298,7 @@ function closeRenameModal(){
     document.getElementById("renameModal").style.display = "none";
 }
 
-/* rest unchanged */
+/* everything else unchanged */
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
     if(raw === '') return;
@@ -322,6 +322,7 @@ function openAccount(i){
     current = i;
     document.getElementById("name").innerText = accounts[i].name;
     document.getElementById("balance").value = accounts[i].balance;
+
     document.getElementById("home").classList.remove("active");
     document.getElementById("account").classList.add("active");
 }
