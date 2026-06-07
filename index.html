@@ -134,12 +134,9 @@ h2 {
 .small { font-size: 11px; color: #93a4b8; }
 
 .big {
-    font-size: clamp(12px, 4.5vw, 20px);
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: 0.3px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .card {
@@ -622,47 +619,18 @@ function num(v){
 }
 
 function money(v){
-    return "$" + Number(v).toLocaleString();
+    return compactMoney(v);
 }
 
-    function money(v){
-    return "$" + Number(v).toLocaleString();
-}
+    function compactMoney(v){
+    let num = Number(v || 0);
 
-function fitText(el, min=10, max=22){
-    if(!el) return;
+    if(num >= 1e12) return "$" + (num/1e12).toFixed(2) + "T";
+    if(num >= 1e9)  return "$" + (num/1e9).toFixed(2) + "B";
+    if(num >= 1e6)  return "$" + (num/1e6).toFixed(2) + "M";
+    if(num >= 1e3)  return "$" + (num/1e3).toFixed(2) + "K";
 
-    requestAnimationFrame(() => {
-        let parentWidth = el.parentElement.offsetWidth;
-
-        let size = max;
-        el.style.fontSize = size + "px";
-
-        while(el.scrollWidth > parentWidth && size > min){
-            size--;
-            el.style.fontSize = size + "px";
-        }
-    });
-}
-}
-
-    function autoFont(el, base=20, min=11){
-    if(!el) return;
-
-    let text = el.innerText || "";
-    
-    // crude but effective: scale down as text grows
-    let len = text.replace(/[^0-9]/g,'').length;
-
-    let size = base;
-
-    if(len > 6) size = base - 2;
-    if(len > 8) size = base - 4;
-    if(len > 10) size = base - 6;
-
-    if(size < min) size = min;
-
-    el.style.fontSize = size + "px";
+    return "$" + num.toFixed(0);
 }
 
 /* unchanged logic */
@@ -779,11 +747,11 @@ function renderPortfolio(){
         draw+=dd(b);
     });
 
-    document.getElementById("p_total").innerText = money(t.toFixed(0));
-    document.getElementById("p_daily").innerText = money(d.toFixed(0));
-    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
-    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
-    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+    document.getElementById("p_total").innerText = money(t);
+document.getElementById("p_daily").innerText = money(d);
+document.getElementById("p_week").innerText = money(d * 5);
+document.getElementById("p_month").innerText = money(d * 22);
+document.getElementById("p_dd").innerText = money(draw);
 }
 
 function render(){
@@ -881,46 +849,11 @@ function render(){
 
     el.innerHTML = html;
 
-    setTimeout(() => {
-    document.querySelectorAll(".accountRow .value, .accountBalance").forEach(el => {
-        fitText(el, 10, 16);
-    });
-}, 0);
-
-    setTimeout(() => {
-    document.querySelectorAll(".accountRow .value").forEach(el => {
-        autoFont(el, 16, 11);
-    });
-
-    document.querySelectorAll(".accountBalance").forEach(el => {
-        autoFont(el, 14, 10);
-    });
-}, 0);
-
-    document.querySelectorAll(".accountRow .value").forEach(el=>{
-    autoFont(el, 16, 11);
-});
-
-document.querySelectorAll(".accountBalance").forEach(el=>{
-    autoFont(el, 14, 10);
-});
-
     document.getElementById("total").innerText = money(t.toFixed(0));
     document.getElementById("daily").innerText = money(d.toFixed(0));
     document.getElementById("weeklyHome").innerText = money((d*5).toFixed(0));
     document.getElementById("monthlyHome").innerText = money((d*22).toFixed(0));
 }
-    fitText(document.getElementById("total"), 12, 22);
-
-fitText(document.getElementById("daily"), 11, 20);
-fitText(document.getElementById("weeklyHome"), 11, 20);
-fitText(document.getElementById("monthlyHome"), 11, 20);
-
-    autoFont(document.getElementById("total"), 22, 12);
-
-autoFont(document.getElementById("daily"), 20, 11);
-autoFont(document.getElementById("weeklyHome"), 20, 11);
-autoFont(document.getElementById("monthlyHome"), 20, 11);
 
 function openAccount(i){
     current=i;
@@ -956,11 +889,6 @@ function updateAccount(){
     document.getElementById("weekly").innerText=money(daily(b)*5);
     document.getElementById("monthly").innerText=money(daily(b)*22);
     document.getElementById("accdd").innerText=money(dd(b));
-    autoFont(document.getElementById("total"), 22, 12);
-
-autoFont(document.getElementById("daily"), 20, 11);
-autoFont(document.getElementById("weeklyHome"), 20, 11);
-autoFont(document.getElementById("monthlyHome"), 20, 11);
 
     let elInput = document.getElementById("balance");
 
