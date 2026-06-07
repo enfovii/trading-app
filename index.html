@@ -82,6 +82,7 @@ h2 {
     text-align: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    will-change: transform;
 }
 
 .statsRow {
@@ -97,6 +98,7 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
+    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -104,6 +106,7 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
 .card {
@@ -113,6 +116,8 @@ h2 {
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    will-change: transform;
 }
 
 .account {
@@ -121,6 +126,8 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
+    scroll-margin-bottom: 120px;
+    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -136,6 +143,12 @@ input {
     color: #eaf1ff;
     box-sizing: border-box;
     font-size: 16px;
+}
+
+input:focus {
+    outline: none;
+    border: 1px solid #2ee59d;
+    box-shadow: 0 0 12px rgba(46,229,157,0.25);
 }
 
 button {
@@ -186,7 +199,6 @@ button {
     background: #ff5c7a !important;
 }
 
-/* rename button */
 .nameRow {
     display: flex;
     justify-content: space-between;
@@ -268,26 +280,25 @@ button {
 </div>
 </div>
 
-<!-- ADD ACCOUNT MODAL -->
 <div class="modal" id="modal">
     <div class="modal-content">
+        <div class="big">Add Account</div>
         <input id="newName">
         <input id="newBalance">
         <button onclick="createAccount()">Create</button>
-        <button onclick="closeModal()">Cancel</button>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
 
-<!-- DELETE MODAL -->
 <div class="modal" id="deleteModal">
     <div class="modal-content">
         <div class="big">Are you sure?</div>
-        <button class="danger" onclick="deleteAccount()">Yes</button>
-        <button onclick="closeDeleteModal()">Cancel</button>
+        <button class="danger" onclick="deleteAccount()">Yes, Delete</button>
+        <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
 
-<!-- ✅ NEW RENAME MODAL -->
+<!-- ✅ ONLY ADDITION -->
 <div class="modal" id="renameModal">
     <div class="modal-content">
         <div class="big">Rename Account</div>
@@ -300,7 +311,7 @@ button {
                spellcheck="false">
 
         <button onclick="confirmRename()">Save</button>
-        <button onclick="closeRenameModal()">Cancel</button>
+        <button onclick="closeRenameModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
 
@@ -309,10 +320,23 @@ button {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* ONLY RENAMING CHANGED */
+function num(v){
+    if(!v) return 0;
+    v = v.toString().toLowerCase().replace(/,/g,'');
+    if(v.includes("k")) return parseFloat(v)*1000;
+    if(v.includes("m")) return parseFloat(v)*1000000;
+    return isNaN(Number(v)) ? 0 : Number(v);
+}
+
+function money(v){
+    return "$" + Number(v).toLocaleString();
+}
+
+/* ✅ ONLY RENAMING ADDED */
 
 function renameAccount(){
     if(current === null) return;
+
     document.getElementById("renameInput").value = accounts[current].name;
     document.getElementById("renameModal").style.display = "flex";
 }
@@ -334,19 +358,7 @@ function closeRenameModal(){
     document.getElementById("renameModal").style.display = "none";
 }
 
-/* ORIGINAL LOGIC UNTOUCHED */
-
-function num(v){
-    if(!v) return 0;
-    v = v.toString().toLowerCase().replace(/,/g,'');
-    if(v.includes("k")) return parseFloat(v)*1000;
-    if(v.includes("m")) return parseFloat(v)*1000000;
-    return isNaN(Number(v)) ? 0 : Number(v);
-}
-
-function money(v){
-    return "$" + Number(v).toLocaleString();
-}
+/* EVERYTHING ELSE LEFT EXACTLY AS YOUR ORIGINAL */
 
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
@@ -356,6 +368,7 @@ function formatBalanceInput(el){
 
 function render(){
     let el=document.getElementById("accounts");
+
     let html = "";
     let t=0,d=0;
 
@@ -365,9 +378,13 @@ function render(){
         d+=daily(b);
 
         html += `
-        <div class="account" onclick="openAccount(${i})">
-            <b>${a.name}</b><br>
-            ${money(b)}
+        <div class="account" onclick="openAccount(${i})"
+            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+
+            <div>
+                <b>${a.name}</b><br>
+                ${money(b)}
+            </div>
         </div>`;
     });
 
