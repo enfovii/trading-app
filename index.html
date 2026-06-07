@@ -313,7 +313,41 @@ button {
     color: #eaf1ff;
 }
 
-    
+    .accountRow {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1fr 1.2fr 1.6fr;
+    gap: 12px;
+    align-items: center;
+    padding: 14px 12px;
+}
+
+.cell {
+    text-align: center;
+}
+
+.cellLeft {
+    text-align: left;
+}
+
+.cellTitle {
+    font-size: 10px;
+    color: #93a4b8;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+.cellValue {
+    font-size: 12.5px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+
+.cellStrong {
+    font-size: 14px;
+    font-weight: 700;
+}
     
 </style>
 </head>
@@ -683,98 +717,58 @@ function render(){
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
 
         html += `
-<div class="account"
-     onclick="openAccount(${i})"
-     style="display:grid;
-            grid-template-columns: 1.6fr 0.9fr 0.9fr 1.1fr 1.5fr;
-            gap:12px;
-            align-items:start;
-            padding:14px 12px;">
+<div class="account accountRow" onclick="openAccount(${i})">
 
-   <!-- ACCOUNT -->
-<div>
-
-    <b style="font-size:14px;">${a.name}</b>
-
-    <!-- BIG BALANCE (PRIMARY FOCUS) -->
-    <div style="margin-top:6px; font-size:17px; font-weight:700; letter-spacing:0.2px; color:#eaf1ff;">
-    ${money(b)}
-</div>
-
-    <!-- SMALL MULTIPLIER UNDER BALANCE -->
-    <div style="margin-top:4px; font-size:12px; color:#2ee59d; font-weight:600;">
-        ${currentMult.toFixed(2)}x
+    <!-- ACCOUNT -->
+    <div class="cellLeft">
+        <div class="cellTitle">Account</div>
+        <div class="cellStrong">${a.name}</div>
+        <div class="cellValue">${money(b)}</div>
     </div>
 
-</div>
-
     <!-- DAILY -->
-    <div style="text-align:center;">
-        <div class="small">Daily</div>
-        <div style="margin-top:6px; font-size:12.5px; font-weight:500; letter-spacing:0.1px;">
-            ${money(daily(b))}
-        </div>
+    <div class="cell">
+        <div class="cellTitle">Daily</div>
+        <div class="cellValue">${money(daily(b))}</div>
     </div>
 
     <!-- MULTIPLIER -->
-    <div style="text-align:center;">
-        <div class="small">Multiplier</div>
-        <div style="margin-top:6px; font-size:12.5px; font-weight:500; letter-spacing:0.1px;">
-            ${currentMult.toFixed(2)}x
-        </div>
+    <div class="cell">
+        <div class="cellTitle">Multiplier</div>
+        <div class="cellValue">${currentMult.toFixed(2)}x</div>
     </div>
 
     <!-- NEXT TARGET -->
-<div style="text-align:center;">
-
-    <div class="small" style="white-space:nowrap;">Next target</div>
-
-    <!-- VALUE (same style as Daily / Multiplier) -->
-    <div style="margin-top:6px; font-size:12.5px; font-weight:500; letter-spacing:0.1px;">
-        ${money(needed)}
+    <div class="cell">
+        <div class="cellTitle">Next target</div>
+        <div class="cellValue">${money(needed)}</div>
+        <div style="font-size:11px; color:#93a4b8; margin-top:4px;">
+            ${nextMult.toFixed(2)}x
+        </div>
     </div>
-
-    <!-- MULTIPLIER UNDER IT -->
-    <div style="margin-top:4px; font-size:12px; color:#93a4b8; font-weight:500;">
-        ${nextMult.toFixed(2)}x
-    </div>
-
-</div>
 
     <!-- PROGRESS -->
-    <div>
+    <div class="cell">
 
-        <div style="position:relative;
-                    height:10px;
-                    background:rgba(255,255,255,0.05);
-                    border-radius:999px;
-                    overflow:hidden;">
+        <div style="height:10px; background:rgba(255,255,255,0.05);
+                    border-radius:999px; overflow:hidden; position:relative;">
 
-            <div style="width:${progress}%;
-                        height:100%;
-                        background:linear-gradient(90deg,#1f6feb,#2ee59d);
-                        border-radius:999px;"></div>
+            <div style="width:${progress}%; height:100%;
+                        background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
 
-            <div style="position:absolute;
-                        right:6px;
-                        top:50%;
+            <div style="position:absolute; right:6px; top:50%;
                         transform:translateY(-50%);
-                        font-size:10px;
-                        font-weight:700;
-                        color:#fff;">
+                        font-size:10px; color:white;">
                 ${progress.toFixed(0)}%
             </div>
         </div>
 
-        <div style="margin-top:6px;
-            font-size:10px;
-            color:#93a4b8;
-            opacity:0.85;">
+        <div style="font-size:10px; color:#93a4b8; margin-top:6px;">
             ${(() => {
                 let dp = daily(b);
-                if (dp <= 0) return "ETA --";
+                if (dp <= 0) return "~";
                 let days = needed / dp;
-                return isFinite(days) ? "~" + days.toFixed(1) + "d" : "~--";
+                return isFinite(days) ? "~" + days.toFixed(1) : "~";
             })()}
         </div>
 
