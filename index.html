@@ -496,12 +496,28 @@ function formatBalanceInput(el){
 }
 
 function tier(b){
-    if (b < 90000) return 3;
+
+    // ---- STEP SYSTEM: 30k start, +0.5 per 15k ----
+    if (b < 90000) {
+        let steps = Math.floor((b - 30000) / 15000);
+        let x = 1 + (steps * 0.5);
+
+        // clamp minimum
+        if (x < 1) x = 1;
+
+        // cap at 3x at 90k
+        if (x > 3) x = 3;
+
+        return x;
+    }
+
+    // ---- FIXED TIER JUMP SYSTEM ----
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
     if (b < 180000) return 4;
     if (b < 200000) return 4.5;
 
+    // ---- POST 200K: +0.5 per 20k ----
     let steps = Math.floor((b - 200000) / 20000);
     return 5 + (steps * 0.5);
 }
