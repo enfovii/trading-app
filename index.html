@@ -12,7 +12,6 @@ body {
     padding-bottom: 90px;
     color: #eaf1ff;
     overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
 }
 
 body::before {
@@ -27,28 +26,12 @@ body::before {
 }
 
 .title {
-    display: flex;
-    justify-content: center;
-    margin: 12px 0 16px;
-}
-
-h2 {
-    font-size: 20px;
-    font-weight: 700;
-    margin: 0;
     text-align: center;
+    margin: 12px 0 16px;
 }
 
 .page { display:none; }
 .active { display:block; }
-
-.portfolioBox {
-    background: rgba(20,30,50,0.6);
-    border: 1px solid rgba(120,170,255,0.2);
-    padding: 18px;
-    border-radius: 18px;
-    text-align: center;
-}
 
 .statsRow {
     display: grid;
@@ -60,15 +43,8 @@ h2 {
     background: rgba(20,30,50,0.5);
     border: 1px solid rgba(120,170,255,0.15);
     padding: 12px;
-    border-radius: 16px;
+    border-radius: 14px;
     text-align: center;
-}
-
-.small { font-size: 11px; color: #93a4b8; }
-
-.big {
-    font-size: 20px;
-    font-weight: 700;
 }
 
 .account {
@@ -77,22 +53,16 @@ h2 {
     border-radius: 16px;
     background: rgba(20,30,50,0.55);
     border: 1px solid rgba(120,170,255,0.18);
-
     display: flex;
     justify-content: space-between;
     gap: 12px;
+    cursor: pointer; /* FIX click feedback */
 }
+
+.small { font-size: 11px; color: #93a4b8; }
+.big { font-size: 20px; font-weight: 700; }
 
 .green { color: #2ee59d; }
-.red { color: #ff5c7a; }
-
-.addBtn {
-    position: fixed;
-    bottom: 18px;
-    left: 12px;
-    right: 12px;
-    z-index: 10;
-}
 
 button {
     width: calc(100% - 24px);
@@ -105,6 +75,7 @@ button {
     border: none;
     border-radius: 12px;
 }
+
 </style>
 </head>
 
@@ -118,7 +89,6 @@ button {
 <div id="home" class="page active">
 
 <div class="statsRow">
-
     <div class="stat">
         <div class="small">Daily</div>
         <div class="big green" id="daily">$0</div>
@@ -133,18 +103,30 @@ button {
         <div class="small">Monthly</div>
         <div class="big green" id="monthlyHome">$0</div>
     </div>
-
 </div>
 
 <div id="accounts"></div>
 
+<button onclick="openPortfolio()">Portfolio</button>
+
 </div>
 
-<button class="addBtn">+ Add Account</button>
+<!-- PORTFOLIO -->
+<div id="portfolio" class="page">
+<h2>Portfolio</h2>
+<button onclick="backHome()">Back</button>
+</div>
+
+<!-- ACCOUNT -->
+<div id="account" class="page">
+<h2 id="accName"></h2>
+<button onclick="back()">Back</button>
+</div>
 
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+let current = null;
 
 function num(v){
     if(!v) return 0;
@@ -171,15 +153,42 @@ function mult(b){
 
 function daily(b){ return mult(b)*800; }
 
-function getNextTierInfo(b){
-    if(b < 90000) return {next:90000,label:"3.0x"};
-    if(b < 140000) return {next:140000,label:"3.5x"};
-    if(b < 160000) return {next:160000,label:"4.0x"};
-    if(b < 200000) return {next:200000,label:"5.0x"};
-    return {next:b+20000,label:"Scaling"};
+/* FIXED: uniform scaling system */
+function getNextTier(b){
+
+    if(b < 90000) return 90000;
+    if(b < 140000) return 140000;
+    if(b < 160000) return 160000;
+    if(b < 200000) return 200000;
+
+    return b + 20000;
 }
 
-/* FIXED RENDER ONLY (LOGIC UNCHANGED) */
+/* CLICK FIXED */
+function openAccount(i){
+    current = i;
+    document.getElementById("accName").innerText = accounts[i].name;
+    show("account");
+}
+
+function openPortfolio(){
+    show("portfolio");
+}
+
+function back(){
+    show("home");
+}
+
+function backHome(){
+    show("home");
+}
+
+function show(p){
+    document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+    document.getElementById(p).classList.add("active");
+}
+
+/* MAIN RENDER */
 function render(){
 
     let el = document.getElementById("accounts");
@@ -193,9 +202,9 @@ function render(){
         t += b;
         d += daily(b);
 
-        let nextInfo = getNextTierInfo(b);
-        let needed = Math.max(nextInfo.next - b, 0);
-        let progress = Math.min((b / nextInfo.next) * 100, 100);
+        let next = getNextTier(b);
+        let needed = Math.max(next - b, 0);
+        let progress = Math.min((b / next) * 100, 100);
 
         html += `
         <div class="account" onclick="openAccount(${i})">
@@ -208,11 +217,12 @@ function render(){
             </div>
 
             <div style="text-align:right; min-width:120px;">
-                <div class="small">Next ${nextInfo.label}</div>
+                <div class="small">Next scaling</div>
+                <div class="small">${money(next)}</div>
                 <div class="green">${money(needed.toFixed(0))}</div>
 
-                <div style="height:6px; background:rgba(255,255,255,0.08); border-radius:10px; margin-top:6px; overflow:hidden;">
-                    <div style="height:100%; width:${progress}%; background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
+                <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
+                    <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
                 </div>
             </div>
 
