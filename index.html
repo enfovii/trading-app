@@ -16,7 +16,6 @@ body {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-text-size-adjust: 100%;
-    touch-action: manipulation;
 }
 
 body::before {
@@ -107,10 +106,6 @@ h2 {
     scroll-margin-bottom: 120px;
 }
 
-.account:active {
-    transform: scale(0.99);
-}
-
 .green { color: #2ee59d; }
 .red { color: #ff5c7a; }
 
@@ -144,7 +139,6 @@ button {
     border-radius: 12px;
     font-weight: 600;
     box-shadow: 0 8px 20px rgba(0,120,255,0.25);
-    touch-action: manipulation;
 }
 
 .addBtn {
@@ -259,9 +253,7 @@ button {
 <div class="card">
     <h3 id="name"></h3>
 
-    <input id="balance" inputmode="decimal" pattern="[0-9]*"
-        oninput="formatBalanceInput(this)"
-        onblur="updateAccount()">
+    <input id="balance" inputmode="decimal" pattern="[0-9]*" oninput="formatBalanceInput(this)">
 
     <div class="card">
         <div class="small">Multiplier</div>
@@ -331,25 +323,14 @@ function money(v){
 
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
-    if(raw === '') return;
+
+    if(raw === ''){
+        updateAccount();
+        return;
+    }
+
     el.value = Number(raw).toLocaleString('en-US');
-}
-
-function updateAccount(){
-    if(current===null) return;
-
-    let b = num(document.getElementById("balance").value);
-
-    accounts[current].balance = b;
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
-    document.getElementById("dailyP").innerText=money(daily(b));
-    document.getElementById("weekly").innerText=money(daily(b)*5);
-    document.getElementById("monthly").innerText=money(daily(b)*22);
-    document.getElementById("accdd").innerText=money(dd(b));
-
-    render();
+    updateAccount();
 }
 
 function tier(b){
@@ -358,6 +339,7 @@ function tier(b){
     if (b < 160000) return 3.5;
     if (b < 180000) return 4;
     if (b < 200000) return 4.5;
+
     let steps = Math.floor((b - 200000) / 20000);
     return 5 + (steps * 0.5);
 }
@@ -372,118 +354,219 @@ function show(page){
     document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
 }
 
-function nextTargetFromBalance(x){
-    if (x < 90000) return 90000;
-    if (x < 140000) return 140000;
-    if (x < 160000) return 160000;
-    if (x < 180000) return 180000;
-    if (x < 200000) return 200000;
-    let steps = Math.floor((x - 200000) / 20000) + 1;
-    return 200000 + (steps * 20000);
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
 }
 
-/* SAFE RENDER (FIXED DASHBOARD ISSUE) */
-function render(){
-    let html = "";
-    let t = 0, d = 0;
+function renderPortfolio(){
+    let t=0,d=0,draw=0;
 
-    accounts.forEach((a,i)=>{
-        try {
-            let b = num(a.balance);
-            t += b;
-            d += daily(b);
-
-            let currentMult = mult(b);
-            let nextTarget = nextTargetFromBalance(b);
-            let nextMult = mult(nextTarget);
-            let needed = Math.max(0, nextTarget - b);
-
-            let tierStart = 0;
-            if (b < 90000) tierStart = 0;
-            else if (b < 140000) tierStart = 90000;
-            else if (b < 160000) tierStart = 140000;
-            else if (b < 180000) tierStart = 160000;
-            else if (b < 200000) tierStart = 180000;
-            else {
-                let steps = Math.floor((b - 200000) / 20000);
-                tierStart = 200000 + (steps * 20000);
-            }
-
-            let progress = ((b - tierStart) / (nextTarget - tierStart)) * 100;
-            progress = Math.max(0, Math.min(100, progress));
-
-            let glow = progress >= 90 ? "0 0 18px rgba(46,229,157,0.55)" : "none";
-
-            html += `
-            <div class="account" onclick="openAccount(${i})"
-                style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
-
-                <div>
-                    <b>${a.name}</b><br>
-                    ${money(b)}<br>
-                    <span class="green">${currentMult.toFixed(2)}x</span><br>
-                    <span class="small">Daily ${money(daily(b))}</span>
-                </div>
-
-                <div style="min-width:140px;text-align:right;">
-
-                    <div class="small">Next ${nextMult.toFixed(2)}x</div>
-                    <div class="small">Need ${money(needed)}</div>
-
-                    <div style="
-                        width:100%;
-                        height:10px;
-                        background:rgba(255,255,255,0.06);
-                        border-radius:12px;
-                        margin-top:8px;
-                        overflow:hidden;
-                        position:relative;
-                    ">
-                        <div style="
-                            width:${progress}%;
-                            height:100%;
-                            background:linear-gradient(90deg,#1f6feb,#2ee59d);
-                            border-radius:12px;
-                            transition:width 0.4s ease;
-                            box-shadow:${glow};
-                            position:relative;
-                        ">
-                            <div style="
-                                position:absolute;
-                                right:6px;
-                                top:50%;
-                                transform:translateY(-50%);
-                                font-size:10px;
-                                font-weight:700;
-                                color:#fff;
-                                background:rgba(0,0,0,0.45);
-                                padding:2px 6px;
-                                border-radius:8px;
-                                white-space:nowrap;
-                            ">
-                                ${Math.round(progress)}%
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="font-size:11px;color:#93a4b8;margin-top:6px;">
-                        ETA: ${(needed / Math.max(daily(b),1)).toFixed(1)} days
-                    </div>
-
-                </div>
-            </div>`;
-        } catch (e) {
-            console.log("Render error:", e);
-        }
+    accounts.forEach(a=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+        draw+=dd(b);
     });
 
-    document.getElementById("accounts").innerHTML = html;
-
-    document.getElementById("total").innerText = money(t);
-    document.getElementById("daily").innerText = money(d);
-    document.getElementById("weeklyHome").innerText = money(d*5);
-    document.getElementById("monthlyHome").innerText = money(d*22);
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
+
+function render(){
+    let el=document.getElementById("accounts");
+
+    let html = "";
+    let t=0,d=0;
+
+    accounts.forEach((a,i)=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+
+        let currentMult = mult(b);
+
+        function nextTargetFromBalance(x){
+            if (x < 90000) return 90000;
+            if (x < 140000) return 140000;
+            if (x < 160000) return 160000;
+            if (x < 180000) return 180000;
+            if (x < 200000) return 200000;
+            let steps = Math.floor((x - 200000) / 20000) + 1;
+            return 200000 + (steps * 20000);
+        }
+
+        let nextTarget = nextTargetFromBalance(b);
+        let nextMult = mult(nextTarget);
+
+        let needed = Math.max(0, nextTarget - b);
+
+        // ✅ FIXED TIER-BASED PROGRESS
+        let tierStart;
+        if (b < 90000) tierStart = 0;
+        else if (b < 140000) tierStart = 90000;
+        else if (b < 160000) tierStart = 140000;
+        else if (b < 180000) tierStart = 160000;
+        else if (b < 200000) tierStart = 180000;
+        else {
+            let steps = Math.floor((b - 200000) / 20000);
+            tierStart = 200000 + (steps * 20000);
+        }
+
+        let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
+
+        html += `
+        <div class="account" onclick="openAccount(${i})"
+            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+
+            <div>
+                <b>${a.name}</b><br>
+                ${money(b)}<br>
+                <span class="green">${currentMult.toFixed(2)}x</span><br>
+                <span class="small">Daily ${money(daily(b))}</span>
+            </div>
+
+            <div style="min-width:140px;text-align:right;">
+                <div class="small">Next ${nextMult.toFixed(2)}x</div>
+                <div class="small">Need ${money(needed)}</div>
+
+                <div style="
+                    width:100%;
+                    height:10px;
+                    background:rgba(255,255,255,0.06);
+                    border-radius:12px;
+                    margin-top:8px;
+                    overflow:hidden;
+                    position:relative;
+                ">
+                    <div style="
+                        width:${progress}%;
+                        height:100%;
+                        background:linear-gradient(90deg,#1f6feb,#2ee59d);
+                        border-radius:12px;
+                        transition: width 0.4s ease;
+                        box-shadow: 0 0 14px rgba(46,229,157,0.35);
+                    "></div>
+
+                    <div style="
+                        position:absolute;
+                        right:6px;
+                        top:50%;
+                        transform:translateY(-50%);
+                        font-size:10px;
+                        font-weight:700;
+                        color:#ffffff;
+                        background:rgba(0,0,0,0.45);
+                        padding:2px 6px;
+                        border-radius:8px;
+                        backdrop-filter: blur(6px);
+                    ">
+                        ${progress.toFixed(0)}%
+                    </div>
+                </div>
+
+                <div style="font-size:11px;color:#93a4b8;margin-top:6px;">
+                    ${(() => {
+                        let dp = daily(b);
+                        if (dp <= 0) return "ETA: --";
+                        let days = needed / dp;
+                        if (!isFinite(days) || days <= 0) return "ETA: 0 days";
+                        return "ETA: " + days.toFixed(1) + " days";
+                    })()}
+                </div>
+
+            </div>
+
+        </div>`;
+    });
+
+    el.innerHTML = html;
+
+    document.getElementById("total").innerText=money(t.toFixed(0));
+    document.getElementById("daily").innerText=money(d.toFixed(0));
+    document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
+    document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
+}
+
+function openAccount(i){
+    current=i;
+    let a=accounts[i];
+    document.getElementById("name").innerText=a.name;
+    document.getElementById("balance").value=num(a.balance);
+    show("account");
+    updateAccount();
+
+    setTimeout(() => {
+        let input = document.getElementById("balance");
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+        input.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 100);
+}
+
+function updateAccount(){
+    if(current===null) return;
+
+    let inputEl = document.getElementById("balance");
+    let raw = inputEl.value;
+
+    if(raw === "" || raw === null) return;
+
+    let b = num(raw);
+
+    accounts[current].balance = b;
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
+    document.getElementById("dailyP").innerText=money(daily(b));
+    document.getElementById("weekly").innerText=money(daily(b)*5);
+    document.getElementById("monthly").innerText=money(daily(b)*22);
+    document.getElementById("accdd").innerText=money(dd(b));
+
+    let elInput = document.getElementById("balance");
+    elInput.value = Number(b).toLocaleString('en-US');
+
+    render();
+}
+
+function back(){ current=null; show("home"); }
+function backHome(){ show("home"); }
+
+function openModal(){ document.getElementById("modal").style.display="flex"; }
+function closeModal(){ document.getElementById("modal").style.display="none"; }
+
+function createAccount(){
+    let name=document.getElementById("newName").value.trim();
+    let balance=num(document.getElementById("newBalance").value);
+    if(!name) return;
+
+    accounts.push({name,balance});
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    closeModal();
+    render();
+}
+
+function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
+function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
+
+function deleteAccount(){
+    if(current===null) return;
+    accounts.splice(current,1);
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+    current=null;
+    closeDeleteModal();
+    show("home");
+    render();
+}
+
+window.onload=function(){
+    show("home");
+    render();
+};
 </script>
 
 </body>
