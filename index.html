@@ -205,10 +205,8 @@ button {
 <div id="accounts"></div>
 </div>
 
-<div id="portfolio" class="page">
-<!-- unchanged -->
-</div>
-
+<!-- ALL YOUR OTHER PAGES REMAIN UNCHANGED -->
+<div id="portfolio" class="page"></div>
 <div id="account" class="page">
 <div class="card">
     <h3 id="name"></h3>
@@ -246,9 +244,46 @@ button {
 </div>
 </div>
 
+<button class="addBtn" onclick="openModal()">+ Add Account</button>
+
+<div class="modal" id="modal"></div>
+<div class="modal" id="deleteModal"></div>
+
 <script>
 
-/* ✅ NEW LIVE PREVIEW FUNCTION */
+/* ===== YOUR EXISTING VARIABLES (UNCHANGED) ===== */
+let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
+let current = null;
+
+/* ===== YOUR EXISTING FUNCTIONS (UNCHANGED) ===== */
+
+function num(v){
+    if(!v) return 0;
+    v = v.toString().toLowerCase().replace(/,/g,'');
+    if(v.includes("k")) return parseFloat(v)*1000;
+    if(v.includes("m")) return parseFloat(v)*1000000;
+    return isNaN(Number(v)) ? 0 : Number(v);
+}
+
+function money(v){
+    return "$" + Number(v).toLocaleString();
+}
+
+function mult(b){
+    if (b < 90000) return b / 30000;
+    if (b < 140000) return 3;
+    if (b < 160000) return 3.5;
+    if (b < 180000) return 4;
+    if (b < 200000) return 4.5;
+    let base = 5;
+    base += Math.floor((b - 200000) / 20000) * 0.5;
+    return base;
+}
+
+function daily(b){ return mult(b)*800; }
+function dd(b){ return b*0.4; }
+
+/* ===== ✅ NEW LIVE PREVIEW FUNCTION ===== */
 function liveUpdateAccount(){
     if(current === null) return;
 
@@ -261,13 +296,18 @@ function liveUpdateAccount(){
     document.getElementById("accdd").innerText = money(dd(b));
 }
 
-/* EXISTING FUNCTION (UNCHANGED LOGIC) */
+/* ===== EXISTING SAVE FUNCTION (UNCHANGED LOGIC) ===== */
 function updateAccount(){
     let b=num(document.getElementById("balance").value);
     accounts[current].balance=b;
     localStorage.setItem("accounts",JSON.stringify(accounts));
     render();
 }
+
+window.onload=function(){
+    show("home");
+    render();
+};
 
 </script>
 
