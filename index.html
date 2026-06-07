@@ -9,26 +9,29 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
     padding: 14px;
-    color: #e8ecf3;
+    padding-bottom: 90px; /* FIX 2 */
+    color: #eaf1ff;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 
+/* PREMIUM DARK BLUE BACKGROUND */
 body::before {
     content: "";
     position: fixed;
     inset: 0;
     background:
-        radial-gradient(circle at 20% 20%, rgba(60,120,255,0.18), transparent 40%),
-        radial-gradient(circle at 80% 30%, rgba(0,180,255,0.10), transparent 45%),
-        #070b14;
+        radial-gradient(circle at 15% 20%, rgba(0,140,255,0.20), transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(80,180,255,0.12), transparent 50%),
+        radial-gradient(circle at 50% 90%, rgba(0,90,255,0.10), transparent 55%),
+        #050913;
     z-index: -1;
 }
 
 .title {
     display: flex;
     justify-content: center;
-    margin: 10px 0 14px;
+    margin: 12px 0 16px;
 }
 
 h2 {
@@ -36,6 +39,7 @@ h2 {
     font-weight: 700;
     margin: 0;
     text-align: center;
+    letter-spacing: 0.5px;
 }
 
 .page { display:none; }
@@ -44,31 +48,32 @@ h2 {
 .topbar {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .portfolioBox {
-    background: rgba(17,24,35,0.55);
-    border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(12px);
+    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
     padding: 18px;
-    border-radius: 16px;
+    border-radius: 18px;
     text-align: center;
     cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
 }
 
 .statsRow {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 10px;
 }
 
 .stat {
-    background: rgba(17,24,35,0.55);
+    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
     border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
     padding: 12px;
-    border-radius: 14px;
+    border-radius: 16px;
     text-align: center;
 }
 
@@ -77,22 +82,24 @@ h2 {
 .big {
     font-size: 20px;
     font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
 .card {
-    background: rgba(17,24,35,0.55);
+    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
     border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(14px);
     padding: 14px;
     margin-top: 10px;
-    border-radius: 14px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
 .account {
     padding: 14px;
     margin-top: 10px;
-    border-radius: 14px;
-    background: rgba(17,24,35,0.55);
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
 }
 
@@ -105,8 +112,8 @@ input {
     border-radius: 12px;
     border: 1px solid rgba(120,170,255,0.25);
     margin-top: 8px;
-    background: rgba(10,18,32,0.6);
-    color: #e8ecf3;
+    background: rgba(8,12,25,0.65);
+    color: #eaf1ff;
     box-sizing: border-box;
 }
 
@@ -121,6 +128,7 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
 .addBtn {
@@ -129,6 +137,7 @@ button {
     left: 12px;
     right: 12px;
     z-index: 10;
+    backdrop-filter: blur(12px); /* FIX 2 */
 }
 
 .modal {
@@ -137,7 +146,7 @@ button {
     display: none;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.65);
     padding: 16px;
     z-index: 20;
 }
@@ -145,11 +154,11 @@ button {
 .modal-content {
     width: 100%;
     max-width: 360px;
-    background: rgba(17,24,35,0.85);
+    background: rgba(15,20,35,0.9);
     border: 1px solid rgba(120,170,255,0.25);
-    backdrop-filter: blur(14px);
+    backdrop-filter: blur(16px);
     padding: 16px;
-    border-radius: 14px;
+    border-radius: 16px;
 }
 
 .danger {
@@ -200,7 +209,6 @@ button {
 
 <!-- PORTFOLIO -->
 <div id="portfolio" class="page">
-
 <div class="card">
     <h3>Portfolio Overview</h3>
 
@@ -231,12 +239,10 @@ button {
 
     <button onclick="backHome()">Back</button>
 </div>
-
 </div>
 
 <!-- ACCOUNT -->
 <div id="account" class="page">
-
 <div class="card">
     <h3 id="name"></h3>
 
@@ -270,7 +276,6 @@ button {
     <button onclick="back()">Back</button>
     <button class="danger" onclick="confirmDelete()">Delete Account</button>
 </div>
-
 </div>
 
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
@@ -350,20 +355,17 @@ function renderPortfolio(){
 
     document.getElementById("p_total").innerText = money(t.toFixed(0));
     document.getElementById("p_daily").innerText = money(d.toFixed(0));
-
-    // FIXED TO 5 DAY WEEK + 22 DAY MONTH
     document.getElementById("p_week").innerText = money((d*5).toFixed(0));
     document.getElementById("p_month").innerText = money((d*22).toFixed(0));
-
     document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
-/* HOME */
+/* HOME - FIXED RENDER (no += loop) */
 function render(){
 
     let el=document.getElementById("accounts");
-    el.innerHTML="";
 
+    let html = "";
     let t=0,d=0;
 
     accounts.forEach((a,i)=>{
@@ -371,7 +373,7 @@ function render(){
         t+=b;
         d+=daily(b);
 
-        el.innerHTML+=`
+        html += `
         <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
             ${money(b)}<br>
@@ -380,10 +382,10 @@ function render(){
         </div>`;
     });
 
+    el.innerHTML = html;
+
     document.getElementById("total").innerText=money(t.toFixed(0));
     document.getElementById("daily").innerText=money(d.toFixed(0));
-
-    // FIXED TO 5 DAY WEEK + 22 DAY MONTH
     document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
     document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
 }
@@ -407,11 +409,8 @@ function updateAccount(){
 
     document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
     document.getElementById("dailyP").innerText=money(daily(b));
-
-    // FIXED TO 5 DAY WEEK + 22 DAY MONTH
     document.getElementById("weekly").innerText=money(daily(b)*5);
     document.getElementById("monthly").innerText=money(daily(b)*22);
-
     document.getElementById("accdd").innerText=money(dd(b));
 
     render();
