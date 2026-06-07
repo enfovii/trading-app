@@ -316,8 +316,8 @@ function mult(b){
     if (b < 90000) return b / 30000;
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
+    if (b < 180000) return 4.5;   // ✅ FIXED TIER
     if (b < 200000) return 4;
-
     let base = 5;
     base += Math.floor((b - 200000) / 20000) * 0.5;
     return base;
@@ -370,18 +370,11 @@ function render(){
 
         let nextTarget;
 
-        if (b < 90000) {
-            nextTarget = 90000;
-        } 
-        else if (b < 140000) {
-            nextTarget = 140000;
-        } 
-        else if (b < 160000) {
-            nextTarget = 160000;
-        } 
-        else if (b < 200000) {
-            nextTarget = 200000;
-        } 
+        if (b < 90000) nextTarget = 90000;
+        else if (b < 140000) nextTarget = 140000;
+        else if (b < 160000) nextTarget = 160000;
+        else if (b < 180000) nextTarget = 180000;
+        else if (b < 200000) nextTarget = 200000;
         else {
             let steps = Math.floor((b - 200000) / 20000) + 1;
             nextTarget = 200000 + (steps * 20000);
