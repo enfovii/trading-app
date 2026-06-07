@@ -4,9 +4,19 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pro Trading Dashboard">
+
 <title>Pro Trading Dashboard</title>
 
 <style>
+
+* {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
@@ -44,8 +54,18 @@ h2 {
     letter-spacing: 0.5px;
 }
 
-.page { display:none; }
-.active { display:block; }
+.page {
+    display: none;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.page.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
 
 .topbar {
     display: flex;
@@ -62,6 +82,7 @@ h2 {
     text-align: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    will-change: transform;
 }
 
 .statsRow {
@@ -77,6 +98,7 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
+    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -95,6 +117,7 @@ h2 {
     margin-top: 10px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    will-change: transform;
 }
 
 .account {
@@ -104,6 +127,7 @@ h2 {
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
     scroll-margin-bottom: 120px;
+    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -174,6 +198,7 @@ button {
 .danger {
     background: #ff5c7a !important;
 }
+
 </style>
 </head>
 
@@ -253,7 +278,15 @@ button {
 <div class="card">
     <h3 id="name"></h3>
 
-    <input id="balance" inputmode="decimal" pattern="[0-9]*" oninput="formatBalanceInput(this)">
+    <input id="balance"
+       inputmode="decimal"
+       pattern="[0-9]*"
+       autocomplete="off"
+       autocorrect="off"
+       autocapitalize="none"
+       spellcheck="false"
+       onfocus="this.select()"
+       oninput="formatBalanceInput(this)">
 
     <div class="card">
         <div class="small">Multiplier</div>
@@ -404,7 +437,6 @@ function render(){
 
         let needed = Math.max(0, nextTarget - b);
 
-        // ✅ FIXED TIER-BASED PROGRESS
         let tierStart;
         if (b < 90000) tierStart = 0;
         else if (b < 140000) tierStart = 90000;
@@ -433,37 +465,10 @@ function render(){
                 <div class="small">Next ${nextMult.toFixed(2)}x</div>
                 <div class="small">Need ${money(needed)}</div>
 
-                <div style="
-                    width:100%;
-                    height:10px;
-                    background:rgba(255,255,255,0.06);
-                    border-radius:12px;
-                    margin-top:8px;
-                    overflow:hidden;
-                    position:relative;
-                ">
-                    <div style="
-                        width:${progress}%;
-                        height:100%;
-                        background:linear-gradient(90deg,#1f6feb,#2ee59d);
-                        border-radius:12px;
-                        transition: width 0.4s ease;
-                        box-shadow: 0 0 14px rgba(46,229,157,0.35);
-                    "></div>
+                <div style="width:100%;height:10px;background:rgba(255,255,255,0.06);border-radius:12px;margin-top:8px;overflow:hidden;position:relative;">
+                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);border-radius:12px;transition: width 0.4s ease;box-shadow: 0 0 14px rgba(46,229,157,0.35);"></div>
 
-                    <div style="
-                        position:absolute;
-                        right:6px;
-                        top:50%;
-                        transform:translateY(-50%);
-                        font-size:10px;
-                        font-weight:700;
-                        color:#ffffff;
-                        background:rgba(0,0,0,0.45);
-                        padding:2px 6px;
-                        border-radius:8px;
-                        backdrop-filter: blur(6px);
-                    ">
+                    <div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.45);padding:2px 6px;border-radius:8px;backdrop-filter: blur(6px);">
                         ${progress.toFixed(0)}%
                     </div>
                 </div>
@@ -527,9 +532,12 @@ function updateAccount(){
     document.getElementById("accdd").innerText=money(dd(b));
 
     let elInput = document.getElementById("balance");
-    elInput.value = Number(b).toLocaleString('en-US');
 
-    render();
+    let pos = elInput.selectionStart;
+    elInput.value = Number(b).toLocaleString('en-US');
+    elInput.setSelectionRange(elInput.value.length, elInput.value.length);
+
+    requestAnimationFrame(render);
 }
 
 function back(){ current=null; show("home"); }
