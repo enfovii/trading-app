@@ -697,39 +697,39 @@ function renderPortfolio(){
 }
 
 function render(){
-    let el=document.getElementById("accounts");
+    let el = document.getElementById("accounts");
 
     let html = "";
-    let t=0,d=0;
+    let t = 0;
+    let d = 0;
 
     accounts.forEach((a,i)=>{
-        let b=num(a.balance);
-        t+=b;
-        d+=daily(b);
+        let b = num(a.balance);
+        t += b;
+        d += daily(b);
 
         let currentMult = mult(b);
 
         function nextTargetFromBalance(b){
 
-    if (b < 30000) return 30000;
+            if (b < 30000) return 30000;
 
-    if (b < 90000) {
-        let steps = Math.floor((b - 30000) / 15000) + 1;
-        return 30000 + (steps * 15000);
-    }
+            if (b < 90000) {
+                let steps = Math.floor((b - 30000) / 15000) + 1;
+                return 30000 + (steps * 15000);
+            }
 
-    if (b < 140000) return 140000;
-    if (b < 160000) return 160000;
-    if (b < 180000) return 180000;
-    if (b < 200000) return 200000;
+            if (b < 140000) return 140000;
+            if (b < 160000) return 160000;
+            if (b < 180000) return 180000;
+            if (b < 200000) return 200000;
 
-    let steps = Math.floor((b - 200000) / 20000) + 1;
-    return 200000 + (steps * 20000);
-}
+            let steps = Math.floor((b - 200000) / 20000) + 1;
+            return 200000 + (steps * 20000);
+        }
 
         let nextTarget = nextTargetFromBalance(b);
         let nextMult = mult(nextTarget);
-
         let needed = Math.max(0, nextTarget - b);
 
         let tierStart;
@@ -745,7 +745,7 @@ function render(){
 
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
 
-   html += `
+        html += `
 <div class="account"
      onclick="openAccount(${i})"
      style="display:grid;
@@ -786,15 +786,19 @@ function render(){
     <!-- NEXT TARGET -->
     <div style="text-align:center;">
         <div class="small">Next target</div>
+
         <div style="margin-top:6px; font-weight:700;">
             ${money(needed)}
+        </div>
+
+        <div style="margin-top:4px; font-size:12px; color:#93a4b8;">
+            ${nextMult.toFixed(2)}x
         </div>
     </div>
 
     <!-- PROGRESS -->
     <div>
 
-        <!-- progress bar -->
         <div style="position:relative;
                     height:10px;
                     background:rgba(255,255,255,0.05);
@@ -806,7 +810,6 @@ function render(){
                         background:linear-gradient(90deg,#1f6feb,#2ee59d);
                         border-radius:999px;"></div>
 
-            <!-- percent INSIDE bar -->
             <div style="position:absolute;
                         right:6px;
                         top:50%;
@@ -818,16 +821,7 @@ function render(){
             </div>
         </div>
 
-        <!-- next tier multiple UNDER bar -->
         <div style="margin-top:6px;
-                    font-size:12px;
-                    color:#eaf1ff;
-                    font-weight:600;">
-            ${nextMult.toFixed(2)}x
-        </div>
-
-        <!-- ETA UNDER that -->
-        <div style="margin-top:3px;
                     font-size:11px;
                     color:#93a4b8;">
             ${(() => {
@@ -841,15 +835,14 @@ function render(){
     </div>
 
 </div>`;
-
     });
 
     el.innerHTML = html;
 
-    document.getElementById("total").innerText=money(t.toFixed(0));
-    document.getElementById("daily").innerText=money(d.toFixed(0));
-    document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
-    document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
+    document.getElementById("total").innerText = money(t.toFixed(0));
+    document.getElementById("daily").innerText = money(d.toFixed(0));
+    document.getElementById("weeklyHome").innerText = money((d*5).toFixed(0));
+    document.getElementById("monthlyHome").innerText = money((d*22).toFixed(0));
 }
 
 function openAccount(i){
