@@ -628,8 +628,15 @@ function money(v){
         return "$" + (Number.isInteger(m) ? m : m.toFixed(2)) + "m";
     }
 
+
     return "$" + n.toLocaleString();
 }
+
+    function bonus(v){
+    let n = Number(v) / 100;
+    return "(" + money(n.toFixed(0)) + ")";
+}
+
 
 /* unchanged logic */
 function renameAccount(){
@@ -745,11 +752,20 @@ function renderPortfolio(){
         draw+=dd(b);
     });
 
-    document.getElementById("p_total").innerText = money(t.toFixed(0));
-    document.getElementById("p_daily").innerText = money(d.toFixed(0));
-    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
-    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
-    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+    document.getElementById("p_total").innerHTML =
+    money(t.toFixed(0)) + `<div class="small">${bonus(t)}</div>`;
+
+document.getElementById("p_daily").innerHTML =
+    money(d.toFixed(0)) + `<div class="small">${bonus(d)}</div>`;
+
+document.getElementById("p_week").innerHTML =
+    money((d*5).toFixed(0)) + `<div class="small">${bonus(d*5)}</div>`;
+
+document.getElementById("p_month").innerHTML =
+    money((d*22).toFixed(0)) + `<div class="small">${bonus(d*22)}</div>`;
+
+document.getElementById("p_dd").innerHTML =
+    money(draw.toFixed(0)) + `<div class="small">${bonus(draw)}</div>`;
 }
 
 function render(){
