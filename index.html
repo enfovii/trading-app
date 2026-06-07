@@ -25,11 +25,6 @@ body::before {
     z-index: -1;
 }
 
-.title {
-    text-align: center;
-    margin: 12px 0 16px;
-}
-
 .page { display:none; }
 .active { display:block; }
 
@@ -56,77 +51,86 @@ body::before {
     display: flex;
     justify-content: space-between;
     gap: 12px;
-    cursor: pointer; /* FIX click feedback */
 }
 
 .small { font-size: 11px; color: #93a4b8; }
-.big { font-size: 20px; font-weight: 700; }
-
 .green { color: #2ee59d; }
 
 button {
     width: calc(100% - 24px);
-    margin-left: 12px;
-    margin-right: 12px;
+    margin: 10px 12px;
     padding: 14px;
-    margin-top: 10px;
     background: linear-gradient(135deg, #1f6feb, #144a99);
     color: white;
     border: none;
     border-radius: 12px;
 }
 
+/* progress */
+.progressBar{
+    height: 6px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 6px;
+}
+
+.progressFill{
+    height: 100%;
+    background: linear-gradient(90deg,#1f6feb,#2ee59d);
+}
 </style>
 </head>
 
 <body>
 
-<div class="title">
-    <h2>Pro Trading Dashboard</h2>
-</div>
-
-<!-- HOME -->
 <div id="home" class="page active">
 
 <div class="statsRow">
     <div class="stat">
         <div class="small">Daily</div>
-        <div class="big green" id="daily">$0</div>
+        <div id="daily"></div>
     </div>
 
     <div class="stat">
         <div class="small">Weekly</div>
-        <div class="big green" id="weeklyHome">$0</div>
+        <div id="weeklyHome"></div>
     </div>
 
     <div class="stat">
         <div class="small">Monthly</div>
-        <div class="big green" id="monthlyHome">$0</div>
+        <div id="monthlyHome"></div>
     </div>
 </div>
 
 <div id="accounts"></div>
 
 <button onclick="openPortfolio()">Portfolio</button>
+<button onclick="openAdd()">+ Add Account</button>
 
 </div>
 
-<!-- PORTFOLIO -->
+<!-- PORTFOLIO RESTORED -->
 <div id="portfolio" class="page">
 <h2>Portfolio</h2>
 <button onclick="backHome()">Back</button>
 </div>
 
-<!-- ACCOUNT -->
+<!-- ACCOUNT RESTORED -->
 <div id="account" class="page">
 <h2 id="accName"></h2>
 <button onclick="back()">Back</button>
 </div>
 
+<!-- ADD ACCOUNT RESTORED -->
+<div id="add" class="page">
+<h2>Add Account</h2>
+<button onclick="backHome()">Back</button>
+</div>
+
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
-let current = null;
 
 function num(v){
     if(!v) return 0;
@@ -153,42 +157,28 @@ function mult(b){
 
 function daily(b){ return mult(b)*800; }
 
-/* FIXED: uniform scaling system */
+/* ONLY ADDITION (safe) */
 function getNextTier(b){
-
     if(b < 90000) return 90000;
     if(b < 140000) return 140000;
     if(b < 160000) return 160000;
     if(b < 200000) return 200000;
-
     return b + 20000;
 }
 
-/* CLICK FIXED */
-function openAccount(i){
-    current = i;
-    document.getElementById("accName").innerText = accounts[i].name;
-    show("account");
-}
-
-function openPortfolio(){
-    show("portfolio");
-}
-
-function back(){
-    show("home");
-}
-
-function backHome(){
-    show("home");
-}
-
+/* NAV (RESTORED) */
 function show(p){
     document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
     document.getElementById(p).classList.add("active");
 }
 
-/* MAIN RENDER */
+function openPortfolio(){ show("portfolio"); }
+function openAccount(i){ document.getElementById("accName").innerText = accounts[i].name; show("account"); }
+function openAdd(){ show("add"); }
+function back(){ show("home"); }
+function backHome(){ show("home"); }
+
+/* MAIN RENDER (FIXED BUT SAFE) */
 function render(){
 
     let el = document.getElementById("accounts");
@@ -221,8 +211,8 @@ function render(){
                 <div class="small">${money(next)}</div>
                 <div class="green">${money(needed.toFixed(0))}</div>
 
-                <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
-                    <div style="height:100%;width:${progress}%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
+                <div class="progressBar">
+                    <div class="progressFill" style="width:${progress}%"></div>
                 </div>
             </div>
 
