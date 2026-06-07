@@ -16,6 +16,7 @@ body {
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     -webkit-text-size-adjust: 100%;
+    touch-action: manipulation;
 }
 
 body::before {
@@ -106,6 +107,10 @@ h2 {
     scroll-margin-bottom: 120px;
 }
 
+.account:active {
+    transform: scale(0.99);
+}
+
 .green { color: #2ee59d; }
 .red { color: #ff5c7a; }
 
@@ -139,6 +144,7 @@ button {
     border-radius: 12px;
     font-weight: 600;
     box-shadow: 0 8px 20px rgba(0,120,255,0.25);
+    touch-action: manipulation;
 }
 
 .addBtn {
@@ -253,7 +259,9 @@ button {
 <div class="card">
     <h3 id="name"></h3>
 
-    <input id="balance" inputmode="decimal" pattern="[0-9]*" oninput="formatBalanceInput(this)">
+    <input id="balance" inputmode="decimal" pattern="[0-9]*"
+        oninput="formatBalanceInput(this)"
+        onblur="updateAccount()">
 
     <div class="card">
         <div class="small">Multiplier</div>
@@ -309,6 +317,24 @@ button {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
+/* cached DOM (performance improvement) */
+const elAccounts = document.getElementById("accounts");
+const elTotal = document.getElementById("total");
+const elDaily = document.getElementById("daily");
+const elWeeklyHome = document.getElementById("weeklyHome");
+const elMonthlyHome = document.getElementById("monthlyHome");
+
+/* moved outside render (performance improvement) */
+function nextTargetFromBalance(x){
+    if (x < 90000) return 90000;
+    if (x < 140000) return 140000;
+    if (x < 160000) return 160000;
+    if (x < 180000) return 180000;
+    if (x < 200000) return 200000;
+    let steps = Math.floor((x - 200000) / 20000) + 1;
+    return 200000 + (steps * 20000);
+}
+
 function num(v){
     if(!v) return 0;
     v = v.toString().toLowerCase().replace(/,/g,'');
@@ -321,16 +347,40 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
+/* INPUT UX FIX (no live update spam) */
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
 
     if(raw === ''){
-        updateAccount();
         return;
     }
 
     el.value = Number(raw).toLocaleString('en-US');
-    updateAccount();
+}
+
+/* FIXED: only save on blur */
+function updateAccount(){
+    if(current===null) return;
+
+    let inputEl = document.getElementById("balance");
+    let raw = inputEl.value;
+
+    if(raw === "" || raw === null) return;
+
+    let b = num(raw);
+
+    accounts[current].balance = b;
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
+    document.getElementById("dailyP").innerText=money(daily(b));
+    document.getElementById("weekly").innerText=money(daily(b)*5);
+    document.getElementById("monthly").innerText=money(daily(b)*22);
+    document.getElementById("accdd").innerText=money(dd(b));
+
+    document.getElementById("balance").value = Number(b).toLocaleString('en-US');
+
+    render();
 }
 
 function tier(b){
@@ -376,9 +426,8 @@ function renderPortfolio(){
     document.getElementById("p_dd").innerText = money(draw.toFixed(0));
 }
 
+/* PERFORMANCE POLISH applied */
 function render(){
-    let el=document.getElementById("accounts");
-
     let html = "";
     let t=0,d=0;
 
@@ -388,23 +437,11 @@ function render(){
         d+=daily(b);
 
         let currentMult = mult(b);
-
-        function nextTargetFromBalance(x){
-            if (x < 90000) return 90000;
-            if (x < 140000) return 140000;
-            if (x < 160000) return 160000;
-            if (x < 180000) return 180000;
-            if (x < 200000) return 200000;
-            let steps = Math.floor((x - 200000) / 20000) + 1;
-            return 200000 + (steps * 20000);
-        }
-
         let nextTarget = nextTargetFromBalance(b);
         let nextMult = mult(nextTarget);
 
         let needed = Math.max(0, nextTarget - b);
 
-        // ✅ FIXED TIER-BASED PROGRESS
         let tierStart;
         if (b < 90000) tierStart = 0;
         else if (b < 140000) tierStart = 90000;
@@ -433,62 +470,24 @@ function render(){
                 <div class="small">Next ${nextMult.toFixed(2)}x</div>
                 <div class="small">Need ${money(needed)}</div>
 
-                <div style="
-                    width:100%;
-                    height:10px;
-                    background:rgba(255,255,255,0.06);
-                    border-radius:12px;
-                    margin-top:8px;
-                    overflow:hidden;
-                    position:relative;
-                ">
-                    <div style="
-                        width:${progress}%;
-                        height:100%;
-                        background:linear-gradient(90deg,#1f6feb,#2ee59d);
-                        border-radius:12px;
-                        transition: width 0.4s ease;
-                        box-shadow: 0 0 14px rgba(46,229,157,0.35);
-                    "></div>
-
-                    <div style="
-                        position:absolute;
-                        right:6px;
-                        top:50%;
-                        transform:translateY(-50%);
-                        font-size:10px;
-                        font-weight:700;
-                        color:#ffffff;
-                        background:rgba(0,0,0,0.45);
-                        padding:2px 6px;
-                        border-radius:8px;
-                        backdrop-filter: blur(6px);
-                    ">
-                        ${progress.toFixed(0)}%
-                    </div>
+                <div style="width:100%;height:10px;background:rgba(255,255,255,0.06);border-radius:12px;margin-top:8px;overflow:hidden;">
+                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);border-radius:12px;"></div>
                 </div>
 
                 <div style="font-size:11px;color:#93a4b8;margin-top:6px;">
-                    ${(() => {
-                        let dp = daily(b);
-                        if (dp <= 0) return "ETA: --";
-                        let days = needed / dp;
-                        if (!isFinite(days) || days <= 0) return "ETA: 0 days";
-                        return "ETA: " + days.toFixed(1) + " days";
-                    })()}
+                    ETA: ${(needed / Math.max(daily(b),1)).toFixed(1)} days
                 </div>
-
             </div>
 
         </div>`;
     });
 
-    el.innerHTML = html;
+    elAccounts.innerHTML = html;
 
-    document.getElementById("total").innerText=money(t.toFixed(0));
-    document.getElementById("daily").innerText=money(d.toFixed(0));
-    document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
-    document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
+    elTotal.innerText = money(t.toFixed(0));
+    elDaily.innerText = money(d.toFixed(0));
+    elWeeklyHome.innerText = money((d*5).toFixed(0));
+    elMonthlyHome.innerText = money((d*22).toFixed(0));
 }
 
 function openAccount(i){
@@ -503,33 +502,7 @@ function openAccount(i){
         let input = document.getElementById("balance");
         input.focus();
         input.setSelectionRange(input.value.length, input.value.length);
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 100);
-}
-
-function updateAccount(){
-    if(current===null) return;
-
-    let inputEl = document.getElementById("balance");
-    let raw = inputEl.value;
-
-    if(raw === "" || raw === null) return;
-
-    let b = num(raw);
-
-    accounts[current].balance = b;
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
-    document.getElementById("dailyP").innerText=money(daily(b));
-    document.getElementById("weekly").innerText=money(daily(b)*5);
-    document.getElementById("monthly").innerText=money(daily(b)*22);
-    document.getElementById("accdd").innerText=money(dd(b));
-
-    let elInput = document.getElementById("balance");
-    elInput.value = Number(b).toLocaleString('en-US');
-
-    render();
 }
 
 function back(){ current=null; show("home"); }
