@@ -762,32 +762,18 @@ function render(){
         </div>
     </div>
 
-    <!-- PROGRESS -->
-<div style="min-width:140px; width:100%;">
-
-        <div style="height:10px; background:rgba(255,255,255,0.05);
-                    border-radius:999px; overflow:hidden; position:relative;">
-
-            <div style="width:${progress}%; height:100%;
-                        background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
-
-            <div style="position:absolute; right:6px; top:50%;
-                        transform:translateY(-50%);
-                        font-size:10px; color:white;">
-                ${progress.toFixed(0)}%
-            </div>
-        </div>
-
-        <div style="font-size:10px; color:#93a4b8; margin-top:6px;">
-            ${(() => {
-                let dp = daily(b);
-                if (dp <= 0) return "~";
-                let days = needed / dp;
-                return isFinite(days) ? "~" + days.toFixed(1) : "~";
-            })()}
-        </div>
-
+   <!-- ETA ONLY -->
+<div class="cell">
+    <div class="cellTitle">ETA</div>
+    <div class="cellValue">
+        ${(() => {
+            let dp = daily(b);
+            if (dp <= 0) return "~";
+            let days = needed / dp;
+            return isFinite(days) ? "~" + days.toFixed(1) + "d" : "~";
+        })()}
     </div>
+</div>
 
 </div>`;
     });
