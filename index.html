@@ -82,7 +82,6 @@ h2 {
     text-align: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    will-change: transform;
 }
 
 .statsRow {
@@ -98,7 +97,6 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
-    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -117,7 +115,6 @@ h2 {
     margin-top: 10px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-    will-change: transform;
 }
 
 .account {
@@ -126,8 +123,6 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
-    scroll-margin-bottom: 120px;
-    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -162,7 +157,6 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
-    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
 .addBtn {
@@ -171,7 +165,6 @@ button {
     left: 12px;
     right: 12px;
     z-index: 10;
-    backdrop-filter: blur(12px);
 }
 
 .modal {
@@ -244,39 +237,16 @@ button {
 <div id="portfolio" class="page">
 <div class="card">
     <h3>Portfolio Overview</h3>
-
-    <div class="card">
-        <div class="small">Total Balance</div>
-        <div class="big" id="p_total"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Daily Profit</div>
-        <div class="big green" id="p_daily"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Weekly</div>
-        <div class="big green" id="p_week"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Monthly</div>
-        <div class="big green" id="p_month"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Drawdown</div>
-        <div class="big red" id="p_dd"></div>
-    </div>
-
     <button onclick="backHome()">Back</button>
 </div>
 </div>
 
 <div id="account" class="page">
 <div class="card">
-    <h3 id="name"></h3>
+
+    <input id="nameInput"
+           style="font-size:18px;font-weight:700;background:transparent;border:none;color:#eaf1ff;width:100%;outline:none;"
+           oninput="renameAccount(this.value)">
 
     <input id="balance"
        inputmode="decimal"
@@ -288,59 +258,22 @@ button {
        onfocus="this.select()"
        oninput="formatBalanceInput(this)">
 
-    <div class="card">
-        <div class="small">Multiplier</div>
-        <div class="big green" id="mult"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Daily Profit</div>
-        <div id="dailyP"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Weekly</div>
-        <div id="weekly"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Monthly</div>
-        <div id="monthly"></div>
-    </div>
-
-    <div class="card">
-        <div class="small">Drawdown</div>
-        <div class="big red" id="accdd"></div>
-    </div>
-
     <button onclick="back()">Back</button>
-    <button class="danger" onclick="confirmDelete()">Delete Account</button>
-</div>
-</div>
 
-<button class="addBtn" onclick="openModal()">+ Add Account</button>
-
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <div class="big">Add Account</div>
-        <input id="newName" placeholder="Account name">
-        <input id="newBalance" placeholder="Starting balance">
-        <button onclick="createAccount()">Create</button>
-        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
-    </div>
 </div>
-
-<div class="modal" id="deleteModal">
-    <div class="modal-content">
-        <div class="big">Are you sure?</div>
-        <button class="danger" onclick="deleteAccount()">Yes, Delete</button>
-        <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
-    </div>
 </div>
 
 <script>
+
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
+
+function renameAccount(v){
+    if(current === null) return;
+    accounts[current].name = v;
+    localStorage.setItem("accounts", JSON.stringify(accounts));
+    render();
+}
 
 function num(v){
     if(!v) return 0;
@@ -356,225 +289,46 @@ function money(v){
 
 function formatBalanceInput(el){
     let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
-
-    if(raw === ''){
-        updateAccount();
-        return;
-    }
-
+    if(raw === '') return;
     el.value = Number(raw).toLocaleString('en-US');
     updateAccount();
 }
 
-function tier(b){
-    if (b < 90000) return 3;
-    if (b < 140000) return 3;
-    if (b < 160000) return 3.5;
-    if (b < 180000) return 4;
-    if (b < 200000) return 4.5;
-
-    let steps = Math.floor((b - 200000) / 20000);
-    return 5 + (steps * 0.5);
-}
-
-function mult(b){ return tier(b); }
-function daily(b){ return mult(b)*800; }
-function dd(b){ return b*0.4; }
-
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
-    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
-}
-
-function openPortfolio(){
-    show("portfolio");
-    renderPortfolio();
-}
-
-function renderPortfolio(){
-    let t=0,d=0,draw=0;
-
-    accounts.forEach(a=>{
-        let b=num(a.balance);
-        t+=b;
-        d+=daily(b);
-        draw+=dd(b);
-    });
-
-    document.getElementById("p_total").innerText = money(t.toFixed(0));
-    document.getElementById("p_daily").innerText = money(d.toFixed(0));
-    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
-    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
-    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
-}
-
-function render(){
-    let el=document.getElementById("accounts");
-
-    let html = "";
-    let t=0,d=0;
-
-    accounts.forEach((a,i)=>{
-        let b=num(a.balance);
-        t+=b;
-        d+=daily(b);
-
-        let currentMult = mult(b);
-
-        function nextTargetFromBalance(x){
-            if (x < 90000) return 90000;
-            if (x < 140000) return 140000;
-            if (x < 160000) return 160000;
-            if (x < 180000) return 180000;
-            if (x < 200000) return 200000;
-            let steps = Math.floor((x - 200000) / 20000) + 1;
-            return 200000 + (steps * 20000);
-        }
-
-        let nextTarget = nextTargetFromBalance(b);
-        let nextMult = mult(nextTarget);
-
-        let needed = Math.max(0, nextTarget - b);
-
-        let tierStart;
-        if (b < 90000) tierStart = 0;
-        else if (b < 140000) tierStart = 90000;
-        else if (b < 160000) tierStart = 140000;
-        else if (b < 180000) tierStart = 160000;
-        else if (b < 200000) tierStart = 180000;
-        else {
-            let steps = Math.floor((b - 200000) / 20000);
-            tierStart = 200000 + (steps * 20000);
-        }
-
-        let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
-
-        html += `
-        <div class="account" onclick="openAccount(${i})"
-            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
-
-            <div>
-                <b>${a.name}</b><br>
-                ${money(b)}<br>
-                <span class="green">${currentMult.toFixed(2)}x</span><br>
-                <span class="small">Daily ${money(daily(b))}</span>
-            </div>
-
-            <div style="min-width:140px;text-align:right;">
-                <div class="small">Next ${nextMult.toFixed(2)}x</div>
-                <div class="small">Need ${money(needed)}</div>
-
-                <div style="width:100%;height:10px;background:rgba(255,255,255,0.06);border-radius:12px;margin-top:8px;overflow:hidden;position:relative;">
-                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);border-radius:12px;transition: width 0.4s ease;box-shadow: 0 0 14px rgba(46,229,157,0.35);"></div>
-
-                    <div style="position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.45);padding:2px 6px;border-radius:8px;backdrop-filter: blur(6px);">
-                        ${progress.toFixed(0)}%
-                    </div>
-                </div>
-
-                <div style="font-size:11px;color:#93a4b8;margin-top:6px;">
-                    ${(() => {
-                        let dp = daily(b);
-                        if (dp <= 0) return "ETA: --";
-                        let days = needed / dp;
-                        if (!isFinite(days) || days <= 0) return "ETA: 0 days";
-                        return "ETA: " + days.toFixed(1) + " days";
-                    })()}
-                </div>
-
-            </div>
-
-        </div>`;
-    });
-
-    el.innerHTML = html;
-
-    document.getElementById("total").innerText=money(t.toFixed(0));
-    document.getElementById("daily").innerText=money(d.toFixed(0));
-    document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
-    document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
 }
 
 function openAccount(i){
     current=i;
     let a=accounts[i];
-    document.getElementById("name").innerText=a.name;
+    document.getElementById("nameInput").value=a.name;
     document.getElementById("balance").value=num(a.balance);
     show("account");
-    updateAccount();
-
-    setTimeout(() => {
-        let input = document.getElementById("balance");
-        input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 100);
 }
 
 function updateAccount(){
-    if(current===null) return;
-
-    let inputEl = document.getElementById("balance");
-    let raw = inputEl.value;
-
-    if(raw === "" || raw === null) return;
-
-    let b = num(raw);
-
+    let b = num(document.getElementById("balance").value);
     accounts[current].balance = b;
     localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
-    document.getElementById("dailyP").innerText=money(daily(b));
-    document.getElementById("weekly").innerText=money(daily(b)*5);
-    document.getElementById("monthly").innerText=money(daily(b)*22);
-    document.getElementById("accdd").innerText=money(dd(b));
-
-    let elInput = document.getElementById("balance");
-
-    let pos = elInput.selectionStart;
-    elInput.value = Number(b).toLocaleString('en-US');
-    elInput.setSelectionRange(elInput.value.length, elInput.value.length);
-
-    requestAnimationFrame(render);
-}
-
-function back(){ current=null; show("home"); }
-function backHome(){ show("home"); }
-
-function openModal(){ document.getElementById("modal").style.display="flex"; }
-function closeModal(){ document.getElementById("modal").style.display="none"; }
-
-function createAccount(){
-    let name=document.getElementById("newName").value.trim();
-    let balance=num(document.getElementById("newBalance").value);
-    if(!name) return;
-
-    accounts.push({name,balance});
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-
-    closeModal();
     render();
 }
 
-function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
-function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
-
-function deleteAccount(){
-    if(current===null) return;
-    accounts.splice(current,1);
-    localStorage.setItem("accounts",JSON.stringify(accounts));
-    current=null;
-    closeDeleteModal();
-    show("home");
-    render();
+function render(){
+    let el=document.getElementById("accounts");
+    el.innerHTML = accounts.map((a,i)=>`
+        <div class="account" onclick="openAccount(${i})">
+            <b>${a.name}</b><br>
+            ${money(a.balance)}
+        </div>
+    `).join("");
 }
 
 window.onload=function(){
     show("home");
     render();
 };
+
 </script>
 
 </body>
