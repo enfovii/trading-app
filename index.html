@@ -401,8 +401,11 @@ function render(){
 
         let nextTarget = nextTargetFromBalance(b);
         let nextMult = mult(nextTarget);
-        let progress = Math.min(100, (b / nextTarget) * 100);
+
         let needed = Math.max(0, nextTarget - b);
+
+        // ✅ FIXED PROGRESS
+        let progress = Math.min(100, ((b) / (b + needed)) * 100);
 
         html += `
         <div class="account" onclick="openAccount(${i})"
@@ -419,7 +422,6 @@ function render(){
                 <div class="small">Next ${nextMult.toFixed(2)}x</div>
                 <div class="small">Need ${money(needed)}</div>
 
-                <!-- PROGRESS BAR + ETA -->
                 <div style="
                     width:100%;
                     height:10px;
