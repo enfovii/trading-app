@@ -82,6 +82,7 @@ h2 {
     text-align: center;
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    will-change: transform;
 }
 
 .statsRow {
@@ -97,6 +98,7 @@ h2 {
     padding: 12px;
     border-radius: 16px;
     text-align: center;
+    will-change: transform;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -114,6 +116,8 @@ h2 {
     padding: 14px;
     margin-top: 10px;
     border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    will-change: transform;
 }
 
 .account {
@@ -122,6 +126,8 @@ h2 {
     border-radius: 16px;
     background: linear-gradient(145deg, rgba(20,30,50,0.6), rgba(10,15,30,0.4));
     border: 1px solid rgba(120,170,255,0.18);
+    scroll-margin-bottom: 120px;
+    will-change: transform;
 }
 
 .green { color: #2ee59d; }
@@ -150,6 +156,7 @@ button {
     border: none;
     border-radius: 12px;
     font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
 
 .addBtn {
@@ -157,6 +164,7 @@ button {
     bottom: 18px;
     left: 12px;
     right: 12px;
+    z-index: 10;
 }
 
 .modal {
@@ -167,6 +175,7 @@ button {
     justify-content: center;
     background: rgba(0,0,0,0.65);
     padding: 16px;
+    z-index: 20;
 }
 
 .modal-content {
@@ -174,29 +183,31 @@ button {
     max-width: 360px;
     background: rgba(15,20,35,0.9);
     border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
     padding: 16px;
     border-radius: 16px;
 }
 
-.danger { background: #ff5c7a !important; }
+.danger {
+    background: #ff5c7a !important;
+}
 
-/* PREMIUM INLINE EDIT */
+/* ✏️ INLINE RENAME STYLE */
 .nameRow {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
 }
 
 #name {
     outline: none;
-    border-radius: 6px;
     padding: 2px 6px;
+    border-radius: 6px;
 }
 
 #name[contenteditable="true"] {
     background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(120,170,255,0.3);
+    border: 1px solid rgba(120,170,255,0.25);
 }
 
 .editBtn {
@@ -207,6 +218,7 @@ button {
     width: auto;
     margin: 0;
     padding: 6px;
+    cursor: pointer;
 }
 
 </style>
@@ -251,6 +263,13 @@ button {
 <div id="accounts"></div>
 </div>
 
+<div id="portfolio" class="page">
+<div class="card">
+    <h3>Portfolio Overview</h3>
+    <button onclick="backHome()">Back</button>
+</div>
+</div>
+
 <div id="account" class="page">
 <div class="card">
 
@@ -268,33 +287,25 @@ button {
 </div>
 </div>
 
-<div class="modal" id="modal">
-    <div class="modal-content">
-        <div class="big">Add Account</div>
-        <input id="newName" placeholder="Account name">
-        <input id="newBalance" placeholder="Starting balance">
-        <button onclick="createAccount()">Create</button>
-    </div>
-</div>
-
 <script>
 
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
+/* NUM */
 function num(v){
     if(!v) return 0;
     v = v.toString().replace(/,/g,'');
     return Number(v) || 0;
 }
 
+/* 💎 INLINE RENAME (TRADINGVIEW STYLE) */
 function enableRename(){
-    let el = document.getElementById("name");
     if(current === null) return;
 
+    const el = document.getElementById("name");
     el.contentEditable = true;
     el.focus();
-
     document.execCommand("selectAll", false, null);
 
     const save = () => {
@@ -322,6 +333,7 @@ function enableRename(){
     };
 }
 
+/* OPEN ACCOUNT */
 function openAccount(i){
     current = i;
     let a = accounts[i];
@@ -329,17 +341,13 @@ function openAccount(i){
     document.getElementById("name").textContent = a.name;
     document.getElementById("balance").value = a.balance;
 
-    document.getElementById("account").classList.add("active");
+    showPage("account");
 }
 
-function formatBalanceInput(el){
-    let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
-    el.value = Number(raw).toLocaleString('en-US');
-}
-
+/* RENDER */
 function render(){
-    let el = document.getElementById("accounts");
-    el.innerHTML = accounts.map((a,i)=>`
+    document.getElementById("accounts").innerHTML =
+    accounts.map((a,i)=>`
         <div class="account" onclick="openAccount(${i})">
             <b>${a.name}</b><br>
             $${Number(a.balance).toLocaleString()}
@@ -347,15 +355,14 @@ function render(){
     `).join("");
 }
 
-function createAccount(){
-    let name = document.getElementById("newName").value;
-    let balance = num(document.getElementById("newBalance").value);
-
-    accounts.push({name, balance});
-    localStorage.setItem("accounts", JSON.stringify(accounts));
-
-    render();
+/* UI NAV */
+function showPage(id){
+    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
 }
+
+function back(){ showPage("home"); }
+function backHome(){ showPage("home"); }
 
 window.onload = render;
 
