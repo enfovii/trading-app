@@ -162,34 +162,35 @@ button {
     background: #ff5c7a !important;
 }
 
-/* ===== RENAMING ===== */
+/* =========================
+   INLINE RENAME OVERLAY
+========================= */
 
-.nameWrap{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
+.renameOverlay {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%;
+    max-width: 320px;
+    background: rgba(15,20,35,0.95);
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
+    padding: 12px;
+    border-radius: 14px;
+    z-index: 9999;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
 
-.renameInput{
-    font-size:20px;
-    font-weight:700;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(120,170,255,0.3);
-    color:#eaf1ff;
-    border-radius:8px;
-    padding:4px 8px;
-    width:100%;
-}
-
-.editBtn{
-    background:transparent;
-    border:none;
-    color:#93a4b8;
-    font-size:18px;
-    width:auto;
-    margin:0;
-    padding:6px;
+.renameOverlay input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(120,170,255,0.25);
+    background: rgba(8,12,25,0.85);
+    color: #eaf1ff;
+    font-size: 16px;
+    outline: none;
 }
 
 </style>
@@ -234,12 +235,19 @@ button {
 <div id="accounts"></div>
 </div>
 
+<div id="portfolio" class="page">
+<div class="card">
+    <h3>Portfolio Overview</h3>
+    <button onclick="backHome()">Back</button>
+</div>
+</div>
+
 <div id="account" class="page">
 <div class="card">
 
-    <div class="nameWrap">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
         <h3 id="name"></h3>
-        <button class="editBtn" onclick="startRename()">✏️</button>
+        <button onclick="openRename()" style="background:none;border:none;color:#93a4b8;font-size:18px;width:auto;padding:6px;">✏️</button>
     </div>
 
     <input id="balance"
@@ -273,19 +281,26 @@ function num(v){
     return isNaN(Number(v)) ? 0 : Number(v);
 }
 
-/* ===== SAFE INLINE RENAME ===== */
+/* =========================
+   SAFE RENAME SYSTEM
+========================= */
 
-function startRename(){
+let renameBox = null;
+
+function openRename(){
     if(current === null) return;
 
-    const nameEl = document.getElementById("name");
-    const oldName = accounts[current].name;
+    if(renameBox) renameBox.remove();
+
+    renameBox = document.createElement("div");
+    renameBox.className = "renameOverlay";
 
     const input = document.createElement("input");
-    input.className = "renameInput";
-    input.value = oldName;
+    input.value = accounts[current].name;
 
-    nameEl.replaceWith(input);
+    renameBox.appendChild(input);
+    document.body.appendChild(renameBox);
+
     input.focus();
     input.select();
 
@@ -298,20 +313,18 @@ function startRename(){
             render();
         }
 
-        const h3 = document.createElement("h3");
-        h3.id = "name";
-        h3.textContent = accounts[current].name;
-
-        input.replaceWith(h3);
+        renameBox.remove();
+        renameBox = null;
     };
 
     input.addEventListener("blur", save);
 
     input.addEventListener("keydown", (e) => {
         if(e.key === "Enter") input.blur();
+
         if(e.key === "Escape"){
-            input.value = oldName;
-            input.blur();
+            renameBox.remove();
+            renameBox = null;
         }
     });
 }
