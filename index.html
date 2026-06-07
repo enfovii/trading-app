@@ -9,12 +9,13 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
     padding: 14px;
-    padding-bottom: 90px;
+    padding-bottom: 90px; /* FIX 2 */
     color: #eaf1ff;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
 
+/* PREMIUM DARK BLUE BACKGROUND */
 body::before {
     content: "";
     position: fixed;
@@ -219,16 +220,14 @@ button {
         <div class="big green" id="p_daily"></div>
     </div>
 
-    <!-- FIXED: added green -->
     <div class="card">
         <div class="small">Weekly</div>
-        <div class="big green" id="p_week"></div>
+        <div id="p_week"></div>
     </div>
 
-    <!-- FIXED: added green -->
     <div class="card">
         <div class="small">Monthly</div>
-        <div class="big green" id="p_month"></div>
+        <div id="p_month"></div>
     </div>
 
     <div class="card">
@@ -240,11 +239,259 @@ button {
 </div>
 </div>
 
+<div id="account" class="page">
+<div class="card">
+    <h3 id="name"></h3>
+
+    <input id="balance" oninput="updateAccount()">
+
+    <div class="card">
+        <div class="small">Multiplier</div>
+        <div class="big green" id="mult"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Daily Profit</div>
+        <div id="dailyP"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Weekly</div>
+        <div id="weekly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Monthly</div>
+        <div id="monthly"></div>
+    </div>
+
+    <div class="card">
+        <div class="small">Drawdown</div>
+        <div class="big red" id="accdd"></div>
+    </div>
+
+    <button onclick="back()">Back</button>
+    <button class="danger" onclick="confirmDelete()">Delete Account</button>
+</div>
+</div>
+
+<button class="addBtn" onclick="openModal()">+ Add Account</button>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <div class="big">Add Account</div>
+        <input id="newName" placeholder="Account name">
+        <input id="newBalance" placeholder="Starting balance">
+        <button onclick="createAccount()">Create</button>
+        <button onclick="closeModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
+    </div>
+</div>
+
+<div class="modal" id="deleteModal">
+    <div class="modal-content">
+        <div class="big">Are you sure?</div>
+        <button class="danger" onclick="deleteAccount()">Yes, Delete</button>
+        <button onclick="closeDeleteModal()" style="background:rgba(255,255,255,0.08);">Cancel</button>
+    </div>
+</div>
+
 <script>
+
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 
-/* everything else unchanged */
+function num(v){
+    if(!v) return 0;
+    v = v.toString().toLowerCase().replace(/,/g,'');
+    if(v.includes("k")) return parseFloat(v)*1000;
+    if(v.includes("m")) return parseFloat(v)*1000000;
+    return isNaN(Number(v)) ? 0 : Number(v);
+}
+
+function money(v){
+    return "$" + Number(v).toLocaleString();
+}
+
+function mult(b){
+    b = num(b);
+    if (b < 90000) return b / 30000;
+    if (b < 140000) return 3;
+    if (b < 160000) return 3.5;
+    if (b < 200000) return 4;
+    let base = 5;
+    base += Math.floor((b - 200000) / 20000) * 0.5;
+    return base;
+}
+
+function daily(b){ return mult(b)*800; }
+function dd(b){ return b*0.4; }
+
+function show(page){
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(page).classList.add("active");
+    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
+}
+
+/* PORTFOLIO */
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
+
+function renderPortfolio(){
+
+    let t=0,d=0,draw=0;
+
+    accounts.forEach(a=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+        draw+=dd(b);
+    });
+
+    document.getElementById("p_total").innerText = money(t.toFixed(0));
+    document.getElementById("p_daily").innerText = money(d.toFixed(0));
+    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
+    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
+    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+}
+
+/* HOME - ONLY RENDER UPDATED */
+function render(){
+
+    let el=document.getElementById("accounts");
+
+    let html = "";
+    let t=0,d=0;
+
+    accounts.forEach((a,i)=>{
+        let b=num(a.balance);
+        t+=b;
+        d+=daily(b);
+
+        let currentMult = mult(b);
+
+        let nextMult;
+        let nextTarget;
+
+        if (b < 90000) {
+            nextMult = 3;
+            nextTarget = 90000;
+        } 
+        else if (b < 140000) {
+            nextMult = 3;
+            nextTarget = 140000;
+        } 
+        else if (b < 160000) {
+            nextMult = 3.5;
+            nextTarget = 160000;
+        } 
+        else if (b < 200000) {
+            nextMult = 4;
+            nextTarget = 200000;
+        } 
+        else {
+            let steps = Math.floor((b - 200000) / 20000) + 1;
+            nextMult = 5 + (steps * 0.5);
+            nextTarget = 200000 + (steps * 20000);
+        }
+
+        let progress = Math.min(100, (b / nextTarget) * 100);
+        let needed = Math.max(0, nextTarget - b);
+
+        html += `
+        <div class="account" onclick="openAccount(${i})"
+            style="display:flex;justify-content:space-between;gap:12px;align-items:center;">
+
+            <div>
+                <b>${a.name}</b><br>
+                ${money(b)}<br>
+                <span class="green">${currentMult.toFixed(2)}x</span><br>
+                <span class="small">Daily ${money(daily(b))}</span>
+            </div>
+
+            <div style="min-width:140px;text-align:right;">
+                <div class="small">Next ${nextMult.toFixed(2)}x</div>
+                <div class="small">Need ${money(needed)}</div>
+
+                <div style="width:100%;height:6px;background:rgba(255,255,255,0.08);border-radius:10px;margin-top:6px;overflow:hidden;">
+                    <div style="width:${progress}%;height:100%;background:linear-gradient(90deg,#1f6feb,#2ee59d);"></div>
+                </div>
+            </div>
+
+        </div>`;
+    });
+
+    el.innerHTML = html;
+
+    document.getElementById("total").innerText=money(t.toFixed(0));
+    document.getElementById("daily").innerText=money(d.toFixed(0));
+    document.getElementById("weeklyHome").innerText=money((d*5).toFixed(0));
+    document.getElementById("monthlyHome").innerText=money((d*22).toFixed(0));
+}
+
+/* ACCOUNT */
+function openAccount(i){
+    current=i;
+    let a=accounts[i];
+    document.getElementById("name").innerText=a.name;
+    document.getElementById("balance").value=num(a.balance);
+    show("account");
+    updateAccount();
+}
+
+/* REST UNCHANGED */
+function updateAccount(){
+    if(current===null) return;
+
+    let b=num(document.getElementById("balance").value);
+    accounts[current].balance=b;
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
+    document.getElementById("dailyP").innerText=money(daily(b));
+    document.getElementById("weekly").innerText=money(daily(b)*5);
+    document.getElementById("monthly").innerText=money(daily(b)*22);
+    document.getElementById("accdd").innerText=money(dd(b));
+
+    render();
+}
+
+function back(){ current=null; show("home"); }
+function backHome(){ show("home"); }
+
+function openModal(){ document.getElementById("modal").style.display="flex"; }
+function closeModal(){ document.getElementById("modal").style.display="none"; }
+
+function createAccount(){
+    let name=document.getElementById("newName").value.trim();
+    let balance=num(document.getElementById("newBalance").value);
+    if(!name) return;
+
+    accounts.push({name,balance});
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+
+    closeModal();
+    render();
+}
+
+function confirmDelete(){ document.getElementById("deleteModal").style.display="flex"; }
+function closeDeleteModal(){ document.getElementById("deleteModal").style.display="none"; }
+
+function deleteAccount(){
+    if(current===null) return;
+    accounts.splice(current,1);
+    localStorage.setItem("accounts",JSON.stringify(accounts));
+    current=null;
+    closeDeleteModal();
+    show("home");
+    render();
+}
+
+window.onload=function(){
+    show("home");
+    render();
+};
 
 </script>
 
