@@ -404,8 +404,19 @@ function render(){
 
         let needed = Math.max(0, nextTarget - b);
 
-        // ✅ FIXED PROGRESS
-        let progress = Math.min(100, ((b) / (b + needed)) * 100);
+        // ✅ FIXED TIER-BASED PROGRESS
+        let tierStart;
+        if (b < 90000) tierStart = 0;
+        else if (b < 140000) tierStart = 90000;
+        else if (b < 160000) tierStart = 140000;
+        else if (b < 180000) tierStart = 160000;
+        else if (b < 200000) tierStart = 180000;
+        else {
+            let steps = Math.floor((b - 200000) / 20000);
+            tierStart = 200000 + (steps * 20000);
+        }
+
+        let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
 
         html += `
         <div class="account" onclick="openAccount(${i})"
