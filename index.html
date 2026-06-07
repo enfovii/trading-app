@@ -625,6 +625,25 @@ function money(v){
     return "$" + Number(v).toLocaleString();
 }
 
+    function autoFont(el, base=20, min=11){
+    if(!el) return;
+
+    let text = el.innerText || "";
+    
+    // crude but effective: scale down as text grows
+    let len = text.replace(/[^0-9]/g,'').length;
+
+    let size = base;
+
+    if(len > 6) size = base - 2;
+    if(len > 8) size = base - 4;
+    if(len > 10) size = base - 6;
+
+    if(size < min) size = min;
+
+    el.style.fontSize = size + "px";
+}
+
 /* unchanged logic */
 function renameAccount(){
     if(current === null) return;
@@ -841,6 +860,14 @@ function render(){
 
     el.innerHTML = html;
 
+    document.querySelectorAll(".accountRow .value").forEach(el=>{
+    autoFont(el, 16, 11);
+});
+
+document.querySelectorAll(".accountBalance").forEach(el=>{
+    autoFont(el, 14, 10);
+});
+
     document.getElementById("total").innerText = money(t.toFixed(0));
     document.getElementById("daily").innerText = money(d.toFixed(0));
     document.getElementById("weeklyHome").innerText = money((d*5).toFixed(0));
@@ -881,6 +908,11 @@ function updateAccount(){
     document.getElementById("weekly").innerText=money(daily(b)*5);
     document.getElementById("monthly").innerText=money(daily(b)*22);
     document.getElementById("accdd").innerText=money(dd(b));
+    autoFont(document.getElementById("total"), 22, 12);
+
+autoFont(document.getElementById("daily"), 20, 11);
+autoFont(document.getElementById("weeklyHome"), 20, 11);
+autoFont(document.getElementById("monthlyHome"), 20, 11);
 
     let elInput = document.getElementById("balance");
 
