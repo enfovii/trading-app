@@ -338,20 +338,25 @@ button {
 }
 
 .accountRow {
-    display: grid;
-    grid-template-columns:
-        minmax(105px, 1.8fr)
-        minmax(58px, 0.9fr)
-        minmax(58px, 0.9fr)
-        minmax(72px, 1fr)
-        minmax(42px, 0.6fr);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,28,48,0.78),
+            rgba(8,12,24,0.58)
+        );
 
-    gap: 4px;
-    align-items: start;
+    border: 1px solid rgba(120,170,255,0.12);
 
-    padding: 12px 6px;
-    box-sizing: border-box;
-    overflow: hidden;
+    border-radius: 20px;
+
+    padding: 18px 14px;
+
+    margin-top: 14px;
+
+    backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 8px 28px rgba(0,0,0,0.28);
 }
 
 /* NEW STRUCTURE (replace old cell system) */
