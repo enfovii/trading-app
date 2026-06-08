@@ -104,26 +104,15 @@ h2 {
 }
 
 .portfolioBox {
-    background:
-        linear-gradient(
-            145deg,
-            rgba(20,30,50,0.88),
-            rgba(10,15,30,0.70)
-        );
-
-    border: 1px solid rgba(120,170,255,0.16);
-    backdrop-filter: blur(22px);
-
-    padding: 22px 18px;
-    border-radius: 24px;
-
+    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
+    padding: 18px;
+    border-radius: 18px;
     text-align: center;
     cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
     will-change: transform;
-
-    box-shadow:
-        0 12px 40px rgba(0,0,0,0.45),
-        inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .statsRow {
@@ -133,13 +122,30 @@ h2 {
 }
 
 .stat {
-    background: linear-gradient(145deg, rgba(20,30,50,0.65), rgba(10,15,30,0.45));
-    border: 1px solid rgba(120,170,255,0.18);
-    backdrop-filter: blur(14px);
-    padding: 12px;
-    border-radius: 16px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,28,48,0.82),
+            rgba(8,12,24,0.72)
+        );
+
+    border: 1px solid rgba(120,170,255,0.12);
+
+    backdrop-filter: blur(18px);
+
+    padding: 14px 10px;
+
+    border-radius: 20px;
+
     text-align: center;
     will-change: transform;
+}
+    .stat .small {
+    margin-bottom: 6px;
+}
+    .stat div div {
+    opacity: 0.65;
+    font-size: 10px !important;
 }
 
 .small { font-size: 11px; color: #93a4b8; }
@@ -148,11 +154,6 @@ h2 {
     font-size: 20px;
     font-weight: 700;
     letter-spacing: 0.3px;
-}
-    #total {
-    font-size: 38px;
-    font-weight: 800;
-    letter-spacing: -1px;
 }
 
 .card {
