@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pro Trading Dashboard">
+
+<title>Projection Calculator</title>
+
+<style>
+
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #0b0f1a;
+    color: white;
+}
+
+/* Top bar (matches trading dashboard feel) */
+.header {
+    padding: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.back-btn {
+    font-size: 14px;
+    color: #4da3ff;
+    cursor: pointer;
+}
+
+/* Main container */
+.container {
+    padding: 15px;
+}
+
+/* Input card */
+.card {
+    background: #141a2a;
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+/* Labels */
+.label {
+    font-size: 12px;
+    opacity: 0.7;
+    margin-bottom: 6px;
+}
+
+/* Inputs */
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    border: none;
+    background: #0b0f1a;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+/* Primary stat block (matches dashboard cards) */
+.stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat:last-child {
+    border-bottom: none;
+}
+
+.stat-title {
+    font-size: 13px;
+    opacity: 0.7;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* Big projection result */
+.big-result {
+    text-align: center;
+    padding: 25px 10px;
+}
+
+.big-result h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.big-result p {
+    margin: 5px 0 0;
+    opacity: 0.6;
+    font-size: 13px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+    <div onclick="window.location.href='index.html'" class="back-btn">
+        ← Dashboard
+    </div>
+    <div>Projection</div>
+    <div></div>
+</div>
+
+<div class="container">
+
+    <!-- INPUT SECTION -->
+    <div class="card">
+
+        <div class="label">Account Balance</div>
+        <input type="number" id="balance" placeholder="Enter balance">
+
+        <div style="height:10px"></div>
+
+        <div class="label">Daily % Gain</div>
+        <input type="number" id="dailyGain" placeholder="e.g. 2">
+
+        <div style="height:10px"></div>
+
+        <div class="label">Days (Projection Length)</div>
+        <input type="number" id="days" placeholder="e.g. 30">
+
+    </div>
+
+    <!-- RESULT SUMMARY -->
+    <div class="card">
+
+        <div class="big-result">
+            <h1 id="result">$0</h1>
+            <p>Projected Balance</p>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">Daily Result</div>
+            <div class="stat-value" id="dailyResult">$0</div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-title">Total Profit</div>
+            <div class="stat-value" id="profitResult">$0</div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+// simple placeholder logic (we’ll plug your real multiplier system in later)
+
+function calculateProjection() {
+
+    let balance = parseFloat(document.getElementById('balance').value) || 0;
+    let gain = parseFloat(document.getElementById('dailyGain').value) || 0;
+    let days = parseInt(document.getElementById('days').value) || 0;
+
+    let dailyMultiplier = 1 + (gain / 100);
+
+    let projected = balance * Math.pow(dailyMultiplier, days);
+    let profit = projected - balance;
+    let daily = balance * (gain / 100);
+
+    document.getElementById('result').innerText = "$" + projected.toFixed(2);
+    document.getElementById('profitResult').innerText = "$" + profit.toFixed(2);
+    document.getElementById('dailyResult').innerText = "$" + daily.toFixed(2);
+}
+
+// live update
+document.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', calculateProjection);
+});
+
+</script>
+
+</body>
+</html>
