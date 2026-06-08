@@ -338,25 +338,38 @@ button {
 }
 
 .accountRow {
-    background:
-        linear-gradient(
-            145deg,
-            rgba(18,28,48,0.78),
-            rgba(8,12,24,0.58)
-        );
+    display: grid;
+    grid-template-columns:
+        minmax(105px, 1.8fr)
+        minmax(58px, 0.9fr)
+        minmax(58px, 0.9fr)
+        minmax(72px, 1fr)
+        minmax(42px, 0.6fr);
 
-    border: 1px solid rgba(120,170,255,0.12);
+    gap: 8px;
+    align-items: start;
+
+    padding: 16px 12px;
+    margin-top: 12px;
 
     border-radius: 20px;
 
-    padding: 18px 14px;
+    background:
+        linear-gradient(
+            145deg,
+            rgba(18,28,48,0.68),
+            rgba(8,12,24,0.50)
+        );
 
-    margin-top: 14px;
+    border: 1px solid rgba(120,170,255,0.10);
 
     backdrop-filter: blur(18px);
 
     box-shadow:
-        0 8px 28px rgba(0,0,0,0.28);
+        0 8px 28px rgba(0,0,0,0.22);
+
+    box-sizing: border-box;
+    overflow: hidden;
 }
 
 /* NEW STRUCTURE (replace old cell system) */
@@ -401,22 +414,22 @@ button {
     font-size: 16px;
     font-weight: 700;
 }
-   .value {
-    margin-top: 16px;
-    line-height: 1.2;
-    font-size: 14px;
+ .value {
+    margin-top: 8px;
+    line-height: 1.1;
+    font-size: 15px;
+    font-weight: 600;
 }
     .dailyLarge {
     transform: translateX(-10px);
 }
 
 .accountBalance {
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 700;
     margin-top: 8px;
-    color: #93a4b8;
-    font-variant-numeric: tabular-nums;
-    white-space: nowrap;
+    color: #dce8ff;
+    letter-spacing: -0.3px;
 }
    .cell {
     display: flex;
