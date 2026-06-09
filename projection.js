@@ -1,12 +1,12 @@
-document.addEventListener("DOMContentLoaded", () => {
-
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 
 const select = document.getElementById("accountSelect");
 const results = document.getElementById("projectionResults");
 const manualInput = document.getElementById("manualBalance");
 
-if (!select || !results) return;
+if (!select || !results) {
+    console.log("Missing DOM elements");
+}
 
 /* ----------------------------
    LOAD ACCOUNTS
@@ -19,7 +19,7 @@ accounts.forEach((a,i)=>{
 });
 
 /* ----------------------------
-   SAME DASHBOARD LOGIC
+   CORE LOGIC (MATCH DASHBOARD)
 ---------------------------- */
 
 function num(v){
@@ -78,7 +78,7 @@ function nextTargetFromBalance(b){
 
 window.runProjection = function () {
 
-    let b = parseFloat(manualInput.value);
+    let b = num(manualInput.value);
 
     if (select.value !== "") {
         b = accounts[select.value].balance;
@@ -127,5 +127,3 @@ window.runProjection = function () {
 
     results.innerHTML = html;
 };
-
-});
