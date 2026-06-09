@@ -1,67 +1,72 @@
-const accountSelect =
-document.getElementById("accountSelect");
+let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 
-const projectionResults =
-document.getElementById("projectionResults");
+const select = document.getElementById("accountSelect");
+const results = document.getElementById("results");
 
-const savedAccounts =
-JSON.parse(localStorage.getItem("accounts")) || [];
-
-// Load accounts into dropdown
-savedAccounts.forEach((account, index) => {
-    const option =
-    document.createElement("option");
-
-    option.value = index;
-    option.textContent =
-    `${account.name} - $${account.balance}`;
-
-    accountSelect.appendChild(option);
+// load accounts
+accounts.forEach((a,i)=>{
+    let opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = `${a.name} - $${Number(a.balance).toLocaleString()}`;
+    select.appendChild(opt);
 });
 
-function runProjection() {
-
-    let balance =
-    parseFloat(
-        document.getElementById("manualBalance").value
-    );
-
-    // If account selected, use account balance
-    if (accountSelect.value !== "") {
-        balance =
-        savedAccounts[
-            accountSelect.value
-        ].balance;
+// SAME tier logic as dashboard
+function tier(b){
+    if (b < 90000) {
+        let steps = Math.floor((b - 30000) / 15000);
+        let x = 1 + (steps * 0.5);
+        if (x < 1) x = 1;
+        if (x > 3) x = 3;
+        return x;
     }
 
-    if (!balance || balance <= 0) {
-        projectionResults.innerHTML =
-        "Enter a valid balance";
+    if (b < 140000) return 3;
+    if (b < 160000) return 3.5;
+    if (b < 180000) return 4;
+    if (b < 200000) return 4.5;
+
+    let steps = Math.floor((b - 200000) / 20000);
+    return 5 + (steps * 0.5);
+}
+
+function daily(b){
+    return tier(b) * 800;
+}
+
+function runProjection(){
+
+    let b = parseFloat(document.getElementById("manualBalance").value);
+
+    if (select.value !== "") {
+        b = accounts[select.value].balance;
+    }
+
+    if (!b || b <= 0){
+        results.innerHTML = "Enter valid balance";
         return;
     }
 
     let html = "";
 
-    for (let month = 1; month <= 12; month++) {
+    for (let m = 1; m <= 12; m++){
 
-        // Uses existing multiplier logic
-        const monthlyProfit = balance * 0.10;
+        let d = daily(b);
+        let w = d * 5;
+        let mo = d * 22;
 
-        balance += monthlyProfit;
+        b += mo;
 
         html += `
-        <div style="
-            background:#2a2a2a;
-            padding:15px;
-            border-radius:14px;
-            margin-bottom:10px;
-        ">
-            <strong>Month ${month}</strong><br>
-            Balance:
-            $${balance.toLocaleString()}
+        <div class="month">
+            <strong>Month ${m}</strong><br><br>
+            Balance: $${b.toLocaleString()}<br>
+            Daily: $${d.toLocaleString()}<br>
+            Weekly: $${w.toLocaleString()}<br>
+            Monthly: $${mo.toLocaleString()}
         </div>
         `;
     }
 
-    projectionResults.innerHTML = html;
+    results.innerHTML = html;
 }
