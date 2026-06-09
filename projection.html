@@ -6,8 +6,6 @@
 
 <title>Projection Calculator</title>
 
-<link rel="stylesheet" href="style.css">
-
 <style>
 :root {
     --bg: #050913;
@@ -27,17 +25,9 @@ body{
     padding:18px;
 }
 
-h2{
+h1{
     text-align:center;
     margin:10px 0 20px;
-}
-
-.card{
-    background:linear-gradient(145deg,var(--card),var(--card2));
-    border:1px solid rgba(120,170,255,0.14);
-    border-radius:18px;
-    padding:16px;
-    backdrop-filter: blur(14px);
 }
 
 select, input{
@@ -62,10 +52,6 @@ button{
     font-weight:600;
 }
 
-.result{
-    margin-top:14px;
-}
-
 .month{
     margin-top:10px;
     padding:12px;
@@ -77,37 +63,29 @@ button{
 
 <body>
 
-<div class="page">
+<h1>📈 Projection Calculator</h1>
 
-    <h1>📈 Projection Calculator</h1>
+<!-- Account selector (matches JS) -->
+<select id="accountSelect">
+    <option value="">Choose account</option>
+</select>
 
-    <div class="projection-card">
+<!-- Manual input (matches JS) -->
+<input
+    type="number"
+    id="manualBalance"
+    placeholder="Or enter custom balance"
+/>
 
-        <div class="projection-title">
-            12 Month Projection
-        </div>
+<!-- Button (calls JS function) -->
+<button onclick="runProjection()">
+    Calculate Projection
+</button>
 
-        <select id="accountSelect">
-            <option value="">Choose account</option>
-        </select>
+<!-- OUTPUT AREA (THIS MUST MATCH JS) -->
+<div id="projectionResults"></div>
 
-        <input
-            type="number"
-            id="manualBalance"
-            placeholder="Or enter custom balance"
-        >
-
-        <button onclick="runProjection()">
-            Calculate Projection
-        </button>
-
-        <div id="projectionResults" class="result-box">
-        </div>
-
-    </div>
-
-</div>
-
+<!-- JS FILE -->
 <script src="projection.js"></script>
 
 </body>
