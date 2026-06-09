@@ -11,8 +11,17 @@ accounts.forEach((a,i)=>{
     select.appendChild(opt);
 });
 
-// SAME tier logic as dashboard
+function num(v){
+    if(!v) return 0;
+    v = v.toString().toLowerCase().replace(/,/g,'');
+    if(v.includes("k")) return parseFloat(v)*1000;
+    if(v.includes("m")) return parseFloat(v)*1000000;
+    return isNaN(Number(v)) ? 0 : Number(v);
+}
+
+// 🔥 EXACT SAME tier logic from your dashboard
 function tier(b){
+
     if (b < 90000) {
         let steps = Math.floor((b - 30000) / 15000);
         let x = 1 + (steps * 0.5);
@@ -30,43 +39,9 @@ function tier(b){
     return 5 + (steps * 0.5);
 }
 
-function daily(b){
-    return tier(b) * 800;
-}
-
-function runProjection(){
-
-    let b = parseFloat(document.getElementById("manualBalance").value);
-
-    if (select.value !== "") {
-        b = accounts[select.value].balance;
-    }
-
-    if (!b || b <= 0){
-        results.innerHTML = "Enter valid balance";
-        return;
-    }
-
-    let html = "";
-
-    for (let m = 1; m <= 12; m++){
-
-        let d = daily(b);
-        let w = d * 5;
-        let mo = d * 22;
-
-        b += mo;
-
-        html += `
-        <div class="month">
-            <strong>Month ${m}</strong><br><br>
-            Balance: $${b.toLocaleString()}<br>
-            Daily: $${d.toLocaleString()}<br>
-            Weekly: $${w.toLocaleString()}<br>
-            Monthly: $${mo.toLocaleString()}
-        </div>
-        `;
-    }
-
-    results.innerHTML = html;
-}
+// 🔥 EXACT SAME logic
+function mult(b){ return tier(b); }
+function daily(b){ return mult(b) * 800; }
+function weekly(b){ return daily(b) * 5; }
+function monthly(b){ return daily(b) * 22; }
+function dd(b){ return b * 0.4; }
