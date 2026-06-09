@@ -471,9 +471,28 @@ button {
 <div class="topbar">
 
     <div class="portfolioBox" onclick="openPortfolio()">
-        <div class="small">Portfolio</div>
-        <div class="big" id="total">$0</div>
+
+    <div class="small">Portfolio</div>
+    <div class="big" id="total">$0</div>
+
+    <div style="margin-top:10px;">
+        <button
+            onclick="event.stopPropagation(); location.href='projection.html'"
+            style="
+                width:100%;
+                margin:0;
+                padding:10px;
+                border-radius:10px;
+                background:rgba(255,255,255,0.08);
+                font-size:13px;
+                font-weight:600;
+            "
+        >
+            📈 Projection
+        </button>
     </div>
+
+</div>
 
     <div class="statsRow">
 
@@ -581,14 +600,7 @@ button {
 </div>
 
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
-<button
-    id="projectionBtn"
-    class="addBtn"
-    style="bottom:80px;"
-    onclick="location.href='projection.html'"
->
-    📈 Projection
-</button>
+
 <div class="modal" id="modal">
     <div class="modal-content">
         <div class="big">Add Account</div>
