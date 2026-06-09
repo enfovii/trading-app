@@ -389,7 +389,7 @@ button {
 
     white-space: nowrap;
 }
-
+}
 
 /* THIS replaces cellStrong (KEEP IT) */
 .strong {
@@ -470,31 +470,10 @@ button {
 
 <div class="topbar">
 
-    <div class="portfolioBox">
-
-    <div onclick="openPortfolio()">
+    <div class="portfolioBox" onclick="openPortfolio()">
         <div class="small">Portfolio</div>
         <div class="big" id="total">$0</div>
     </div>
-
-    <div style="margin-top:10px;">
-        <button
-            onclick="event.stopPropagation(); location.href='projection.html'"
-            style="
-                width:100%;
-                margin:0;
-                padding:10px;
-                border-radius:10px;
-                background:rgba(255,255,255,0.08);
-                font-size:13px;
-                font-weight:600;
-            "
-        >
-            📈 Projection
-        </button>
-    </div>
-
-</div>
 
     <div class="statsRow">
 
@@ -779,17 +758,7 @@ function dd(b){ return b*0.4; }
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
-
-    let addBtn = document.querySelector(".addBtn");
-    let projectionBtn = document.getElementById("projectionBtn");
-
-    if (page === "home") {
-        addBtn.style.display = "block";
-        projectionBtn.style.display = "block";
-    } else {
-        addBtn.style.display = "none";
-        projectionBtn.style.display = "none";
-    }
+    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
 }
 
 function openPortfolio(){
