@@ -1,7 +1,18 @@
+document.addEventListener("DOMContentLoaded", () => {
+
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 
 const select = document.getElementById("accountSelect");
 const results = document.getElementById("results");
+const manualInput = document.getElementById("manualBalance");
+
+/* ----------------------------
+   SAFETY CHECK (prevents silent failure)
+---------------------------- */
+if (!select || !results) {
+    console.log("Missing HTML elements: check projection.html IDs");
+    return;
+}
 
 /* ----------------------------
    LOAD ACCOUNTS
@@ -14,7 +25,7 @@ accounts.forEach((a,i)=>{
 });
 
 /* ----------------------------
-   CORE FUNCTIONS (MATCH DASHBOARD EXACTLY)
+   CORE LOGIC (MATCH DASHBOARD 1:1)
 ---------------------------- */
 
 function num(v){
@@ -69,12 +80,12 @@ function nextTargetFromBalance(b){
 }
 
 /* ----------------------------
-   MAIN PROJECTION ENGINE
+   MAIN ENGINE
 ---------------------------- */
 
-function runProjection(){
+window.runProjection = function () {
 
-    let b = parseFloat(document.getElementById("manualBalance").value);
+    let b = parseFloat(manualInput?.value);
 
     if (select.value !== "") {
         b = accounts[select.value].balance;
@@ -99,7 +110,7 @@ function runProjection(){
 
         let etaDays = d > 0 ? (needed / d) : 0;
 
-        // compound
+        // compound growth
         b += mo;
 
         html += `
@@ -123,4 +134,6 @@ function runProjection(){
     }
 
     results.innerHTML = html;
-}
+};
+
+});
