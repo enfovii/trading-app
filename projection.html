@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Projection Calculator</title>
 
@@ -13,8 +13,6 @@
     --card2: rgba(10, 14, 28, 0.55);
     --text: #eaf1ff;
     --muted: #8ea2bb;
-    --primary: #4da3ff;
-    --profit: #2ee59d;
 }
 
 body{
@@ -22,12 +20,21 @@ body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto;
     background:var(--bg);
     color:var(--text);
-    padding:18px;
+    padding:16px;
 }
 
 h1{
     text-align:center;
-    margin:10px 0 20px;
+    margin:10px 0 18px;
+}
+
+.card{
+    background:linear-gradient(145deg,var(--card),var(--card2));
+    border:1px solid rgba(120,170,255,0.14);
+    border-radius:18px;
+    padding:14px;
+    backdrop-filter: blur(14px);
+    box-shadow:0 10px 28px rgba(0,0,0,0.35);
 }
 
 select, input{
@@ -39,12 +46,13 @@ select, input{
     color:var(--text);
     margin-top:10px;
     font-size:16px;
+    outline:none;
 }
 
 button{
     width:100%;
     padding:14px;
-    margin-top:14px;
+    margin-top:12px;
     border:none;
     border-radius:12px;
     background:linear-gradient(135deg,#1f6feb,#144a99);
@@ -52,11 +60,17 @@ button{
     font-weight:600;
 }
 
+#projectionResults{
+    margin-top:12px;
+}
+
 .month{
     margin-top:10px;
-    padding:12px;
-    border-radius:12px;
-    background:rgba(255,255,255,0.05);
+    padding:14px;
+    border-radius:16px;
+    background:linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
+    border:1px solid rgba(120,170,255,0.14);
+    box-shadow:0 10px 28px rgba(0,0,0,0.35);
 }
 </style>
 </head>
@@ -65,27 +79,31 @@ button{
 
 <h1>📈 Projection Calculator</h1>
 
-<!-- Account selector (matches JS) -->
-<select id="accountSelect">
-    <option value="">Choose account</option>
-</select>
+<div class="card">
 
-<!-- Manual input (matches JS) -->
-<input
-    type="number"
-    id="manualBalance"
-    placeholder="Or enter custom balance"
-/>
+    <select id="accountSelect">
+        <option value="">Choose account</option>
+    </select>
 
-<!-- Button (calls JS function) -->
-<button onclick="runProjection()">
-    Calculate Projection
-</button>
+    <input
+        type="number"
+        id="manualBalance"
+        placeholder="Or enter custom balance"
+        inputmode="decimal"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="none"
+        spellcheck="false"
+    >
 
-<!-- OUTPUT AREA (THIS MUST MATCH JS) -->
+    <button onclick="runProjection()">
+        Calculate 12 Month Projection
+    </button>
+
+</div>
+
 <div id="projectionResults"></div>
 
-<!-- JS FILE -->
 <script src="projection.js"></script>
 
 </body>
