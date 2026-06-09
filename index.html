@@ -582,6 +582,7 @@ button {
 
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
 <button
+    id="projectionBtn"
     class="addBtn"
     style="bottom:80px;"
     onclick="location.href='projection.html'"
@@ -764,7 +765,17 @@ function dd(b){ return b*0.4; }
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
-    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
+
+    let addBtn = document.querySelector(".addBtn");
+    let projectionBtn = document.getElementById("projectionBtn");
+
+    if (page === "home") {
+        addBtn.style.display = "block";
+        projectionBtn.style.display = "block";
+    } else {
+        addBtn.style.display = "none";
+        projectionBtn.style.display = "none";
+    }
 }
 
 function openPortfolio(){
