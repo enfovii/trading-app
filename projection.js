@@ -3,16 +3,10 @@ document.addEventListener("DOMContentLoaded", () => {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 
 const select = document.getElementById("accountSelect");
-const results = document.getElementById("results");
+const results = document.getElementById("projectionResults");
 const manualInput = document.getElementById("manualBalance");
 
-/* ----------------------------
-   SAFETY CHECK (prevents silent failure)
----------------------------- */
-if (!select || !results) {
-    console.log("Missing HTML elements: check projection.html IDs");
-    return;
-}
+if (!select || !results) return;
 
 /* ----------------------------
    LOAD ACCOUNTS
@@ -25,7 +19,7 @@ accounts.forEach((a,i)=>{
 });
 
 /* ----------------------------
-   CORE LOGIC (MATCH DASHBOARD 1:1)
+   SAME DASHBOARD LOGIC
 ---------------------------- */
 
 function num(v){
@@ -59,7 +53,6 @@ function mult(b){ return tier(b); }
 function daily(b){ return mult(b) * 800; }
 function weekly(b){ return daily(b) * 5; }
 function monthly(b){ return daily(b) * 22; }
-function dd(b){ return b * 0.4; }
 
 function nextTargetFromBalance(b){
 
@@ -80,19 +73,19 @@ function nextTargetFromBalance(b){
 }
 
 /* ----------------------------
-   MAIN ENGINE
+   MAIN PROJECTION
 ---------------------------- */
 
 window.runProjection = function () {
 
-    let b = parseFloat(manualInput?.value);
+    let b = parseFloat(manualInput.value);
 
     if (select.value !== "") {
         b = accounts[select.value].balance;
     }
 
     if (!b || b <= 0){
-        results.innerHTML = "Enter valid balance";
+        results.innerHTML = "<div class='month'>Enter valid balance</div>";
         return;
     }
 
@@ -110,7 +103,6 @@ window.runProjection = function () {
 
         let etaDays = d > 0 ? (needed / d) : 0;
 
-        // compound growth
         b += mo;
 
         html += `
