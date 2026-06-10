@@ -580,7 +580,33 @@ body.hideNav .addBtn {
     <button onclick="backHome()">Back</button>
 </div>
 </div>
+    
+<div id="projection" class="page">
 
+<div class="card">
+    <h3>Projection Calculator</h3>
+
+    <div class="small">Select Mode</div>
+
+    <select id="projMode" onchange="setupProjection()"
+        style="width:100%;padding:14px;margin-top:8px;
+        border-radius:12px;background:rgba(8,12,25,0.65);
+        color:#eaf1ff;border:1px solid rgba(120,170,255,0.25);">
+
+        <option value="portfolio">Total Portfolio</option>
+        <option value="account">Single Account</option>
+        <option value="custom">Custom Balance</option>
+
+    </select>
+
+    <div id="projExtra"></div>
+
+    <div id="projResults"></div>
+
+    <button onclick="backHome()">Back To Dashboard</button>
+</div>
+
+</div>
 <div id="account" class="page">
 <div class="card">
 
@@ -722,6 +748,10 @@ function money(v){
     }
 
     return "$" + v.toLocaleString();
+}
+    function openProjection(){
+    show("projection");
+    setupProjection();
 }
 
 /* unchanged logic */
@@ -1064,6 +1094,91 @@ function deleteAccount(){
     closeDeleteModal();
     show("home");
     render();
+}
+    function setupProjection(){
+
+    let mode = document.getElementById("projMode").value;
+    let extra = document.getElementById("projExtra");
+
+    extra.innerHTML = "";
+
+    if(mode === "account"){
+        let options = "";
+
+        accounts.forEach((a,i)=>{
+            options += `<option value="${i}">${a.name}</option>`;
+        });
+
+        extra.innerHTML = `
+            <div class="small" style="margin-top:10px;">Select Account</div>
+            <select id="projAccount"
+                style="width:100%;padding:14px;margin-top:8px;
+                border-radius:12px;background:rgba(8,12,25,0.65);
+                color:#eaf1ff;border:1px solid rgba(120,170,255,0.25);">
+                ${options}
+            </select>
+        `;
+    }
+
+    if(mode === "custom"){
+        extra.innerHTML = `
+            <div class="small" style="margin-top:10px;">Custom Balance</div>
+            <input id="projCustom"
+                placeholder="Enter balance"
+                inputmode="decimal"
+                style="margin-top:8px;">
+        `;
+    }
+
+    renderProjection();
+}
+    function getBaseBalance(){
+
+    let mode = document.getElementById("projMode").value;
+
+    if(mode === "portfolio"){
+        return accounts.reduce((t,a)=>t + num(a.balance),0);
+    }
+
+    if(mode === "account"){
+        let i = document.getElementById("projAccount").value;
+        return num(accounts[i].balance);
+    }
+
+    if(mode === "custom"){
+        return num(document.getElementById("projCustom").value);
+    }
+
+    return 0;
+}
+
+function renderProjection(){
+
+    let balance = getBaseBalance();
+    let html = "";
+
+    for(let m = 1; m <= 12; m++){
+
+        let d = daily(balance);
+        let w = d * 5;
+        let mo = d * 22;
+
+        html += `
+        <div class="card">
+            <div class="small">Month ${m}</div>
+
+            <div class="big">${money(balance.toFixed(0))}</div>
+
+            <div class="small">
+                Daily ${money(d)} • Weekly ${money(w)} • Monthly ${money(mo)}
+            </div>
+        </div>
+        `;
+
+        balance += mo;
+    }
+
+    document.getElementById("projResults").innerHTML = html;
 }
 
 window.onload=function(){
