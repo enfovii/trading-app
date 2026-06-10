@@ -496,6 +496,25 @@ button {
 
     backdrop-filter: blur(18px);
 }
+    .fixedBack{
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 78px; /* sits just above your bottomNav */
+    z-index: 9999;
+}
+
+.fixedBack button{
+    width: 100%;
+    margin: 0;
+    padding: 14px;
+    border-radius: 16px;
+    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
+    border: 1px solid rgba(120,170,255,0.18);
+    color: #eaf1ff;
+    font-weight: 600;
+    backdrop-filter: blur(18px);
+}
 
 .activeNav{
     border:1px solid rgba(56,230,176,0.45);
@@ -603,7 +622,9 @@ body.hideNav .addBtn {
 
     <div id="projResults"></div>
 
+    <div class="fixedBack">
     <button onclick="backHome()">Back To Dashboard</button>
+</div>
 </div>
 
 </div>
