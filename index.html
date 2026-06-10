@@ -951,9 +951,27 @@ function updateAccount(){
 function back(){ current=null; show("home"); }
 function backHome(){ show("home"); }
 
-function openModal(){ document.getElementById("modal").style.display="flex"; }
-function closeModal(){ document.getElementById("modal").style.display="none"; }
+function openModal(){
 
+    // Clear old values every time
+    document.getElementById("newName").value = "";
+    document.getElementById("newBalance").value = "";
+
+    document.getElementById("modal").style.display = "flex";
+
+    // Auto focus name field
+    setTimeout(() => {
+        document.getElementById("newName").focus();
+    }, 100);
+}
+function closeModal(){
+
+    document.getElementById("modal").style.display = "none";
+
+    // Reset inputs
+    document.getElementById("newName").value = "";
+    document.getElementById("newBalance").value = "";
+}
 function createAccount(){
     let name=document.getElementById("newName").value.trim();
     let balance=num(document.getElementById("newBalance").value);
