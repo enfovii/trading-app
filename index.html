@@ -37,7 +37,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
     margin: 0;
     padding: 14px;
-    padding-bottom: 180px;
+    padding-bottom: 240px;
     color: #eaf1ff;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
@@ -264,6 +264,24 @@ button {
     border-radius: 12px;
     font-weight: 600;
     box-shadow: 0 8px 20px rgba(0,120,255,0.25);
+}
+    .stickyBackBtn{
+    position: fixed;
+    left: 12px;
+    right: 12px;
+    bottom: 18px;
+    z-index: 9999;
+
+    padding: 16px;
+    border: none;
+    border-radius: 18px;
+
+    background: linear-gradient(135deg, #1f6feb, #144a99);
+    color: white;
+    font-weight: 700;
+
+    box-shadow: 0 10px 30px rgba(0,120,255,0.35);
+    backdrop-filter: blur(18px);
 }
 
 .addBtn {
@@ -623,7 +641,9 @@ body.hideNav .addBtn {
     <div id="projResults"></div>
 
     <div class="fixedBack">
-    <button onclick="backHome()">Back To Dashboard</button>
+    <button class="stickyBackBtn" onclick="backHome()">
+    Back To Dashboard
+</button>
 </div>
 </div>
 
