@@ -603,7 +603,7 @@ body.hideNav .addBtn {
 
     <div id="projResults"></div>
 
-    <button onclick="backHome()">Back To Dashboard</button>
+    
 </div>
 
 </div>
@@ -725,6 +725,9 @@ body.hideNav .addBtn {
         </button>
     </div>
 </div>
+    <button class="addBtn" id="backDashBtn" onclick="show('home')">
+    ← Dashboard
+</button>
 
 <script>
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
@@ -859,11 +862,17 @@ function show(page){
 
     const isHome = (page === "home");
 
-    if (isHome) {
-        document.body.classList.remove("hideNav");
-    } else {
-        document.body.classList.add("hideNav");
+    // Home add button
+    document.querySelector(".addBtn").style.display = isHome ? "block" : "none";
+
+    // Back button only shows on projection/account pages
+    let backBtn = document.getElementById("backDashBtn");
+    if(backBtn){
+        backBtn.style.display = (page === "projection") ? "block" : "none";
     }
+
+    // bottom nav only on home
+    document.body.classList.toggle("hideNav", !isHome);
 }
 function renderPortfolio(){
     let t=0,d=0,draw=0;
