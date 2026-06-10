@@ -500,6 +500,10 @@ button {
 .activeNav{
     border:1px solid rgba(56,230,176,0.45);
 }
+    body.hideNav .bottomNav,
+body.hideNav .addBtn {
+    display: none !important;
+}
     
 </style>
 </head>
@@ -813,24 +817,24 @@ function mult(b){ return tier(b); }
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
+
+
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
 
     const isHome = (page === "home");
 
-    // Add Account button only on home
-    document.querySelector(".addBtn").style.display = isHome ? "block" : "none";
-
-    // Bottom nav only on home
-    document.querySelector(".bottomNav").style.display = isHome ? "flex" : "none";
+    if (isHome) {
+        document.body.classList.remove("hideNav");
+    } else {
+        document.body.classList.add("hideNav");
+    }
 }
-
-function openPortfolio(){
-    show("portfolio");
-    renderPortfolio();
-}
-
 function renderPortfolio(){
     let t=0,d=0,draw=0;
 
