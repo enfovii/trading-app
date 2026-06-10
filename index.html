@@ -627,7 +627,9 @@ body.hideNav .addBtn {
     <div id="projExtra"></div>
 
     <div id="projResults"></div>
-
+<button class="floatingBackBtn" id="backDashBtn" onclick="show('home')">
+    ← Dashboard
+</button>
     
 </div>
 
@@ -875,34 +877,33 @@ function mult(b){ return tier(b); }
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
-
-
-function openPortfolio(){
-    show("portfolio");
-    renderPortfolio();
-}
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
 
     const isHome = (page === "home");
 
-    // Home controls
+    // ✅ BODY CLASS (this is fine to keep)
     document.body.classList.toggle("hideNav", !isHome);
 
+    // ✅ BUTTONS
     const addBtn = document.querySelector(".addBtn");
     const backBtn = document.getElementById("backDashBtn");
 
-    // Add Account only on home
     if(addBtn){
         addBtn.style.display = isHome ? "block" : "none";
     }
 
-    // Back button only on projection page
     if(backBtn){
         backBtn.style.display = (page === "projection") ? "block" : "none";
     }
 }
+
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
+
 function renderPortfolio(){
     let t=0,d=0,draw=0;
 
