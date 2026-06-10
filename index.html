@@ -469,6 +469,9 @@ button {
 
     z-index: 9999;
 }
+    #backDashBtn{
+    bottom: 78px; /* sits above bottom nav */
+}
 
 /* IMPORTANT: kill global button styling inside nav */
 .bottomNav button{
@@ -862,17 +865,21 @@ function show(page){
 
     const isHome = (page === "home");
 
-    // Home add button
-    document.querySelector(".addBtn").style.display = isHome ? "block" : "none";
+    // Home controls
+    document.body.classList.toggle("hideNav", !isHome);
 
-    // Back button only shows on projection/account pages
-    let backBtn = document.getElementById("backDashBtn");
+    const addBtn = document.querySelector(".addBtn");
+    const backBtn = document.getElementById("backDashBtn");
+
+    // Add Account only on home
+    if(addBtn){
+        addBtn.style.display = isHome ? "block" : "none";
+    }
+
+    // Back button only on projection page
     if(backBtn){
         backBtn.style.display = (page === "projection") ? "block" : "none";
     }
-
-    // bottom nav only on home
-    document.body.classList.toggle("hideNav", !isHome);
 }
 function renderPortfolio(){
     let t=0,d=0,draw=0;
