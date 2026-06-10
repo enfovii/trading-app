@@ -457,41 +457,42 @@ button {
     font-weight: 500;
 }
 
-  .bottomNav{
-    position: fixed;
-    bottom: 12px;
+.bottomNav{
+    position: fixed !important;
     left: 12px;
     right: 12px;
+    bottom: 12px;
 
-    display:flex;
-    gap:10px;
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px;
 
-    z-index:11;
+    z-index: 9999;
+}
+
+/* IMPORTANT: kill global button styling inside nav */
+.bottomNav button{
+    width: auto !important;
+    margin: 0 !important;
+    flex: 1 !important;
 }
 
 .navBtn{
-    flex:1 !important;
+    padding: 14px;
+    border: none;
+    border-radius: 16px;
 
-    width:auto !important;
-    margin:0 !important;
+    background: linear-gradient(
+        145deg,
+        rgba(20,30,50,0.75),
+        rgba(10,15,30,0.55)
+    );
 
-    padding:14px;
+    border: 1px solid rgba(120,170,255,0.18);
 
-    border:none;
-    border-radius:16px;
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(20,30,50,0.75),
-            rgba(10,15,30,0.55)
-        );
-
-    border:1px solid rgba(120,170,255,0.18);
-
-    color:#eaf1ff;
-    font-size:15px;
-    font-weight:600;
+    color: #eaf1ff;
+    font-size: 15px;
+    font-weight: 600;
 
     backdrop-filter: blur(18px);
 }
