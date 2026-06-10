@@ -274,25 +274,6 @@ button {
     z-index: 10;
     backdrop-filter: blur(12px);
 }
-    .floatingBackBtn{
-    position: fixed;
-    bottom: 78px;
-    left: 12px;
-    right: 12px;
-
-    width: calc(100% - 24px);
-
-    padding: 14px;
-    border-radius: 12px;
-
-    background: linear-gradient(135deg, #144a99, #1f6feb);
-    color: white;
-    border: none;
-
-    font-weight: 600;
-    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
-    z-index: 9999;
-}
 
 .modal {
     position: fixed;
@@ -488,9 +469,6 @@ button {
 
     z-index: 9999;
 }
-    #backDashBtn{
-    bottom: 78px; /* sits above bottom nav */
-}
 
 /* IMPORTANT: kill global button styling inside nav */
 .bottomNav button{
@@ -524,9 +502,6 @@ button {
 }
     body.hideNav .bottomNav,
 body.hideNav .addBtn {
-    display: none !important;
-}
-    body.hideNav .floatingBackBtn {
     display: none !important;
 }
     
@@ -627,10 +602,8 @@ body.hideNav .addBtn {
     <div id="projExtra"></div>
 
     <div id="projResults"></div>
-<button class="floatingBackBtn" id="backDashBtn" onclick="show('home')">
-    ← Dashboard
-</button>
-    
+
+    <button onclick="backHome()">Back To Dashboard</button>
 </div>
 
 </div>
@@ -752,9 +725,6 @@ body.hideNav .addBtn {
         </button>
     </div>
 </div>
-    <button class="floatingBackBtn" id="backDashBtn" onclick="show('home')">
-    ← Dashboard
-</button>
 
 <script>
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
@@ -877,33 +847,24 @@ function mult(b){ return tier(b); }
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
+
+
+function openPortfolio(){
+    show("portfolio");
+    renderPortfolio();
+}
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
 
     const isHome = (page === "home");
 
-    // ✅ BODY CLASS (this is fine to keep)
-    document.body.classList.toggle("hideNav", !isHome);
-
-    // ✅ BUTTONS
-    const addBtn = document.querySelector(".addBtn");
-    const backBtn = document.getElementById("backDashBtn");
-
-    if(addBtn){
-        addBtn.style.display = isHome ? "block" : "none";
-    }
-
-    if(backBtn){
-        backBtn.style.display = (page === "projection") ? "block" : "none";
+    if (isHome) {
+        document.body.classList.remove("hideNav");
+    } else {
+        document.body.classList.add("hideNav");
     }
 }
-
-function openPortfolio(){
-    show("portfolio");
-    renderPortfolio();
-}
-
 function renderPortfolio(){
     let t=0,d=0,draw=0;
 
