@@ -456,6 +456,45 @@ button {
     color: #93a4b8;
     font-weight: 500;
 }
+
+    .bottomNav{
+    position: fixed;
+    bottom: 82px;
+    left: 12px;
+    right: 12px;
+
+    display:flex;
+    gap:10px;
+
+    z-index:9;
+}
+
+.navBtn{
+    flex:1;
+    padding:14px;
+
+    border:none;
+    border-radius:16px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(20,30,50,0.75),
+            rgba(10,15,30,0.55)
+        );
+
+    border:1px solid rgba(120,170,255,0.18);
+
+    color:#eaf1ff;
+    font-size:15px;
+    font-weight:600;
+
+    backdrop-filter: blur(18px);
+}
+
+.activeNav{
+    border:1px solid rgba(56,230,176,0.45);
+}
     
 </style>
 </head>
@@ -494,11 +533,7 @@ button {
 
     </div>
 
-</div>
-    <div class="card" onclick="openProjection()" style="text-align:center;cursor:pointer;">
-    <div class="small">Tools</div>
-    <div class="big">Projection Calculator</div>
-</div>
+
 <div id="accounts"></div>
 </div>
 
@@ -583,6 +618,19 @@ button {
 </div>
 </div>
 
+    <div class="bottomNav">
+
+    <button class="navBtn activeNav"
+            onclick="show('home')">
+        🏠 Home
+    </button>
+
+    <button class="navBtn"
+            onclick="openProjection()">
+        📈 Projection
+    </button>
+
+</div>
 <button class="addBtn" onclick="openModal()">+ Add Account</button>
 
 <div class="modal" id="modal">
