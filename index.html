@@ -1169,7 +1169,7 @@ function deleteAccount(){
 
         extra.innerHTML = `
             <div class="small" style="margin-top:10px;">Select Account</div>
-            <select id="projAccount"
+            <select id="projAccount" onchange="renderProjection()"
                 style="width:100%;padding:14px;margin-top:8px;
                 border-radius:12px;background:rgba(8,12,25,0.65);
                 color:#eaf1ff;border:1px solid rgba(120,170,255,0.25);">
@@ -1182,9 +1182,10 @@ function deleteAccount(){
         extra.innerHTML = `
             <div class="small" style="margin-top:10px;">Custom Balance</div>
             <input id="projCustom"
-                placeholder="Enter balance"
-                inputmode="decimal"
-                style="margin-top:8px;">
+    placeholder="Enter balance"
+    inputmode="decimal"
+    oninput="renderProjection()"
+    style="margin-top:8px;">
         `;
     }
 
