@@ -644,13 +644,14 @@ body.hideNav .addBtn {
     <div id="projResults"></div>
 
     <div class="fixedBack">
-    <button class="stickyBackBtn" onclick="backHome()">
-    Back To Dashboard
-</button>
+
 </div>
 </div>
 
 </div>
+    <button class="stickyBackBtn" onclick="backHome()">
+    Back To Dashboard
+</button>
 <div id="account" class="page">
 <div class="card">
 
@@ -898,8 +899,21 @@ function openPortfolio(){
     renderPortfolio();
 }
 function show(page){
-    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
-    document.getElementById(page).classList.add("active");
+
+    document.querySelectorAll(".page")
+        .forEach(p => p.classList.remove("active"));
+
+    document.getElementById(page)
+        .classList.add("active");
+
+    const stickyBtn =
+        document.querySelector(".stickyBackBtn");
+
+    if(page === "projection"){
+        stickyBtn.style.display = "block";
+    } else {
+        stickyBtn.style.display = "none";
+    }
 
     const isHome = (page === "home");
 
