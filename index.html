@@ -816,7 +816,14 @@ function dd(b){ return b*0.4; }
 function show(page){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(page).classList.add("active");
-    document.querySelector(".addBtn").style.display = (page==="home")?"block":"none";
+
+    const isHome = (page === "home");
+
+    // Add Account button only on home
+    document.querySelector(".addBtn").style.display = isHome ? "block" : "none";
+
+    // Bottom nav only on home
+    document.querySelector(".bottomNav").style.display = isHome ? "flex" : "none";
 }
 
 function openPortfolio(){
