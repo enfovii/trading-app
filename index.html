@@ -274,6 +274,25 @@ button {
     z-index: 10;
     backdrop-filter: blur(12px);
 }
+    .floatingBackBtn{
+    position: fixed;
+    bottom: 78px;
+    left: 12px;
+    right: 12px;
+
+    width: calc(100% - 24px);
+
+    padding: 14px;
+    border-radius: 12px;
+
+    background: linear-gradient(135deg, #144a99, #1f6feb);
+    color: white;
+    border: none;
+
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
+    z-index: 9999;
+}
 
 .modal {
     position: fixed;
@@ -507,6 +526,9 @@ button {
 body.hideNav .addBtn {
     display: none !important;
 }
+    body.hideNav .floatingBackBtn {
+    display: none !important;
+}
     
 </style>
 </head>
@@ -728,7 +750,7 @@ body.hideNav .addBtn {
         </button>
     </div>
 </div>
-    <button class="addBtn" id="backDashBtn" onclick="show('home')">
+    <button class="floatingBackBtn" id="backDashBtn" onclick="show('home')">
     ← Dashboard
 </button>
 
