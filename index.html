@@ -1190,12 +1190,10 @@ function renderProjection(){
 
     for(let m = 1; m <= 12; m++){
 
-        let monthStartBalance = balance;
-
         let monthlyWithdraw = 0;
         let monthlyReinvest = 0;
 
-        // 4 weeks per month (simplified trading cycle)
+        // 4 weeks per month
         for(let w = 0; w < 4; w++){
 
             let d = daily(balance);
@@ -1221,8 +1219,7 @@ function renderProjection(){
             <div class="big">${money(balance.toFixed(0))}</div>
 
             <div class="small">
-                Weekly Withdraw: ${money(monthlyWithdraw)} • 
-                Reinvested: ${money(monthlyReinvest)}
+                Withdrawn: ${money(monthlyWithdraw)} • Reinvested: ${money(monthlyReinvest)}
             </div>
 
             <div class="small">
