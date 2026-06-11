@@ -863,9 +863,16 @@ function formatBalanceInput(el){
 
 function tier(b){
 
-    if (b < 25000) return 0;
+    // No multiplier below 40k
+    if (b < 40000) return 0;
 
-    return 1 + Math.floor((b - 25000) / 25000);
+    // 1x starts at 40k
+    let x = 1;
+
+    // Every extra 20k adds 0.5x
+    x += Math.floor((b - 40000) / 20000) * 0.5;
+
+    return x;
 }
     
 
@@ -937,11 +944,11 @@ function render(){
 
        function nextTargetFromBalance(b){
 
-    if (b < 25000) return 25000;
+    if (b < 40000) return 40000;
 
-    let steps = Math.floor((b - 25000) / 25000) + 1;
+    let steps = Math.floor((b - 40000) / 20000) + 1;
 
-    return 25000 + (steps * 25000);
+    return 40000 + (steps * 20000);
 }
 
         let nextTarget = nextTargetFromBalance(b);
@@ -950,13 +957,11 @@ function render(){
 
    let tierStart;
 
-// Below 25k = no trading
-if (b < 25000) {
+if (b < 40000) {
     tierStart = 0;
 } else {
-
-   let steps = Math.floor((b - 25000) / 25000);
-tierStart = 25000 + (steps * 25000);
+    let steps = Math.floor((b - 40000) / 20000);
+    tierStart = 40000 + (steps * 20000);
 }
 
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
