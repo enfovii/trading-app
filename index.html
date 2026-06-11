@@ -863,20 +863,15 @@ function formatBalanceInput(el){
 
 function tier(b){
 
-    // ---- STEP SYSTEM: 30k start, +0.5 per 15k ----
-    if (b < 90000) {
-        let steps = Math.floor((b - 30000) / 15000);
-        let x = 1 + (steps * 0.5);
+    // No trading below 100k
+    if (b < 100000) return 0;
 
-        // clamp minimum
-        if (x < 1) x = 1;
+    // 100k = 1x
+    // Every extra 50k = +0.5x
+    let steps = Math.floor((b - 100000) / 50000);
 
-        // cap at 3x at 90k
-        if (x > 3) x = 3;
-
-        return x;
-    }
-
+    return 1 + (steps * 0.5);
+}
     // ---- FIXED TIER JUMP SYSTEM ----
     if (b < 140000) return 3;
     if (b < 160000) return 3.5;
@@ -956,36 +951,36 @@ function render(){
 
         function nextTargetFromBalance(b){
 
-            if (b < 30000) return 30000;
+    // Need 100k to start trading
+    if (b < 100000) {
+        return 100000;
+    }
 
-            if (b < 90000) {
-                let steps = Math.floor((b - 30000) / 15000) + 1;
-                return 30000 + (steps * 15000);
-            }
+    // After 100k:
+    // every 50k increases multiplier by 0.5x
+    let steps =
+        Math.floor((b - 100000) / 50000) + 1;
 
-            if (b < 140000) return 140000;
-            if (b < 160000) return 160000;
-            if (b < 180000) return 180000;
-            if (b < 200000) return 200000;
-
-            let steps = Math.floor((b - 200000) / 20000) + 1;
-            return 200000 + (steps * 20000);
-        }
+    return 100000 + (steps * 50000);
+}
 
         let nextTarget = nextTargetFromBalance(b);
         let nextMult = mult(nextTarget);
         let needed = Math.max(0, nextTarget - b);
 
-        let tierStart;
-        if (b < 90000) tierStart = 0;
-        else if (b < 140000) tierStart = 90000;
-        else if (b < 160000) tierStart = 140000;
-        else if (b < 180000) tierStart = 160000;
-        else if (b < 200000) tierStart = 180000;
-        else {
-            let steps = Math.floor((b - 200000) / 20000);
-            tierStart = 200000 + (steps * 20000);
-        }
+   let tierStart;
+
+// Below 100k = not trading yet
+if (b < 100000) {
+    tierStart = 0;
+} else {
+    // Every tier starts 50k apart
+    let steps =
+        Math.floor((b - 100000) / 50000);
+
+    tierStart =
+        100000 + (steps * 50000);
+}     
 
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
 
