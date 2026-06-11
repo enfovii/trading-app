@@ -862,14 +862,15 @@ function formatBalanceInput(el){
 }
 
 function tier(b){
+    if (b < 20000) return 0;
 
-    if (b < 25000) return 0;
-
-    return 1 + Math.floor((b - 25000) / 25000);
+    // every 20k = 0.5x
+    return Math.floor(b / 20000) * 0.5;
 }
-    
 
-function mult(b){ return tier(b); }
+function mult(b){
+    return tier(b);
+}
 function daily(b){ return mult(b)*800; }
 function dd(b){ return b*0.4; }
 
@@ -937,11 +938,11 @@ function render(){
 
        function nextTargetFromBalance(b){
 
-    if (b < 25000) return 25000;
+    if (b < 20000) return 20000;
 
-    let steps = Math.floor((b - 25000) / 25000) + 1;
+    let steps = Math.floor(b / 20000) + 1;
 
-    return 25000 + (steps * 25000);
+    return steps * 20000;
 }
 
         let nextTarget = nextTargetFromBalance(b);
@@ -951,12 +952,11 @@ function render(){
    let tierStart;
 
 // Below 25k = no trading
-if (b < 25000) {
+if (b < 20000) {
     tierStart = 0;
 } else {
-
-   let steps = Math.floor((b - 25000) / 25000);
-tierStart = 25000 + (steps * 25000);
+    let steps = Math.floor(b / 20000);
+    tierStart = steps * 20000;
 }
 
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
