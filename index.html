@@ -872,16 +872,7 @@ function tier(b){
 
     return 1 + (steps * 0.5);
 }
-    // ---- FIXED TIER JUMP SYSTEM ----
-    if (b < 140000) return 3;
-    if (b < 160000) return 3.5;
-    if (b < 180000) return 4;
-    if (b < 200000) return 4.5;
-
-    // ---- POST 200K: +0.5 per 20k ----
-    let steps = Math.floor((b - 200000) / 20000);
-    return 5 + (steps * 0.5);
-}
+    
 
 function mult(b){ return tier(b); }
 function daily(b){ return mult(b)*800; }
