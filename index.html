@@ -649,7 +649,6 @@ body.hideNav .addBtn {
 </div>
 
 </div>
-    <div id="drawdown" class="page">
 
 <div id="drawdown" class="page">
 
@@ -911,14 +910,15 @@ function show(page){
     document.getElementById(page)
         .classList.add("active");
 
-    const stickyBtn =
-        document.querySelector(".stickyBackBtn");
+  const stickyBtn = document.querySelector(".stickyBackBtn");
 
-    if(page === "projection"){
+if (stickyBtn) {
+    if (page === "projection") {
         stickyBtn.style.display = "block";
     } else {
         stickyBtn.style.display = "none";
     }
+}
 
     const isHome = (page === "home");
 
@@ -929,6 +929,7 @@ function show(page){
     }
     if(page === "drawdown"){
     renderDrawdown();
+}
 }
 
 function renderPortfolio(){
