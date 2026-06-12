@@ -915,7 +915,13 @@ function show(page){
 if (stickyBtn) {
     if (page === "projection") {
         stickyBtn.style.display = "block";
-    } else {
+        stickyBtn.innerText = "Back to Dashboard";
+    } 
+    else if (page === "drawdown") {
+        stickyBtn.style.display = "block";
+        stickyBtn.innerText = "Back to Dashboard";
+    } 
+    else {
         stickyBtn.style.display = "none";
     }
 }
