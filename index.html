@@ -1238,30 +1238,33 @@ function renderDrawdown(){
 
         let total = 0;
 
-        for(let i = 1; i <= 20; i++){
+        // how many grid hits happen from this move
+        let gridLevels = Math.floor(p / 10); // 10 pip grid base
 
-            // correct block system (10 trades per block)
+        for(let i = 1; i <= gridLevels; i++){
+
+            // determine tier from grid depth (this is KEY)
+            let dd = total;
+
+            let grid;
+            if (dd < 10000) grid = 10;
+            else if (dd < 20000) grid = 15;
+            else grid = 20;
+
+            // exposure grows per grid level
             let block = Math.floor((i - 1) / 10) + 1;
-
-            // correct lot scaling per block
             let lot = 0.01 * block;
 
-            let loss = pnlPerLot * lot;
+            // grid spacing affects impact
+            let exposureMultiplier = grid / 10;
 
-            total += loss;
+            total += pnlPerLot * lot * exposureMultiplier;
         }
-
-        // tier based on FINAL correct DD
-        let grid;
-
-        if (total < 10000) grid = 10;
-        else if (total < 20000) grid = 15;
-        else grid = 20;
 
         html += `
         <div class="card">
             <h3>${p} Pips Move</h3>
-            <div class="small">Grid Scale: ${grid}/10</div>
+            <div class="small">Grid Scale: ${total < 10000 ? "10" : total < 20000 ? "15" : "20"}/10</div>
             <div class="big red">Total DD: ${money(total.toFixed(0))}</div>
         </div>
         `;
@@ -1269,7 +1272,6 @@ function renderDrawdown(){
 
     container.innerHTML = html;
 }
-
 function renderProjection(){
 
     let balance = getBaseBalance();
