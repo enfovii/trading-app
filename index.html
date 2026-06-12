@@ -1229,39 +1229,54 @@ function getTierByPipMove(pips){
     return {grid:20, blockSize:10};
 }
 
+function getTierFromDD(dd){
+    if(dd < 10000) return 1.0;   // 10/10
+    if(dd < 20000) return 1.5;   // 15/10
+    return 2.0;                  // 20/10
+}
+
 function renderDrawdown(){
 
     let container = document.getElementById("dd_results");
     let html = "";
 
-    // simulate grid entries (10 trades per block, 10 pip spacing)
-    let entries = [];
-    for(let i = 0; i < 30; i++){
-        let block = Math.floor(i / 10) + 1;
-        let entryPriceOffset = i * 10; // 10 pip spacing
-        let lot = 0.01 * block;
+    let grid = [];
 
-        entries.push({lot, offset: entryPriceOffset});
+    for(let i = 0; i < 10; i++){
+        grid.push({
+            lot: 0.01 * (i + 1),
+            offset: i * 10
+        });
     }
 
     for(let p = 100; p <= 500; p += 100){
 
         let total = 0;
 
-        for(let e of entries){
+        for(let trade of grid){
 
-            let pipsAgainst = p + e.offset; // THIS is the key fix
+            let runningDD = 0;
 
-            let lossPerLot = pipsAgainst * 100; // $1 per pip per 0.01 lot
+            let pipsAgainst = p + trade.offset;
 
-            total += lossPerLot * e.lot;
+            let lossPerPip = trade.lot * 100;
+
+            // simulate step-by-step so tier can change mid-move
+            for(let step = 0; step <= pipsAgainst; step++){
+
+                let dd = total;
+
+                let tier = getTierFromDD(dd);
+
+                total += lossPerPip * tier;
+            }
         }
 
         html += `
         <div class="card">
-            <h3>${p} Pips Move</h3>
-            <div class="small">Real grid exposure model</div>
-            <div class="big red">Total DD: ${money(total.toFixed(0))}</div>
+            <h3>${p} Pip Move</h3>
+            <div class="small">10/10 → 15/10 → 20/10 tier model</div>
+            <div class="big red">Drawdown: ${money(total.toFixed(0))}</div>
         </div>
         `;
     }
