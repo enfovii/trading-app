@@ -1219,17 +1219,32 @@ function deleteAccount(){
 
     let trades = [];
     let nextGrid = 0;
-    let total = 0;
+
+    let equity = 0;
+    let peak = 0;
 
     for (let i = 1; i <= pips; i++) {
 
-        // GRID STEP (tiered)
+        // 1. UPDATE EQUITY FIRST (real basket state)
+        equity = 0;
+
+        for (let t = 0; t < trades.length; t++) {
+            equity += trades[t] * i * 100;
+        }
+
+        // 2. TRACK PEAK (for real drawdown)
+        if (equity > peak) peak = equity;
+
+        let drawdown = Math.max(0, peak - equity);
+
+        // 3. GRID STEP BASED ON TRUE DD (NOT floating PnL)
         let gridStep;
-        if (total < 10000) gridStep = 10;
-        else if (total < 20000) gridStep = 15;
+
+        if (drawdown < 10000) gridStep = 10;
+        else if (drawdown < 20000) gridStep = 15;
         else gridStep = 20;
 
-        // open trade on grid
+        // 4. OPEN TRADES
         if (i >= nextGrid) {
 
             let block = Math.floor(trades.length / 10) + 1;
@@ -1239,14 +1254,11 @@ function deleteAccount(){
 
             nextGrid += gridStep;
         }
-
-        // floating PnL (REAL logic)
-        total = 0;
-
-        for (let t = 0; t < trades.length; t++) {
-            total += trades[t] * i * 100;
-        }
     }
+
+    // final equity result
+    return Math.abs(equity);
+}
 
     return Math.abs(total);
 }
