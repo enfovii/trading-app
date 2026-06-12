@@ -659,11 +659,7 @@ body.hideNav .addBtn {
 
     <div id="dd_results"></div>
 
-    <div class="fixedBack">
-        <button onclick="backHome()">
-            Return to Dashboard
-        </button>
-    </div>
+    
 
 </div>
     
@@ -726,7 +722,7 @@ body.hideNav .addBtn {
             onclick="openProjection()">
         📈 Projection
     </button>
-        <button class="navBtn" onclick="show('drawdown')">
+        <button class="navBtn" onclick="openDrawdown()">
     📉 Drawdown
 </button>
 
@@ -815,6 +811,10 @@ function money(v){
     function openProjection(){
     show("projection");
     setupProjection();
+}
+    function openDrawdown(){
+    show("drawdown");
+    renderDrawdown();
 }
 
 /* unchanged logic */
