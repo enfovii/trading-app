@@ -1221,10 +1221,12 @@ function deleteAccount(){
     return {grid:20, step:10};
 }
 
-function getTierFromDD(dd){
-    if (dd < 10000) return 10;
-    if (dd < 20000) return 15;
-    return 20;
+function getTierByPipMove(pips){
+    let dd = pips * 100;
+
+    if (dd < 10000) return {grid:10, blockSize:10};
+    if (dd < 20000) return {grid:15, blockSize:10};
+    return {grid:20, blockSize:10};
 }
 
 function renderDrawdown(){
@@ -1236,24 +1238,22 @@ function renderDrawdown(){
 
         let pnlPerLot = p * 100;
 
+        let tier = getTierByPipMove(p);
+        let grid = tier.grid;
+
         let total = 0;
 
         for(let i = 1; i <= 20; i++){
 
-            let block = Math.floor((i - 1) / 10) + 1;
+            let block = Math.ceil(i / 10);
             let lot = 0.01 * block;
 
-            let loss = pnlPerLot * lot;
+            let exposureMultiplier = grid / 10;
+
+            let loss = pnlPerLot * lot * exposureMultiplier;
 
             total += loss;
         }
-
-        // determine grid from FINAL DD (correct logic position)
-        let grid;
-
-        if (total < 10000) grid = 10;
-        else if (total < 20000) grid = 15;
-        else grid = 20;
 
         html += `
         <div class="card">
@@ -1266,6 +1266,7 @@ function renderDrawdown(){
 
     container.innerHTML = html;
 }
+
 function renderProjection(){
 
     let balance = getBaseBalance();
