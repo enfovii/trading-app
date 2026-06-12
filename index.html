@@ -1237,41 +1237,25 @@ function renderDrawdown(){
 
         let total = 0;
 
-        html += `
-        <div class="card">
-            <h3>${p} Pips Move</h3>
-            <div class="small">Grid: ${grid}/10 system</div>
-        `;
-
-        // simulate 20 positions (not 5)
         for(let i = 1; i <= 20; i++){
 
             let block = Math.ceil(i / 10);
-
-            // lot scaling per block (your system core logic)
             let lot = 0.01 * block;
 
-            // apply grid pressure (important missing piece)
             let exposureMultiplier = grid / 10;
 
             let loss = pnlPerLot * lot * exposureMultiplier;
 
             total += loss;
-
-            html += `
-            <div class="small">
-                Sell ${i} | Block ${block} | Lot ${lot.toFixed(2)} | ${money(loss.toFixed(0))}
-            </div>
-            `;
         }
 
         html += `
-            <div style="margin-top:10px;">
-                <div class="big red">Total DD: ${money(total.toFixed(0))}</div>
-            </div>
+        <div class="card">
+            <h3>${p} Pips Move</h3>
+            <div class="small">Grid system: ${grid}/10</div>
+            <div class="big red">Total DD: ${money(total.toFixed(0))}</div>
         </div>
         `;
-
     }
 
     container.innerHTML = html;
