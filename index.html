@@ -1234,31 +1234,33 @@ function renderDrawdown(){
     let container = document.getElementById("dd_results");
     let html = "";
 
+    // simulate grid entries (10 trades per block, 10 pip spacing)
+    let entries = [];
+    for(let i = 0; i < 30; i++){
+        let block = Math.floor(i / 10) + 1;
+        let entryPriceOffset = i * 10; // 10 pip spacing
+        let lot = 0.01 * block;
+
+        entries.push({lot, offset: entryPriceOffset});
+    }
+
     for(let p = 100; p <= 500; p += 100){
-
-        let pnlPerLot = p * 100;
-
-        let tier = getTierByPipMove(p);
-        let grid = tier.grid;
 
         let total = 0;
 
-        for(let i = 1; i <= 20; i++){
+        for(let e of entries){
 
-            let block = Math.ceil(i / 10);
-            let lot = 0.01 * block;
+            let pipsAgainst = p + e.offset; // THIS is the key fix
 
-            let exposureMultiplier = grid / 10;
+            let lossPerLot = pipsAgainst * 100; // $1 per pip per 0.01 lot
 
-            let loss = pnlPerLot * lot * exposureMultiplier;
-
-            total += loss;
+            total += lossPerLot * e.lot;
         }
 
         html += `
         <div class="card">
             <h3>${p} Pips Move</h3>
-            <div class="small">Grid system: ${grid}/10</div>
+            <div class="small">Real grid exposure model</div>
             <div class="big red">Total DD: ${money(total.toFixed(0))}</div>
         </div>
         `;
