@@ -1218,20 +1218,30 @@ function deleteAccount(){
     function simulateDrawdown(pips){
 
     let trades = [];
-    let total = 0;
+    let equity = 0;
 
     let nextGrid = 0;
 
     for (let i = 1; i <= pips; i++) {
 
-        let currentDD = total;
+        // 1) calculate current equity first
+        equity = 0;
 
+        for (let t = 0; t < trades.length; t++) {
+            equity += trades[t] * i * 100;
+        }
+
+        // 2) drawdown is negative equity
+        let dd = Math.max(0, -equity);
+
+        // 3) GRID LOGIC BASED ON REAL DD (NOT RESETTING VALUE)
         let gridStep;
-        if (currentDD < 10000) gridStep = 10;
-        else if (currentDD < 20000) gridStep = 15;
+
+        if (dd < 10000) gridStep = 10;
+        else if (dd < 20000) gridStep = 15;
         else gridStep = 20;
 
-        // open new trade on grid
+        // 4) open trades on grid
         if (i >= nextGrid) {
 
             let block = Math.floor(trades.length / 10) + 1;
@@ -1241,16 +1251,17 @@ function deleteAccount(){
 
             nextGrid += gridStep;
         }
-
-        // FLOATING PnL UPDATE (THIS IS THE MISSING PIECE)
-        total = 0;
-
-        for (let t = 0; t < trades.length; t++) {
-            total += trades[t] * i * 100;
-        }
     }
 
-    return total;
+    // final equity after loop
+    let final = 0;
+
+    for (let t = 0; t < trades.length; t++) {
+        final += trades[t] * pips * 100;
+    }
+
+    // return drawdown as negative equity impact
+    return Math.abs(final);
 }
 
 function renderDrawdown(){
