@@ -652,17 +652,19 @@ body.hideNav .addBtn {
 
 <div id="drawdown" class="page">
 
-    <div class="card">
-        <h3>📉 Drawdown Scenarios</h3>
-        <div class="small">Drawdown stress test (100 → 500 pips)</div>
-    </div>
+<div class="card">
+    <h3>📉 Drawdown Scenarios</h3>
+    <div class="small"Drawdown stress test (100 → 500 pips)</div>
+</div>
 
-    <div id="dd_results"></div>
-
-    
+<div id="dd_results"></div>
 
 </div>
-    
+
+</div>
+    <button class="stickyBackBtn" onclick="backHome()">
+    Back To Dashboard
+</button>
 <div id="account" class="page">
 <div class="card">
 
@@ -722,7 +724,7 @@ body.hideNav .addBtn {
             onclick="openProjection()">
         📈 Projection
     </button>
-        <button class="navBtn" onclick="openDrawdown()">
+        <button class="navBtn" onclick="show('drawdown')">
     📉 Drawdown
 </button>
 
@@ -811,10 +813,6 @@ function money(v){
     function openProjection(){
     show("projection");
     setupProjection();
-}
-    function openDrawdown(){
-    show("drawdown");
-    renderDrawdown();
 }
 
 /* unchanged logic */
