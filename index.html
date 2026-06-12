@@ -1215,36 +1215,52 @@ function deleteAccount(){
     return 0;
 }
 
-    
-function simulateDrawdown(pips){
-
-    let grid = 10; // start 10/10 tier (we'll adjust dynamically)
-    let priceMove = pips;
+    function simulateDrawdown(pips){
 
     let total = 0;
     let trades = [];
 
-    for (let i = 1; i <= priceMove; i++) {
+    let lastEntry = 0;
 
-    let currentDD = Math.abs(total);
+    for (let i = 1; i <= pips; i++) {
 
-    let tier;
-    if (currentDD < 10000) tier = 10;
-    else if (currentDD < 20000) tier = 15;
-    else tier = 20;
+        // current drawdown state
+        let currentDD = Math.abs(total);
 
-    let grid = tier;
+        // tier logic (your system)
+        let gridStep;
 
-    let block = Math.floor((i - 1) / 10) + 1;
-    let lot = 0.01 * block;
+        if (currentDD < 10000) gridStep = 10;
+        else if (currentDD < 20000) gridStep = 15;
+        else gridStep = 20;
 
-    let loss = lot * 100;
+        // ONLY open trade when grid level is hit
+        if (i - lastEntry >= gridStep) {
 
-    total += loss;
-}
+            let tradeIndex = trades.length + 1;
+
+            // 10 trades per block scaling
+            let block = Math.floor((tradeIndex - 1) / 10) + 1;
+            let lot = 0.01 * block;
+
+            // pip value model: $1 per pip per 0.01 lot
+            let loss = lot * 100;
+
+            total += loss;
+
+            trades.push({
+                entry: i,
+                lot: lot,
+                loss: loss
+            });
+
+            lastEntry = i;
+        }
+    }
 
     return total;
 }
+
 function renderDrawdown(){
 
     let container = document.getElementById("dd_results");
