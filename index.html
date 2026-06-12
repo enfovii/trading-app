@@ -1215,24 +1215,40 @@ function deleteAccount(){
     return 0;
 }
 
-    function simulateDrawdown(pips){
+   function simulateDrawdown(pips){
 
-    // CALIBRATED EXPONENTIAL MODEL (matches your basket behaviour)
-    let exposureMultiplier = 1;
+    let trades = [];
+    let nextGrid = 0;
+    let total = 0;
 
-    // tier acceleration (10/10 → 15/10 → 20/10 effect)
-    if (pips >= 100) exposureMultiplier = 1;
-    if (pips >= 200) exposureMultiplier = 2.5;
-    if (pips >= 300) exposureMultiplier = 5;
-    if (pips >= 400) exposureMultiplier = 8;
-    if (pips >= 500) exposureMultiplier = 12;
+    for (let i = 1; i <= pips; i++) {
 
-    // base risk curve (your 0.01 = $1 per pip system)
-    let base = pips * pips * 0.06;
+        // GRID STEP (tiered)
+        let gridStep;
+        if (total < 10000) gridStep = 10;
+        else if (total < 20000) gridStep = 15;
+        else gridStep = 20;
 
-    let result = base * exposureMultiplier;
+        // open trade on grid
+        if (i >= nextGrid) {
 
-    return result;
+            let block = Math.floor(trades.length / 10) + 1;
+            let lot = 0.01 * block;
+
+            trades.push(lot);
+
+            nextGrid += gridStep;
+        }
+
+        // floating PnL (REAL logic)
+        total = 0;
+
+        for (let t = 0; t < trades.length; t++) {
+            total += trades[t] * i * 100;
+        }
+    }
+
+    return Math.abs(total);
 }
 
 function renderDrawdown(){
