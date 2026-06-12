@@ -1234,7 +1234,36 @@ function getTierFromDD(dd){
     if(dd < 20000) return 1.5;   // 15/10
     return 2.0;                  // 20/10
 }
+function simulateDrawdown(pips){
 
+    let grid = 10; // start 10/10 tier (we'll adjust dynamically)
+    let priceMove = pips;
+
+    let total = 0;
+    let trades = [];
+
+    for(let i = 0; i <= priceMove; i += grid){
+
+        // determine tier dynamically based on current DD pressure
+        let currentDD = Math.abs(total);
+
+        if(currentDD > 20000) grid = 20;
+        else if(currentDD > 10000) grid = 15;
+        else grid = 10;
+
+        let tradeIndex = trades.length + 1;
+        let block = Math.floor((tradeIndex - 1) / 10) + 1;
+        let lot = 0.01 * block;
+
+        let loss = i * lot * 100; // $1 per pip at 0.01
+
+        trades.push(loss);
+    }
+
+    total = trades.reduce((a,b)=>a+b,0);
+
+    return total;
+}
 function renderDrawdown(){
 
     let container = document.getElementById("dd_results");
@@ -1242,41 +1271,12 @@ function renderDrawdown(){
 
     for(let p = 100; p <= 500; p += 100){
 
-        let pipMove = p;
-        let priceMoveValue = pipMove * 100; // $ per 1.00 lot
-
-        // determine grid tier based on drawdown pressure
-        let approxDD = 0;
-
-        if(pipMove >= 200) approxDD = 12000;
-        if(pipMove >= 300) approxDD = 20000;
-        if(pipMove >= 400) approxDD = 30000;
-
-        let tier = getTier(approxDD);
-        let grid = tier.grid;
-
-        let totalDD = 0;
-
-        // simulate up to 30 trades (enough for 500 pip move)
-        let trades = Math.floor(pipMove / (grid)) + 1;
-
-        for(let i = 1; i <= trades; i++){
-
-            let block = Math.ceil(i / 10);   // 10 trades per block
-            let lot = 0.01 * block;
-
-            // distance increases per trade
-            let entryDistance = i * grid;
-
-            let loss = entryDistance * 100 * lot;
-
-            totalDD += loss;
-        }
+        let totalDD = simulateDrawdown(p);
 
         html += `
         <div class="card">
             <h3>${p} Pips Move</h3>
-            <div class="small">Grid system: ${grid}/10</div>
+            <div class="small">REAL basket engine (10/10 → 15/10 → 20/10)</div>
             <div class="big red">Total DD: ${money(totalDD.toFixed(0))}</div>
         </div>
         `;
