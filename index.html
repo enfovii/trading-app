@@ -1224,30 +1224,24 @@ function simulateDrawdown(pips){
     let total = 0;
     let trades = [];
 
-    for(let i = 1; i <= priceMove; i++){
+    for (let i = 1; i <= priceMove; i++) {
 
-        // determine tier dynamically based on current DD pressure
-        let currentDD = Math.abs(totalLossSoFar);
+    let currentDD = Math.abs(total);
 
-let tier;
-if (currentDD < 10000) tier = 10;
-else if (currentDD < 20000) tier = 15;
-else tier = 20;
+    let tier;
+    if (currentDD < 10000) tier = 10;
+    else if (currentDD < 20000) tier = 15;
+    else tier = 20;
 
-let grid = tier;
+    let grid = tier;
 
-        let tradeIndex = trades.length + 1;
-        let block = Math.floor((tradeIndex - 1) / 10) + 1;
-        let lot = 0.01 * block;
+    let block = Math.floor((i - 1) / 10) + 1;
+    let lot = 0.01 * block;
 
-    
-let loss = lot * 100;
-total += loss;
+    let loss = lot * 100;
 
-        trades.push(loss);
-    }
-
-    total = trades.reduce((a,b)=>a+b,0);
+    total += loss;
+}
 
     return total;
 }
