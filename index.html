@@ -651,23 +651,15 @@ body.hideNav .addBtn {
 </div>
     <div id="drawdown" class="page">
 
+<div id="drawdown" class="page">
+
 <div class="card">
-    <h3>📉 Drawdown Calculator</h3>
-
-    <div class="small">Entry Price (SELL)</div>
-    <input id="dd_entry" placeholder="e.g. 4178">
-
-    <div class="small">Current Price</div>
-    <input id="dd_current" placeholder="e.g. 4215">
-
-    <div class="small">Active Sell Positions</div>
-    <input id="dd_positions" value="5">
-
-    <button onclick="calcDrawdown()">Calculate Drawdown</button>
+    <h3>📉 Drawdown Scenarios</h3>
+    <div class="small">Fixed SELL stress test (100 → 500 pips)</div>
 </div>
 
-<div class="card">
-    <div id="dd_output" class="big">Enter values...</div>
+<div id="dd_results"></div>
+
 </div>
 
 </div>
@@ -935,7 +927,10 @@ function show(page){
     } else {
         document.body.classList.add("hideNav");
     }
+    if(page === "drawdown"){
+    renderDrawdown();
 }
+
 function renderPortfolio(){
     let t=0,d=0,draw=0;
 
@@ -1219,42 +1214,49 @@ function deleteAccount(){
     return {grid:20, step:10};
 }
 
-function calcDrawdown(){
+function renderDrawdown(){
 
-    let entry = parseFloat(document.getElementById("dd_entry").value);
-    let current = parseFloat(document.getElementById("dd_current").value);
-    let pos = parseInt(document.getElementById("dd_positions").value);
+    let container = document.getElementById("dd_results");
 
-    if(!entry || !current || !pos) return;
+    let html = "";
 
-    // SELL logic
-    let move = current - entry;
+    for(let p = 100; p <= 500; p += 100){
 
-    // $1 per 0.01 lot scaling model you use
-    let pnlPerLot = move * 100;
+        let move = p;
+        let pnlPerLot = move * 100;
 
-    let total = 0;
-    let breakdown = "";
+        let total = 0;
 
-    let tier = getTier(Math.abs(pnlPerLot));
+        html += `
+        <div class="card">
+            <h3>${p} Pips Move</h3>
+        `;
 
-    breakdown += `Move: ${move.toFixed(2)} pips\nTier: ${tier.grid}/${tier.step}\n\n`;
+        for(let i = 1; i <= 5; i++){
 
-    for(let i=1; i<=pos; i++){
+            let block = Math.ceil(i / 10);
+            let lot = 0.01 * block;
 
-        let block = Math.ceil(i / 10);
-        let lot = 0.01 * block;
+            let loss = pnlPerLot * lot;
 
-        let loss = pnlPerLot * lot;
+            total += loss;
 
-        total += loss;
+            html += `
+            <div class="small">
+                Sell ${i} | Lot ${lot.toFixed(2)} | ${money(loss.toFixed(0))}
+            </div>
+            `;
+        }
 
-        breakdown += `Sell ${i} | Lot ${lot.toFixed(2)} | ${money(loss.toFixed(0))}\n`;
+        html += `
+            <div style="margin-top:10px;">
+                <div class="big red">Total DD: ${money(total.toFixed(0))}</div>
+            </div>
+        </div>
+        `;
     }
 
-    breakdown += `\nTOTAL DRAWNDOWN: ${money(total.toFixed(0))}`;
-
-    document.getElementById("dd_output").innerText = breakdown;
+    container.innerHTML = html;
 }
 
 function renderProjection(){
