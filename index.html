@@ -1215,36 +1215,52 @@ function deleteAccount(){
     return {grid:20, step:10};
 }
 
+function getTierByPipMove(pips){
+    let dd = pips * 100;
+
+    if (dd < 10000) return {grid:10, blockSize:10};
+    if (dd < 20000) return {grid:15, blockSize:10};
+    return {grid:20, blockSize:10};
+}
+
 function renderDrawdown(){
 
     let container = document.getElementById("dd_results");
-
     let html = "";
 
     for(let p = 100; p <= 500; p += 100){
 
-        let move = p;
-        let pnlPerLot = move * 100;
+        let pnlPerLot = p * 100;
+
+        let tier = getTierByPipMove(p);
+        let grid = tier.grid;
 
         let total = 0;
 
         html += `
         <div class="card">
             <h3>${p} Pips Move</h3>
+            <div class="small">Grid: ${grid}/10 system</div>
         `;
 
-        for(let i = 1; i <= 5; i++){
+        // simulate 20 positions (not 5)
+        for(let i = 1; i <= 20; i++){
 
             let block = Math.ceil(i / 10);
+
+            // lot scaling per block (your system core logic)
             let lot = 0.01 * block;
 
-            let loss = pnlPerLot * lot;
+            // apply grid pressure (important missing piece)
+            let exposureMultiplier = grid / 10;
+
+            let loss = pnlPerLot * lot * exposureMultiplier;
 
             total += loss;
 
             html += `
             <div class="small">
-                Sell ${i} | Lot ${lot.toFixed(2)} | ${money(loss.toFixed(0))}
+                Sell ${i} | Block ${block} | Lot ${lot.toFixed(2)} | ${money(loss.toFixed(0))}
             </div>
             `;
         }
@@ -1255,6 +1271,7 @@ function renderDrawdown(){
             </div>
         </div>
         `;
+
     }
 
     container.innerHTML = html;
