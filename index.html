@@ -1240,43 +1240,44 @@ function renderDrawdown(){
     let container = document.getElementById("dd_results");
     let html = "";
 
-    let grid = [];
-
-    for(let i = 0; i < 10; i++){
-        grid.push({
-            lot: 0.01 * (i + 1),
-            offset: i * 10
-        });
-    }
-
     for(let p = 100; p <= 500; p += 100){
 
-        let total = 0;
+        let pipMove = p;
+        let priceMoveValue = pipMove * 100; // $ per 1.00 lot
 
-        for(let trade of grid){
+        // determine grid tier based on drawdown pressure
+        let approxDD = 0;
 
-            let runningDD = 0;
+        if(pipMove >= 200) approxDD = 12000;
+        if(pipMove >= 300) approxDD = 20000;
+        if(pipMove >= 400) approxDD = 30000;
 
-            let pipsAgainst = p + trade.offset;
+        let tier = getTier(approxDD);
+        let grid = tier.grid;
 
-            let lossPerPip = trade.lot * 100;
+        let totalDD = 0;
 
-            // simulate step-by-step so tier can change mid-move
-            for(let step = 0; step <= pipsAgainst; step++){
+        // simulate up to 30 trades (enough for 500 pip move)
+        let trades = Math.floor(pipMove / (grid)) + 1;
 
-                let dd = total;
+        for(let i = 1; i <= trades; i++){
 
-                let tier = getTierFromDD(dd);
+            let block = Math.ceil(i / 10);   // 10 trades per block
+            let lot = 0.01 * block;
 
-                total += lossPerPip * tier;
-            }
+            // distance increases per trade
+            let entryDistance = i * grid;
+
+            let loss = entryDistance * 100 * lot;
+
+            totalDD += loss;
         }
 
         html += `
         <div class="card">
-            <h3>${p} Pip Move</h3>
-            <div class="small">10/10 → 15/10 → 20/10 tier model</div>
-            <div class="big red">Drawdown: ${money(total.toFixed(0))}</div>
+            <h3>${p} Pips Move</h3>
+            <div class="small">Grid system: ${grid}/10</div>
+            <div class="big red">Total DD: ${money(totalDD.toFixed(0))}</div>
         </div>
         `;
     }
