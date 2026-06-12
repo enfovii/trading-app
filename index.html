@@ -1217,50 +1217,15 @@ function deleteAccount(){
 
    function simulateDrawdown(pips){
 
-    let trades = [];
-    let nextGrid = 0;
+    const table = {
+        100: 200,
+        200: 1500,
+        300: 5000,
+        400: 11000,
+        500: 20000
+    };
 
-    let equity = 0;
-    let peak = 0;
-
-    for (let i = 1; i <= pips; i++) {
-
-        // 1. UPDATE EQUITY FIRST (real basket state)
-        equity = 0;
-
-        for (let t = 0; t < trades.length; t++) {
-            equity += trades[t] * i * 100;
-        }
-
-        // 2. TRACK PEAK (for real drawdown)
-        if (equity > peak) peak = equity;
-
-        let drawdown = Math.max(0, peak - equity);
-
-        // 3. GRID STEP BASED ON TRUE DD (NOT floating PnL)
-        let gridStep;
-
-        if (drawdown < 10000) gridStep = 10;
-        else if (drawdown < 20000) gridStep = 15;
-        else gridStep = 20;
-
-        // 4. OPEN TRADES
-        if (i >= nextGrid) {
-
-            let block = Math.floor(trades.length / 10) + 1;
-            let lot = 0.01 * block;
-
-            trades.push(lot);
-
-            nextGrid += gridStep;
-        }
-    }
-
-    // final equity result
-    return Math.abs(equity);
-}
-
-    return Math.abs(total);
+    return table[pips] || 0;
 }
 
 function renderDrawdown(){
@@ -1277,8 +1242,8 @@ function renderDrawdown(){
         html += `
         <div class="card">
             <h3>${p} Pips Move</h3>
-            <div class="small">10/10 → 15/10 → 20/10 tier model</div>
-            <div class="big red">Total DD: ${money(totalDD.toFixed(0))}</div>
+            <div class="small">Fixed scenario model</div>
+            <div class="big red">Total DD: ${money(totalDD)}</div>
         </div>
         `;
     }
