@@ -1215,25 +1215,7 @@ function deleteAccount(){
     return 0;
 }
 
-    function getTier(gridDD){
-    if(gridDD < 10000) return {grid:10, step:10};
-    if(gridDD < 20000) return {grid:15, step:10};
-    return {grid:20, step:10};
-}
-
-function getTierByPipMove(pips){
-    let dd = pips * 100;
-
-    if (dd < 10000) return {grid:10, blockSize:10};
-    if (dd < 20000) return {grid:15, blockSize:10};
-    return {grid:20, blockSize:10};
-}
-
-function getTierFromDD(dd){
-    if(dd < 10000) return 1.0;   // 10/10
-    if(dd < 20000) return 1.5;   // 15/10
-    return 2.0;                  // 20/10
-}
+    
 function simulateDrawdown(pips){
 
     let grid = 10; // start 10/10 tier (we'll adjust dynamically)
@@ -1242,20 +1224,25 @@ function simulateDrawdown(pips){
     let total = 0;
     let trades = [];
 
-    for(let i = 0; i <= priceMove; i += grid){
+    for(let i = 1; i <= priceMove; i++){
 
         // determine tier dynamically based on current DD pressure
-        let currentDD = Math.abs(total);
+        let currentDD = Math.abs(totalLossSoFar);
 
-        if(currentDD > 20000) grid = 20;
-        else if(currentDD > 10000) grid = 15;
-        else grid = 10;
+let tier;
+if (currentDD < 10000) tier = 10;
+else if (currentDD < 20000) tier = 15;
+else tier = 20;
+
+let grid = tier;
 
         let tradeIndex = trades.length + 1;
         let block = Math.floor((tradeIndex - 1) / 10) + 1;
         let lot = 0.01 * block;
 
-        let loss = i * lot * 100; // $1 per pip at 0.01
+    
+let loss = lot * 100;
+total += loss;
 
         trades.push(loss);
     }
