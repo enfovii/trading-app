@@ -1221,12 +1221,10 @@ function deleteAccount(){
     return {grid:20, step:10};
 }
 
-function getTierByPipMove(pips){
-    let dd = pips * 100;
-
-    if (dd < 10000) return {grid:10, blockSize:10};
-    if (dd < 20000) return {grid:15, blockSize:10};
-    return {grid:20, blockSize:10};
+function getTierFromDD(dd){
+    if (dd < 10000) return 10;
+    if (dd < 20000) return 15;
+    return 20;
 }
 
 function renderDrawdown(){
@@ -1238,28 +1236,47 @@ function renderDrawdown(){
 
         let pnlPerLot = p * 100;
 
-        let tier = getTierByPipMove(p);
-        let grid = tier.grid;
-
         let total = 0;
+        let runningDD = 0;
 
         for(let i = 1; i <= 20; i++){
 
             let block = Math.ceil(i / 10);
             let lot = 0.01 * block;
 
+            // base loss for this step
+            let loss = pnlPerLot * lot;
+
+            // update running drawdown BEFORE tier check
+            runningDD += loss;
+
+            // tier is now dynamic based on accumulated DD
+            let grid;
+
+            if (runningDD < 10000) {
+                grid = 10;
+            } 
+            else if (runningDD < 20000) {
+                grid = 15;
+            } 
+            else {
+                grid = 20;
+            }
+
             let exposureMultiplier = grid / 10;
 
-            let loss = pnlPerLot * lot * exposureMultiplier;
-
-            total += loss;
+            total += loss * exposureMultiplier;
         }
 
         html += `
         <div class="card">
             <h3>${p} Pips Move</h3>
-            <div class="small">Grid system: ${grid}/10</div>
-            <div class="big red">Total DD: ${money(total.toFixed(0))}</div>
+            <div class="small">
+                10/10 → 15/10 → 20/10 progressive tier system
+            </div>
+            <div class="big red">
+                Total DD: ${money(total.toFixed(0))}
+            </div>
         </div>
         `;
     }
