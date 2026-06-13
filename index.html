@@ -1067,11 +1067,18 @@ function num(v){
 function money(v){
     v = Number(v);
 
-    if (v >= 1000000) {
-        return "$" + (v / 1000000).toFixed(
-            v >= 10000000 ? 0 : 1
-        ) + "M";
+    if (Math.abs(v) >= 1000000) {
+        let m = v / 1000000;
+
+        return "$" + m.toFixed(m >= 10 ? 0 : 1) + "M";
     }
+
+    if (Math.abs(v) >= 1000) {
+        return "$" + v.toLocaleString('en-US');
+    }
+
+    return "$" + v;
+}
 
     return "$" + v.toLocaleString();
 }
