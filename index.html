@@ -929,20 +929,28 @@ function changeMonth(dir){
     calendarDate.setMonth(calendarDate.getMonth() + dir);
     renderCalendar();
 }
-    function formatCalValue(v){
+   function formatCalValue(v){
 
     v = Number(v);
+    let abs = Math.abs(v);
 
-    let display = v.toLocaleString('en-US');
+    let display;
 
+    // Only millions get shortened
+    if (abs >= 1000000) {
+        display = (v / 1000000).toFixed(v >= 10000000 ? 0 : 1) + "M";
+    } else {
+        // everything else shows full number with commas (NO k)
+        display = v.toLocaleString('en-US');
+    }
+
+    // scale font based on digit length (kept from your logic)
     let len = display.replace(/[^0-9]/g,'').length;
 
     let scale = 1;
-
-    if(len >= 6) scale = 0.85;
-    if(len >= 7) scale = 0.75;
-    if(len >= 8) scale = 0.65;
-    if(len >= 9) scale = 0.55;
+    if (len >= 6) scale = 0.85;
+    if (len >= 7) scale = 0.75;
+    if (len >= 8) scale = 0.65;
 
     return `<span style="
         display:block;
@@ -951,7 +959,6 @@ function changeMonth(dir){
         transform: scale(${scale});
         transform-origin:center;
         white-space:nowrap;
-        line-height:1.1;
     ">${display}</span>`;
 }
   function renderCalendar(){
