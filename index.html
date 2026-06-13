@@ -907,10 +907,11 @@ body.hideNav .addBtn {
 
         <input
             id="calEditInput"
-            placeholder="Enter profit/loss"
+            placeholder="Enter profit"
             inputmode="decimal"
             autocomplete="off"
             onfocus="this.select()"
+            oninput="formatBalanceInput(this)"
         >
 
         <button onclick="saveCalendarDay()">Save</button>
