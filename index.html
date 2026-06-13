@@ -1054,40 +1054,7 @@ function money(v){
 
     return "$" + v.toLocaleString();
 }
-    function formatCalValue(v){
-
-    v = Number(v);
-
-    let abs = Math.abs(v);
-
-    let display = money(v);
-
-    // convert to shorter format if large
-    if(abs >= 1000000){
-        display = (v / 1000000).toFixed(v >= 10000000 ? 0 : 1) + "M";
-    } 
-    else if(abs >= 1000){
-        display = (v / 1000).toFixed(v >= 10000 ? 0 : 1) + "k";
-    }
-
-    // scale font based on digit length
-    let len = display.replace(/[^0-9]/g,'').length;
-
-    let scale = 1;
-
-    if(len >= 6) scale = 0.85;
-    if(len >= 7) scale = 0.75;
-    if(len >= 8) scale = 0.65;
-
-    return `<span style="
-        display:block;
-        font-size:13px;
-        font-weight:600;
-        transform: scale(${scale});
-        transform-origin:center;
-        white-space:nowrap;
-    ">${display}</span>`;
-}
+    
     function openProjection(){
     show("projection");
     setupProjection();
