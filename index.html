@@ -943,12 +943,13 @@ body.hideNav .addBtn {
         <div class="big" id="calEditTitle">Edit Day</div>
 
         <input
-            id="calEditInput"
-            placeholder="Enter profit/loss"
-            inputmode="decimal"
-            autocomplete="off"
-            onfocus="this.select()"
-        >
+    id="calEditInput"
+    placeholder="Enter profit/loss"
+    inputmode="decimal"
+    autocomplete="off"
+    onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+    oninput="formatCalendarInput(this)"
+>
 
         <button onclick="saveCalendarDay()">Save</button>
         <button onclick="closeCalendarEdit()" style="background:rgba(255,255,255,0.08);">Cancel</button>
@@ -1126,6 +1127,27 @@ function formatBalanceInput(el){
 
     el.value = Number(raw).toLocaleString('en-US');
     updateAccount();
+}
+    function formatCalendarInput(el){
+
+    let raw = el.value
+        .replace(/,/g,'')
+        .replace(/[^\d-]/g,'');
+
+    if(raw === '' || raw === '-'){
+        return;
+    }
+
+    let isNegative = raw.startsWith('-');
+
+    raw = raw.replace('-', '');
+
+    let formatted =
+        Number(raw).toLocaleString('en-US');
+
+    el.value = isNegative
+        ? '-' + formatted
+        : formatted;
 }
 
 function tier(b){
@@ -1508,8 +1530,15 @@ function openCalendarEdit(dateKey, val){
     document.getElementById("calEditModal").style.display = "flex";
 
     setTimeout(() => {
-        document.getElementById("calEditInput").focus();
-        document.getElementById("calEditInput").select();
+
+        let input = document.getElementById("calEditInput");
+
+        input.focus();
+
+        // place cursor at end instead of highlighting
+        let length = input.value.length;
+        input.setSelectionRange(length, length);
+
     }, 100);
 }
 
