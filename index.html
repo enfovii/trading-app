@@ -1580,27 +1580,49 @@ function renderProjection(){
     margin-top:8px;
     display:flex;
     justify-content:space-between;
-    gap:10px;
+    gap:6px;
     text-align:center;
+    font-size:12px;
 ">
 
-    <div style="flex:1;">
-        <div>Daily ${money(d)}</div>
-        <div style="font-size:11px;color:#93a4b8;margin-top:3px;">
+    <div style="flex:1; min-width:0;">
+        <div style="white-space:nowrap;">
+            Daily ${money(d)}
+        </div>
+
+        <div style="
+            font-size:10px;
+            color:#93a4b8;
+            margin-top:2px;
+        ">
             (${money(d / 100)})
         </div>
     </div>
 
-    <div style="flex:1;">
-        <div>Weekly ${money(w)}</div>
-        <div style="font-size:11px;color:#93a4b8;margin-top:3px;">
+    <div style="flex:1; min-width:0;">
+        <div style="white-space:nowrap;">
+            Weekly ${money(w)}
+        </div>
+
+        <div style="
+            font-size:10px;
+            color:#93a4b8;
+            margin-top:2px;
+        ">
             (${money(w / 100)})
         </div>
     </div>
 
-    <div style="flex:1;">
-        <div>Monthly ${money(mo)}</div>
-        <div style="font-size:11px;color:#93a4b8;margin-top:3px;">
+    <div style="flex:1; min-width:0;">
+        <div style="white-space:nowrap;">
+            Monthly ${money(mo)}
+        </div>
+
+        <div style="
+            font-size:10px;
+            color:#93a4b8;
+            margin-top:2px;
+        ">
             (${money(mo / 100)})
         </div>
     </div>
