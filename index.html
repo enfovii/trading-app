@@ -1577,38 +1577,29 @@ function renderProjection(){
             <div class="big">${money(balance.toFixed(0))}</div>
 
             <div style="
-    margin-top:12px;
+    margin-top:8px;
     display:flex;
     justify-content:space-between;
-    gap:8px;
+    gap:10px;
     text-align:center;
 ">
 
     <div style="flex:1;">
-        <div class="small">Daily</div>
-        <div class="green" style="font-weight:700;">
-            ${money(d)}
-        </div>
+        <div>Daily ${money(d)}</div>
         <div style="font-size:11px;color:#93a4b8;margin-top:3px;">
             (${money(d / 100)})
         </div>
     </div>
 
     <div style="flex:1;">
-        <div class="small">Weekly</div>
-        <div class="green" style="font-weight:700;">
-            ${money(w)}
-        </div>
+        <div>Weekly ${money(w)}</div>
         <div style="font-size:11px;color:#93a4b8;margin-top:3px;">
             (${money(w / 100)})
         </div>
     </div>
 
     <div style="flex:1;">
-        <div class="small">Monthly</div>
-        <div class="green" style="font-weight:700;">
-            ${money(mo)}
-        </div>
+        <div>Monthly ${money(mo)}</div>
         <div style="font-size:11px;color:#93a4b8;margin-top:3px;">
             (${money(mo / 100)})
         </div>
