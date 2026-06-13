@@ -559,9 +559,14 @@ body.hideNav .addBtn {
 <div class="topbar">
 
     <div class="portfolioBox" onclick="openPortfolio()">
-        <div class="small">Portfolio</div>
-        <div class="big" id="total">$0</div>
-    </div>
+
+    <div class="small">All Time</div>
+    <div class="big" id="allTimeTotal">$0</div>
+
+    <div class="small" style="margin-top:6px;">Monthly</div>
+    <div class="big green" id="monthlyTop">$0</div>
+
+</div>
 
     <div class="statsRow">
 
@@ -1043,62 +1048,53 @@ function render(){
 
         let currentMult = mult(b);
 
-       function nextTargetFromBalance(b){
-
-    if (b < 40000) return 40000;
-
-    let steps = Math.floor((b - 40000) / 20000) + 1;
-
-    return 40000 + (steps * 20000);
-}
+        function nextTargetFromBalance(b){
+            if (b < 40000) return 40000;
+            let steps = Math.floor((b - 40000) / 20000) + 1;
+            return 40000 + (steps * 20000);
+        }
 
         let nextTarget = nextTargetFromBalance(b);
-        let nextMult = mult(nextTarget);
         let needed = Math.max(0, nextTarget - b);
 
-   let tierStart;
+        let tierStart;
 
-if (b < 40000) {
-    tierStart = 0;
-} else {
-    let steps = Math.floor((b - 40000) / 20000);
-    tierStart = 40000 + (steps * 20000);
-}
+        if (b < 40000) {
+            tierStart = 0;
+        } else {
+            let steps = Math.floor((b - 40000) / 20000);
+            tierStart = 40000 + (steps * 20000);
+        }
 
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
 
         html += `
 <div class="accountRow" onclick="openAccount(${i})">
 
-    <!-- ACCOUNT -->
     <div class="col name">
         <div class="label">Account</div>
         <div class="value strong">${a.name}</div>
         <div class="accountBalance">${money(b)}</div>
     </div>
 
-   <!-- DAILY -->
-<div class="col num">
-    <div class="label">Daily</div>
-    <div class="value ${daily(b) >= 100000 ? 'dailyLarge' : ''}">
-        ${money(daily(b))}
+    <div class="col num">
+        <div class="label">Daily</div>
+        <div class="value">
+            ${money(daily(b))}
+        </div>
     </div>
-</div>
 
-    <!-- MULTIPLIER -->
     <div class="col num">
         <div class="label">Multi</div>
         <div class="value">${currentMult.toFixed(2)}x</div>
     </div>
 
-    <!-- TARGET -->
     <div class="col num">
-       <div class="label">Δ NEXT</div>
+        <div class="label">Δ NEXT</div>
         <div class="value">${money(needed)}</div>
     </div>
 
-    <!-- ETA -->
-    <div class="col num muted">
+    <div class="col num">
         <div class="label">ETA</div>
         <div class="value">
             ${(() => {
@@ -1111,32 +1107,42 @@ if (b < 40000) {
     </div>
 
 </div>`;
-            });
+    });
 
     el.innerHTML = html;
 
+    // TOTALS
     document.getElementById("total").innerText = money(t.toFixed(0));
+
     let dailyValue = d;
-let weeklyValue = d * 5;
-let monthlyValue = d * 22;
+    let weeklyValue = d * 5;
+    let monthlyValue = d * 22;
 
-document.getElementById("daily").innerHTML =
-    money(dailyValue) +
-    '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
-    money(dailyValue / 100) +
-    ')</div>';
+    // NEW: ALL TIME (top box)
+    document.getElementById("allTimeTotal").innerText =
+        money(t.toFixed(0));
 
-document.getElementById("weeklyHome").innerHTML =
-    money(weeklyValue) +
-    '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
-    money(weeklyValue / 100) +
-    ')</div>';
+    // NEW: MONTHLY (top box)
+    document.getElementById("monthlyTop").innerText =
+        money(monthlyValue.toFixed(0));
 
-document.getElementById("monthlyHome").innerHTML =
-    money(monthlyValue) +
-    '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
-    money(monthlyValue / 100) +
-    ')</div>';
+    document.getElementById("daily").innerHTML =
+        money(dailyValue) +
+        '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
+        money(dailyValue / 100) +
+        ')</div>';
+
+    document.getElementById("weeklyHome").innerHTML =
+        money(weeklyValue) +
+        '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
+        money(weeklyValue / 100) +
+        ')</div>';
+
+    document.getElementById("monthlyHome").innerHTML =
+        money(monthlyValue) +
+        '<div style="font-size:11px;color:#93a4b8;margin-top:3px;">(' +
+        money(monthlyValue / 100) +
+        ')</div>';
 }
 
 function openAccount(i){
