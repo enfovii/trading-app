@@ -571,6 +571,17 @@ body.hideNav .addBtn {
     font-size: 13px;
     font-weight: 600;
 }
+    .weekHeader{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+    text-align: center;
+    font-size: 11px;
+    color: #93a4b8;
+    letter-spacing: 0.5px;
+}
     
 </style>
 </head>
@@ -715,7 +726,16 @@ body.hideNav .addBtn {
             <div id="calMonthTitle" class="big"></div>
             <button onclick="changeMonth(1)">▶</button>
         </div>
-    </div>
+       <div class="weekHeader">
+    <div>Mon</div>
+    <div>Tue</div>
+    <div>Wed</div>
+    <div>Thu</div>
+    <div>Fri</div>
+    <div>Sat</div>
+    <div>Sun</div>
+</div>
+   </div>
 
     <div id="calendarGrid"></div>
 
@@ -899,6 +919,18 @@ function changeMonth(dir){
     let html = "";
     let monthlyTotal = 0;
 
+    // 🔑 Get first day of month (0 = Sunday)
+    let firstDay = new Date(year, month, 1).getDay();
+
+    // Convert to Monday-first system (Mon=0 ... Sun=6)
+    firstDay = (firstDay + 6) % 7;
+
+    // Add empty slots before day 1
+    for (let i = 0; i < firstDay; i++) {
+        html += `<div></div>`;
+    }
+
+    // Render days
     for(let d = 1; d <= lastDay; d++){
 
         let dateKey = `${year}-${month+1}-${d}`;
@@ -909,17 +941,17 @@ function changeMonth(dir){
         let color = val > 0 ? "green" : (val < 0 ? "red" : "");
 
         html += `
-<div class="calendarDay"
-     onclick="openCalendarEdit('${dateKey}', ${val})">
+        <div class="calendarDay"
+             onclick="openCalendarEdit('${dateKey}', ${val})">
 
-    <div class="dayLabel">Day ${d}</div>
+            <div class="dayLabel">Day ${d}</div>
 
-    <div class="${color}">
-        ${money(val)}
-    </div>
+            <div class="${color}">
+                ${money(val)}
+            </div>
 
-</div>
-`;
+        </div>
+        `;
     }
 
     // ALL TIME TOTAL
