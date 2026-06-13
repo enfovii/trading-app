@@ -1577,8 +1577,10 @@ function renderProjection(){
             <div class="big">${money(balance.toFixed(0))}</div>
 
             <div class="small">
-                Daily ${money(d)} • Weekly ${money(w)} • Monthly ${money(mo)}
-            </div>
+    Daily ${money(d)} (${money(d / 100)}) • 
+    Weekly ${money(w)} (${money(w / 100)}) • 
+    Monthly ${money(mo)} (${money(mo / 100)})
+</div>
         </div>
         `;
 
