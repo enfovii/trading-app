@@ -665,6 +665,31 @@ body.hideNav .addBtn {
     <button class="stickyBackBtn" onclick="backHome()">
     Back To Dashboard
 </button>
+    <div id="calendar" class="page">
+
+    <div class="card">
+        <h3>📅 Profit Calendar</h3>
+
+        <div class="small">Track daily profit per month</div>
+
+        <div style="display:flex; justify-content:space-between; margin-top:10px;">
+            <button onclick="changeMonth(-1)">◀</button>
+            <div id="calMonthTitle" class="big"></div>
+            <button onclick="changeMonth(1)">▶</button>
+        </div>
+    </div>
+
+    <div id="calendarGrid"></div>
+
+    <div class="card">
+        <div class="small">Monthly Total</div>
+        <div class="big green" id="calendarTotal">$0</div>
+    </div>
+
+</div>
+    <button class="stickyBackBtn" onclick="backHome()">
+    Back To Dashboard
+</button>
 <div id="account" class="page">
 <div class="card">
 
@@ -721,6 +746,9 @@ body.hideNav .addBtn {
     </button>
         <button class="navBtn" onclick="show('drawdown')">
     📉 Drawdown
+</button>
+        <button class="navBtn" onclick="openCalendar()">
+    📅 Calendar
 </button>
 
 </div>
@@ -785,7 +813,64 @@ body.hideNav .addBtn {
 <script>
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
+    let calendarDate = new Date();
 
+    function openCalendar(){
+    show("calendar");
+    renderCalendar();
+}
+
+function changeMonth(dir){
+    calendarDate.setMonth(calendarDate.getMonth() + dir);
+    renderCalendar();
+}
+    function renderCalendar(){
+
+    let grid = document.getElementById("calendarGrid");
+    let title = document.getElementById("calMonthTitle");
+
+    let year = calendarDate.getFullYear();
+    let month = calendarDate.getMonth();
+
+    let monthNames = [
+        "Jan","Feb","Mar","Apr","May","Jun",
+        "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
+
+    title.innerText = monthNames[month] + " " + year;
+
+    let lastDay = new Date(year, month + 1, 0).getDate();
+
+    let html = "";
+    let total = 0;
+
+    for(let d = 1; d <= lastDay; d++){
+
+        let dateKey = `${year}-${month+1}-${d}`;
+
+        let val = num(localStorage.getItem("cal_" + dateKey) || 0);
+
+        total += val;
+
+        let color = val > 0 ? "green" : (val < 0 ? "red" : "");
+
+        html += `
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+            
+            <div class="small">Day ${d}</div>
+
+            <div class="${color}">
+                ${money(val)}
+            </div>
+
+        </div>
+        `;
+    }
+
+    grid.innerHTML = html;
+    document.getElementById("calendarTotal").innerText = money(total);
+}
+    
 function num(v){
     if(!v) return 0;
     v = v.toString().toLowerCase().replace(/,/g,'');
