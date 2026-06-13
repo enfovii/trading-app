@@ -610,6 +610,10 @@ body.hideNav .addBtn {
     align-items: center;
     width: 100%;
 }
+    input {
+    user-select: text;
+    -webkit-user-select: text;
+}
     
 </style>
 </head>
@@ -1506,9 +1510,16 @@ function openCalendarEdit(dateKey, val){
     document.getElementById("calEditModal").style.display = "flex";
 
     setTimeout(() => {
-        document.getElementById("calEditInput").focus();
-        document.getElementById("calEditInput").select();
-    }, 100);
+    const input = document.getElementById("calEditInput");
+
+    input.focus();
+
+    // move cursor to end instead of highlighting all text
+    let len = input.value.length;
+    input.setSelectionRange(len, len);
+
+}, 100);
+
 }
 
 function closeCalendarEdit(){
