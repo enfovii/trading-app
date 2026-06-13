@@ -890,17 +890,34 @@ function changeMonth(dir){
     let firstDay = new Date(year, month, 1).getDay();
     let lastDay = new Date(year, month + 1, 0).getDate();
 
+    // Monday start adjustment
     let startOffset = (firstDay === 0) ? 6 : firstDay - 1;
 
     let html = "";
     let total = 0;
 
+    // GRID START
     html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">`;
 
+    // MONDAY - SUNDAY HEADER (NOW correctly ABOVE days)
+    html += `
+    <div style="grid-column:span 7;display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px;">
+        <div class="small">Mon</div>
+        <div class="small">Tue</div>
+        <div class="small">Wed</div>
+        <div class="small">Thu</div>
+        <div class="small">Fri</div>
+        <div class="small">Sat</div>
+        <div class="small">Sun</div>
+    </div>
+    `;
+
+    // empty slots before first day
     for (let i = 0; i < startOffset; i++) {
         html += `<div></div>`;
     }
 
+    // days
     for (let d = 1; d <= lastDay; d++) {
 
         let dateKey = `${year}-${month+1}-${d}`;
@@ -916,6 +933,7 @@ function changeMonth(dir){
             style="padding:12px;text-align:center;cursor:pointer;">
 
             <div class="small">${d}</div>
+
             <div class="${color}" style="font-size:12px;margin-top:4px;">
                 ${money(val)}
             </div>
@@ -928,7 +946,8 @@ function changeMonth(dir){
 
     grid.innerHTML = html;
 
-    document.getElementById("calendarTotal").innerText = money(total);
+    // ❌ NO bottom monthly total anymore
+    // (top one handles it now)
 }
     
 function num(v){
@@ -1386,6 +1405,18 @@ function renderDrawdown(){
     }
 
     container.innerHTML = html;
+}
+    function openCalInput(dateKey){
+
+    let current = localStorage.getItem("cal_" + dateKey) || "";
+
+    let val = prompt("Enter P/L for " + dateKey, current);
+
+    if(val === null) return;
+
+    localStorage.setItem("cal_" + dateKey, val);
+
+    renderCalendar();
 }
 function openCalendarEdit(dateKey, val){
 
