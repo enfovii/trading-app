@@ -940,25 +940,27 @@ function changeMonth(dir){
     if (abs >= 1000000) {
         display = (v / 1000000).toFixed(v >= 10000000 ? 0 : 1) + "M";
     } else {
-        // everything else shows full number with commas (NO k)
-        display = v.toLocaleString('en-US');
+        display = v.toLocaleString('en-US'); // no "k"
     }
 
-    // scale font based on digit length (kept from your logic)
+    // 🔥 AUTO FONT SIZE (instead of scaling transform)
     let len = display.replace(/[^0-9]/g,'').length;
 
-    let scale = 1;
-    if (len >= 6) scale = 0.85;
-    if (len >= 7) scale = 0.75;
-    if (len >= 8) scale = 0.65;
+    let fontSize = 13;
+
+    if (len >= 6) fontSize = 12;
+    if (len >= 7) fontSize = 11;
+    if (len >= 8) fontSize = 10;
+    if (len >= 9) fontSize = 9;
 
     return `<span style="
         display:block;
-        font-size:13px;
+        font-size:${fontSize}px;
         font-weight:600;
-        transform: scale(${scale});
-        transform-origin:center;
         white-space:nowrap;
+        line-height:1.1;
+        overflow:hidden;
+        text-overflow:ellipsis;
     ">${display}</span>`;
 }
   function renderCalendar(){
