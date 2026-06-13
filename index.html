@@ -981,43 +981,47 @@ function changeMonth(dir){
     let lastDay = new Date(year, month + 1, 0).getDate();
 
     let html = "";
-    let monthlyTotal = 0;
+let monthlyTotal = 0;
+let allTimeTotal = 0;
 
-    // All-time calculation unchanged
-    let allTimeTotal = 0;
+let firstDay = new Date(year, month, 1).getDay(); 
+// JS: 0=Sun ... 6=Sat
 
-    // Loop through all days in month
-    for(let d = 1; d <= lastDay; d++){
+// Convert to Monday-start index (0=Mon ... 6=Sun)
+let startOffset = (firstDay === 0) ? 6 : firstDay - 1;
 
-        let dateKey = `${year}-${month+1}-${d}`;
+// 🔲 add blank cells BEFORE day 1
+for (let i = 0; i < startOffset; i++) {
+    html += `<div class="calendarDay" style="opacity:0"></div>`;
+}
 
-        // Get real weekday (0 = Sun ... 6 = Sat)
-        let jsDay = new Date(year, month, d).getDay();
+// now real days
+for (let d = 1; d <= lastDay; d++) {
 
-        // ❌ SKIP WEEKENDS (Sunday + Saturday)
-        if (jsDay === 0 || jsDay === 6) {
-            continue;
-        }
+    let dateKey = `${year}-${month+1}-${d}`;
+    let jsDay = new Date(year, month, d).getDay();
 
-        let val = num(localStorage.getItem("cal_" + dateKey) || 0);
+    // skip weekends (your logic stays)
+    if (jsDay === 0 || jsDay === 6) continue;
 
-        monthlyTotal += val;
+    let val = num(localStorage.getItem("cal_" + dateKey) || 0);
+    monthlyTotal += val;
 
-        let color = val > 0 ? "green" : (val < 0 ? "red" : "");
+    let color = val > 0 ? "green" : (val < 0 ? "red" : "");
 
-        html += `
-        <div class="calendarDay"
-             onclick="openCalendarEdit('${dateKey}', ${val})">
+    html += `
+    <div class="calendarDay"
+         onclick="openCalendarEdit('${dateKey}', ${val})">
 
-            <div class="dayLabel">Day ${d}</div>
+        <div class="dayLabel">Day ${d}</div>
 
-            <div class="${color}">
-                <span class="calValue">${formatCalValue(val)}</span>
-            </div>
-
+        <div class="${color}">
+            <span class="calValue">${formatCalValue(val)}</span>
         </div>
-        `;
-    }
+
+    </div>
+    `;
+}
 
     // ALL TIME TOTAL (unchanged logic)
     for (let i = 0; i < localStorage.length; i++) {
