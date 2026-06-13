@@ -544,6 +544,33 @@ button {
 body.hideNav .addBtn {
     display: none !important;
 }
+    #calendarGrid{
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.calendarDay{
+    background: linear-gradient(145deg, var(--card), var(--card2));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 10px 6px;
+    text-align: center;
+    backdrop-filter: blur(14px);
+}
+
+/* stack day above value */
+.calendarDay .dayLabel{
+    font-size: 10px;
+    color: #93a4b8;
+    margin-bottom: 6px;
+}
+
+.calendarDay .value{
+    font-size: 13px;
+    font-weight: 600;
+}
     
 </style>
 </head>
@@ -882,18 +909,17 @@ function changeMonth(dir){
         let color = val > 0 ? "green" : (val < 0 ? "red" : "");
 
         html += `
-        <div class="card"
-             onclick="openCalendarEdit('${dateKey}', ${val})"
-             style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
+<div class="calendarDay"
+     onclick="openCalendarEdit('${dateKey}', ${val})">
 
-            <div class="small">Day ${d}</div>
+    <div class="dayLabel">Day ${d}</div>
 
-            <div class="${color}">
-                ${money(val)}
-            </div>
+    <div class="${color}">
+        ${money(val)}
+    </div>
 
-        </div>
-        `;
+</div>
+`;
     }
 
     // ALL TIME TOTAL
