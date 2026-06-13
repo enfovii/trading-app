@@ -665,12 +665,25 @@ body.hideNav .addBtn {
     
     <div id="calendar" class="page">
 
-    <div class="card">
-        <h3>📅 Profit Calendar</h3>
+   <div class="card">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        
+        <div>
+            <h3>📅 Profit Calendar</h3>
+            <div class="small">Track daily profit per month</div>
+        </div>
 
-        <div class="small">Track daily profit per month</div>
+        <div style="text-align:right;">
+            <div class="small">Monthly</div>
+            <div class="big green" id="calMonthTotal">$0</div>
 
-        <div style="display:flex; justify-content:space-between; margin-top:10px;">
+            <div class="small" style="margin-top:6px;">All Time</div>
+            <div class="big" id="calAllTime">$0</div>
+        </div>
+
+    </div>
+
+    <div style="display:flex; justify-content:space-between; margin-top:10px;">
             <button onclick="changeMonth(-1)">◀</button>
             <div id="calMonthTitle" class="big"></div>
             <button onclick="changeMonth(1)">▶</button>
@@ -838,19 +851,31 @@ function changeMonth(dir){
 
     let lastDay = new Date(year, month + 1, 0).getDate();
 
+    let html = "";
     let monthlyTotal = 0;
-    let allTimeTotal = 0;
 
     for(let d = 1; d <= lastDay; d++){
 
         let dateKey = `${year}-${month+1}-${d}`;
-
         let val = num(localStorage.getItem("cal_" + dateKey) || 0);
 
         monthlyTotal += val;
+
+        let color = val > 0 ? "green" : (val < 0 ? "red" : "");
+
+        html += `
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+            <div class="small">Day ${d}</div>
+            <div class="${color}">
+                ${money(val)}
+            </div>
+        </div>
+        `;
     }
 
-    // calculate all-time from localStorage
+    // ALL TIME TOTAL (sum of all stored calendar values)
+    let allTimeTotal = 0;
+
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
 
@@ -859,19 +884,11 @@ function changeMonth(dir){
         }
     }
 
-    grid.innerHTML = `
-        <div class="card">
-            <div class="small">Monthly Total</div>
-            <div class="big green">${money(monthlyTotal)}</div>
-        </div>
+    grid.innerHTML = html;
 
-        <div class="card">
-            <div class="small">All Time Total</div>
-            <div class="big">${money(allTimeTotal)}</div>
-        </div>
-    `;
-
-    document.getElementById("calendarTotal").innerText = money(monthlyTotal);
+    // update header stats (top right)
+    document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
+    document.getElementById("calAllTime").innerText = money(allTimeTotal);
 }
     
 function num(v){
