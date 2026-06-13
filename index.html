@@ -936,18 +936,16 @@ function changeMonth(dir){
    function formatCalValue(v){
 
     v = Number(v);
+
+    let display = v.toLocaleString('en-US'); // ✔️ adds commas automatically
+
     let abs = Math.abs(v);
 
-    let display;
-
-    // Only millions get shortened
+    // only millions get shortened
     if (abs >= 1000000) {
         display = (v / 1000000).toFixed(v >= 10000000 ? 0 : 1) + "M";
-    } else {
-        display = v.toLocaleString('en-US'); // no "k"
     }
 
-    // 🔥 AUTO FONT SIZE (instead of scaling transform)
     let len = display.replace(/[^0-9]/g,'').length;
 
     let fontSize = 13;
@@ -1504,7 +1502,7 @@ function openCalendarEdit(dateKey, val){
 
     selectedCalDate = dateKey;
 
-    document.getElementById("calEditInput").value = val || 0;
+    document.getElementById("calEditInput").value = val ? val : "";
     document.getElementById("calEditTitle").innerText = "Edit " + dateKey;
 
     document.getElementById("calEditModal").style.display = "flex";
@@ -1533,7 +1531,16 @@ function saveCalendarDay(){
 
     let val = num(document.getElementById("calEditInput").value);
 
-    localStorage.setItem("cal_" + selectedCalDate, val);
+    let key = "cal_" + selectedCalDate;
+
+    // ❌ if empty or zero → remove from storage
+    if(!val || val === 0){
+        localStorage.removeItem(key);
+    } 
+    // ✔️ otherwise save value
+    else {
+        localStorage.setItem(key, val);
+    }
 
     closeCalendarEdit();
     renderCalendar();
