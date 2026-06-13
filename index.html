@@ -662,9 +662,7 @@ body.hideNav .addBtn {
 </div>
 
 </div>
-    <button class="stickyBackBtn" onclick="backHome()">
-    Back To Dashboard
-</button>
+    
     <div id="calendar" class="page">
 
     <div class="card">
@@ -687,9 +685,8 @@ body.hideNav .addBtn {
     </div>
 
 </div>
-    <button class="stickyBackBtn" onclick="backHome()">
-    Back To Dashboard
-</button>
+    
+
 <div id="account" class="page">
 <div class="card">
 
@@ -993,15 +990,12 @@ function show(page){
   const stickyBtn = document.querySelector(".stickyBackBtn");
 
 if (stickyBtn) {
-    if (page === "projection") {
+
+    const showBackPages = ["projection", "drawdown", "calendar", "account", "portfolio"];
+
+    if (showBackPages.includes(page)) {
         stickyBtn.style.display = "block";
-        stickyBtn.innerText = "Back to Dashboard";
-    } 
-    else if (page === "drawdown") {
-        stickyBtn.style.display = "block";
-        stickyBtn.innerText = "Back to Dashboard";
-    } 
-    else {
+    } else {
         stickyBtn.style.display = "none";
     }
 }
@@ -1365,6 +1359,8 @@ window.onload=function(){
     render();
 };
 </script>
-
+<button class="stickyBackBtn" onclick="backHome()" style="display:none;">
+    Back To Dashboard
+</button>
 </body>
 </html>
