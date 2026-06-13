@@ -546,7 +546,7 @@ body.hideNav .addBtn {
 }
     #calendarGrid{
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     margin-top: 10px;
 }
@@ -590,7 +590,6 @@ body.hideNav .addBtn {
     text-align: center;
     font-size: 11px;
     color: #93a4b8;
-    letter-spacing: 0.5px;
 }
     
 </style>
@@ -742,8 +741,7 @@ body.hideNav .addBtn {
     <div>Wed</div>
     <div>Thu</div>
     <div>Fri</div>
-    <div>Sat</div>
-    <div>Sun</div>
+    
 </div>
    </div>
 
@@ -932,30 +930,22 @@ function changeMonth(dir){
     let html = "";
     let monthlyTotal = 0;
 
-    // Monday-first alignment (0 = Mon ... 6 = Sun)
-    let firstDay = new Date(year, month, 1).getDay();
-    firstDay = (firstDay + 6) % 7;
+    // All-time calculation unchanged
+    let allTimeTotal = 0;
 
-    // build full weekday map BUT skip weekends
-    let weekdayIndex = firstDay;
-
-    // empty slots before day 1 (but still respecting Mon–Fri grid)
-    for (let i = 0; i < firstDay; i++) {
-        html += `<div></div>`;
-    }
-
+    // Loop through all days in month
     for(let d = 1; d <= lastDay; d++){
 
-        // determine weekday (0-6)
-        let jsDay = new Date(year, month, d).getDay();
-        let monIndex = (jsDay + 6) % 7; // Mon=0 ... Sun=6
+        let dateKey = `${year}-${month+1}-${d}`;
 
-        // ❌ SKIP WEEKENDS
-        if (monIndex === 5 || monIndex === 6) {
+        // Get real weekday (0 = Sun ... 6 = Sat)
+        let jsDay = new Date(year, month, d).getDay();
+
+        // ❌ SKIP WEEKENDS (Sunday + Saturday)
+        if (jsDay === 0 || jsDay === 6) {
             continue;
         }
 
-        let dateKey = `${year}-${month+1}-${d}`;
         let val = num(localStorage.getItem("cal_" + dateKey) || 0);
 
         monthlyTotal += val;
@@ -976,9 +966,7 @@ function changeMonth(dir){
         `;
     }
 
-    // ALL TIME TOTAL (unchanged)
-    let allTimeTotal = 0;
-
+    // ALL TIME TOTAL (unchanged logic)
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
 
@@ -989,6 +977,7 @@ function changeMonth(dir){
 
     grid.innerHTML = html;
 
+    // header stats (unchanged)
     document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
     document.getElementById("calAllTime").innerText = money(allTimeTotal);
 }
