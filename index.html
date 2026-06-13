@@ -639,16 +639,16 @@ body.hideNav .addBtn {
 }
 
 .calendarDay .value{
-    font-size: clamp(8px, 2vw, 13px);
     font-weight: 700;
     line-height: 1.1;
 
     width: 100%;
-    overflow: hidden;
-
     white-space: nowrap;
     text-overflow: ellipsis;
+    overflow: hidden;
 
+    font-size: 14px;
+    transform: scale(1);
     transform-origin: center;
 }
     .weekHeader{
@@ -1003,22 +1003,16 @@ function changeMonth(dir){
 
     let html = "";
     let monthlyTotal = 0;
-
-    // All-time calculation unchanged
     let allTimeTotal = 0;
 
-    // Loop through all days in month
     for(let d = 1; d <= lastDay; d++){
 
         let dateKey = `${year}-${month+1}-${d}`;
 
-        // Get real weekday (0 = Sun ... 6 = Sat)
         let jsDay = new Date(year, month, d).getDay();
 
-        // ❌ SKIP WEEKENDS (Sunday + Saturday)
-        if (jsDay === 0 || jsDay === 6) {
-            continue;
-        }
+        // skip weekends
+        if (jsDay === 0 || jsDay === 6) continue;
 
         let val = num(localStorage.getItem("cal_" + dateKey) || 0);
 
@@ -1026,21 +1020,29 @@ function changeMonth(dir){
 
         let color = val > 0 ? "green" : (val < 0 ? "red" : "");
 
+        let display = money(val);
+
+        // auto scale based on length (prevents overflow)
+        let scale = 1;
+        if (display.length > 7) scale = 0.9;
+        if (display.length > 9) scale = 0.8;
+        if (display.length > 11) scale = 0.7;
+
         html += `
         <div class="calendarDay"
              onclick="openCalendarEdit('${dateKey}', ${val})">
 
             <div class="dayLabel">Day ${d}</div>
 
-            <div class="${color}">
-                ${money(val)}
+            <div class="${color} value" style="transform: scale(${scale})">
+                ${display}
             </div>
 
         </div>
         `;
     }
 
-    // ALL TIME TOTAL (unchanged logic)
+    // all-time total
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
 
@@ -1051,7 +1053,6 @@ function changeMonth(dir){
 
     grid.innerHTML = html;
 
-    // header stats (unchanged)
     document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
     document.getElementById("calAllTime").innerText = money(allTimeTotal);
 }
@@ -1069,7 +1070,6 @@ function money(v){
 
     if (Math.abs(v) >= 1000000) {
         let m = v / 1000000;
-
         return "$" + m.toFixed(m >= 10 ? 0 : 1) + "M";
     }
 
@@ -1077,7 +1077,7 @@ function money(v){
         return "$" + v.toLocaleString('en-US');
     }
 
-    return "$" + v;
+    return "$" + v.toFixed(0);
 }
 
     return "$" + v.toLocaleString();
@@ -1148,26 +1148,27 @@ function formatBalanceInput(el){
     el.value = Number(raw).toLocaleString('en-US');
     updateAccount();
 }
-    function formatCalendarInput(el){
+   function formatCalendarInput(el){
 
     let raw = el.value
-        .replace(/,/g,'')
-        .replace(/[^\d-]/g,'');
+        .replace(/,/g, '')
+        .replace(/[^\d-]/g, '');
 
-    if(raw === '' || raw === '-'){
-        return;
-    }
+    if (raw === '' || raw === '-') return;
 
     let isNegative = raw.startsWith('-');
 
     raw = raw.replace('-', '');
 
-    let formatted =
-        Number(raw).toLocaleString('en-US');
+    if (raw === '') return;
 
-    el.value = isNegative
-        ? '-' + formatted
-        : formatted;
+    let numVal = Number(raw);
+
+    if (isNaN(numVal)) return;
+
+    let formatted = numVal.toLocaleString('en-US');
+
+    el.value = isNegative ? '-' + formatted : formatted;
 }
 
 function tier(b){
