@@ -619,6 +619,17 @@ body.hideNav .addBtn {
     min-width: 0;
     overflow: hidden;
 }
+    .calendarDay{
+    min-width: 0;
+}
+
+/* make big values scale down nicely */
+.calendarDay .green,
+.calendarDay .red,
+.calendarDay .value{
+    max-width: 100%;
+    display: block;
+}
 
 /* stack day above value */
 .calendarDay .dayLabel{
@@ -628,15 +639,17 @@ body.hideNav .addBtn {
 }
 
 .calendarDay .value{
-    font-size: clamp(10px, 2.6vw, 13px);
+    font-size: clamp(8px, 2vw, 13px);
     font-weight: 700;
-    line-height: 1.15;
+    line-height: 1.1;
 
+    width: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
 
     white-space: nowrap;
-    width: 100%;
+    text-overflow: ellipsis;
+
+    transform-origin: center;
 }
     .weekHeader{
     display: grid;
