@@ -1195,20 +1195,26 @@ if (stickyBtn) {
 }
 
 function renderPortfolio(){
-    let t=0,d=0,
+    let t = 0;
+    let d = 0;
 
     accounts.forEach(a=>{
-        let b=num(a.balance);
-        t+=b;
-        d+=daily(b);
-    
+        let b = num(a.balance);
+        t += b;
+        d += daily(b);
     });
 
-    document.getElementById("p_total").innerText = money(t.toFixed(0));
-    document.getElementById("p_daily").innerText = money(d.toFixed(0));
-    document.getElementById("p_week").innerText = money((d*5).toFixed(0));
-    document.getElementById("p_month").innerText = money((d*22).toFixed(0));
-    
+    document.getElementById("p_total").innerText =
+        money(t.toFixed(0));
+
+    document.getElementById("p_daily").innerText =
+        money(d.toFixed(0));
+
+    document.getElementById("p_week").innerText =
+        money((d * 5).toFixed(0));
+
+    document.getElementById("p_month").innerText =
+        money((d * 22).toFixed(0));
 }
 
 function render(){
