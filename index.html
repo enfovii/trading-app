@@ -937,19 +937,22 @@ function changeMonth(dir){
 
     v = Number(v);
 
-    let display = v.toLocaleString('en-US'); // ✔️ adds commas automatically
-
     let abs = Math.abs(v);
+    let display;
 
-    // only millions get shortened
+    // Millions first
     if (abs >= 1000000) {
         display = (v / 1000000).toFixed(v >= 10000000 ? 0 : 1) + "M";
+    } 
+    // Everything else with commas
+    else {
+        display = v.toLocaleString('en-US');
     }
 
+    // font sizing (ignore commas safely)
     let len = display.replace(/[^0-9]/g,'').length;
 
     let fontSize = 13;
-
     if (len >= 6) fontSize = 12;
     if (len >= 7) fontSize = 11;
     if (len >= 8) fontSize = 10;
