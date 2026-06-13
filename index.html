@@ -582,6 +582,16 @@ body.hideNav .addBtn {
     color: #93a4b8;
     letter-spacing: 0.5px;
 }
+    .weekHeaderOutside{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin: 10px 0 6px;
+    text-align: center;
+    font-size: 11px;
+    color: #93a4b8;
+    letter-spacing: 0.5px;
+}
     
 </style>
 </head>
@@ -737,7 +747,15 @@ body.hideNav .addBtn {
 </div>
    </div>
 
-    <div id="calendarGrid"></div>
+    <div class="weekHeaderOutside">
+    <div>Mon</div>
+    <div>Tue</div>
+    <div>Wed</div>
+    <div>Thu</div>
+    <div>Fri</div>
+</div>
+
+<div id="calendarGrid"></div>
 
 </div>
     
@@ -914,19 +932,28 @@ function changeMonth(dir){
     let html = "";
     let monthlyTotal = 0;
 
-    // 🔑 Get first day of month (0 = Sunday)
+    // Monday-first alignment (0 = Mon ... 6 = Sun)
     let firstDay = new Date(year, month, 1).getDay();
-
-    // Convert to Monday-first system (Mon=0 ... Sun=6)
     firstDay = (firstDay + 6) % 7;
 
-    // Add empty slots before day 1
+    // build full weekday map BUT skip weekends
+    let weekdayIndex = firstDay;
+
+    // empty slots before day 1 (but still respecting Mon–Fri grid)
     for (let i = 0; i < firstDay; i++) {
         html += `<div></div>`;
     }
 
-    // Render days
     for(let d = 1; d <= lastDay; d++){
+
+        // determine weekday (0-6)
+        let jsDay = new Date(year, month, d).getDay();
+        let monIndex = (jsDay + 6) % 7; // Mon=0 ... Sun=6
+
+        // ❌ SKIP WEEKENDS
+        if (monIndex === 5 || monIndex === 6) {
+            continue;
+        }
 
         let dateKey = `${year}-${month+1}-${d}`;
         let val = num(localStorage.getItem("cal_" + dateKey) || 0);
@@ -949,7 +976,7 @@ function changeMonth(dir){
         `;
     }
 
-    // ALL TIME TOTAL
+    // ALL TIME TOTAL (unchanged)
     let allTimeTotal = 0;
 
     for (let i = 0; i < localStorage.length; i++) {
@@ -962,7 +989,6 @@ function changeMonth(dir){
 
     grid.innerHTML = html;
 
-    // header stats
     document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
     document.getElementById("calAllTime").innerText = money(allTimeTotal);
 }
