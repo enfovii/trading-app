@@ -1120,14 +1120,28 @@ function confirmRename(){
 }
 
 function formatBalanceInput(el){
-    let raw = el.value.replace(/,/g,'').replace(/[^\d]/g,'');
 
-    if(raw === ''){
+    let cursorPos = el.selectionStart;
+
+    let raw = el.value.replace(/,/g,'').replace(/[^\d-]/g,'');
+
+    if(raw === '' || raw === '-'){
+        el.value = raw;
         updateAccount();
         return;
     }
 
-    el.value = Number(raw).toLocaleString('en-US');
+    let isNegative = raw.startsWith('-');
+    let numVal = Number(raw);
+
+    let formatted = Math.abs(numVal).toLocaleString('en-US');
+
+    el.value = isNegative ? '-' + formatted : formatted;
+
+    // restore cursor (prevents jump issues)
+    setTimeout(() => {
+        el.setSelectionRange(el.value.length, el.value.length);
+    }, 0);
 
     updateAccount();
 }
