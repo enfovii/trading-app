@@ -1121,9 +1121,7 @@ function confirmRename(){
 
 function formatBalanceInput(el){
 
-    let cursorPos = el.selectionStart;
-
-    let raw = el.value.replace(/,/g,'').replace(/[^\d-]/g,'');
+    let raw = el.value.replace(/,/g,'');
 
     if(raw === '' || raw === '-'){
         el.value = raw;
@@ -1134,14 +1132,11 @@ function formatBalanceInput(el){
     let isNegative = raw.startsWith('-');
     let numVal = Number(raw);
 
+    if(isNaN(numVal)) return;
+
     let formatted = Math.abs(numVal).toLocaleString('en-US');
 
     el.value = isNegative ? '-' + formatted : formatted;
-
-    // restore cursor (prevents jump issues)
-    setTimeout(() => {
-        el.setSelectionRange(el.value.length, el.value.length);
-    }, 0);
 
     updateAccount();
 }
@@ -1368,7 +1363,7 @@ function updateAccount(){
 
     let elInput = document.getElementById("balance");
 
-    let pos = elInput.selectionStart;
+    
     elInput.value = Number(b).toLocaleString('en-US');
     elInput.setSelectionRange(elInput.value.length, elInput.value.length);
 
