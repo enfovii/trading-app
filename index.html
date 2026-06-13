@@ -664,33 +664,13 @@ body.hideNav .addBtn {
 </div>
     
     <div id="calendar" class="page">
-        <div style="
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    text-align:center;
-    margin-bottom:10px;
-    padding:10px 6px;
-    border-radius:14px;
-    background:rgba(10,15,30,0.35);
-    border:1px solid rgba(120,170,255,0.12);
-">
-    <div class="small">Mon</div>
-    <div class="small">Tue</div>
-    <div class="small">Wed</div>
-    <div class="small">Thu</div>
-    <div class="small">Fri</div>
-    <div class="small">Sat</div>
-    <div class="small">Sun</div>
-</div>
 
    <div class="card">
-    
+    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         
         <div>
             <h3>📅 Profit Calendar</h3>
             <div class="small">Track daily profit per month</div>
-            
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         </div>
 
         <div style="text-align:right;">
@@ -887,54 +867,28 @@ function changeMonth(dir){
 
     title.innerText = monthNames[month] + " " + year;
 
-    let firstDay = new Date(year, month, 1).getDay();
     let lastDay = new Date(year, month + 1, 0).getDate();
 
-    // Monday start adjustment
-    let startOffset = (firstDay === 0) ? 6 : firstDay - 1;
-
     let html = "";
-    let total = 0;
+    let monthlyTotal = 0;
 
-    // GRID START
-    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">`;
-
-    // MONDAY - SUNDAY HEADER (NOW correctly ABOVE days)
-    html += `
-    <div style="grid-column:span 7;display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px;">
-        <div class="small">Mon</div>
-        <div class="small">Tue</div>
-        <div class="small">Wed</div>
-        <div class="small">Thu</div>
-        <div class="small">Fri</div>
-        <div class="small">Sat</div>
-        <div class="small">Sun</div>
-    </div>
-    `;
-
-    // empty slots before first day
-    for (let i = 0; i < startOffset; i++) {
-        html += `<div></div>`;
-    }
-
-    // days
-    for (let d = 1; d <= lastDay; d++) {
+    for(let d = 1; d <= lastDay; d++){
 
         let dateKey = `${year}-${month+1}-${d}`;
         let val = num(localStorage.getItem("cal_" + dateKey) || 0);
 
-        total += val;
+        monthlyTotal += val;
 
         let color = val > 0 ? "green" : (val < 0 ? "red" : "");
 
         html += `
         <div class="card"
-            onclick="openCalInput('${dateKey}')"
-            style="padding:12px;text-align:center;cursor:pointer;">
+             onclick="openCalendarEdit('${dateKey}', ${val})"
+             style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">
 
-            <div class="small">${d}</div>
+            <div class="small">Day ${d}</div>
 
-            <div class="${color}" style="font-size:12px;margin-top:4px;">
+            <div class="${color}">
                 ${money(val)}
             </div>
 
@@ -942,12 +896,22 @@ function changeMonth(dir){
         `;
     }
 
-    html += `</div>`;
+    // ALL TIME TOTAL
+    let allTimeTotal = 0;
+
+    for (let i = 0; i < localStorage.length; i++) {
+        let key = localStorage.key(i);
+
+        if (key && key.startsWith("cal_")) {
+            allTimeTotal += num(localStorage.getItem(key));
+        }
+    }
 
     grid.innerHTML = html;
 
-    // ❌ NO bottom monthly total anymore
-    // (top one handles it now)
+    // header stats
+    document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
+    document.getElementById("calAllTime").innerText = money(allTimeTotal);
 }
     
 function num(v){
@@ -1405,18 +1369,6 @@ function renderDrawdown(){
     }
 
     container.innerHTML = html;
-}
-    function openCalInput(dateKey){
-
-    let current = localStorage.getItem("cal_" + dateKey) || "";
-
-    let val = prompt("Enter P/L for " + dateKey, current);
-
-    if(val === null) return;
-
-    localStorage.setItem("cal_" + dateKey, val);
-
-    renderCalendar();
 }
 function openCalendarEdit(dateKey, val){
 
