@@ -682,10 +682,7 @@ body.hideNav .addBtn {
         <div class="big green" id="p_month"></div>
     </div>
 
-    <div class="card">
-        <div class="small">Drawdown</div>
-        <div class="big red" id="p_dd"></div>
-    </div>
+    
 
     <button onclick="backHome()">Back</button>
 </div>
@@ -819,10 +816,7 @@ body.hideNav .addBtn {
         <div id="monthly"></div>
     </div>
 
-    <div class="card">
-        <div class="small">Drawdown</div>
-        <div class="big red" id="accdd"></div>
-    </div>
+    
 
     <button onclick="back()">Back</button>
     <button class="danger" onclick="confirmDelete()">Delete Account</button>
@@ -1201,20 +1195,20 @@ if (stickyBtn) {
 }
 
 function renderPortfolio(){
-    let t=0,d=0,draw=0;
+    let t=0,d=0,
 
     accounts.forEach(a=>{
         let b=num(a.balance);
         t+=b;
         d+=daily(b);
-        draw+=dd(b);
+    
     });
 
     document.getElementById("p_total").innerText = money(t.toFixed(0));
     document.getElementById("p_daily").innerText = money(d.toFixed(0));
     document.getElementById("p_week").innerText = money((d*5).toFixed(0));
     document.getElementById("p_month").innerText = money((d*22).toFixed(0));
-    document.getElementById("p_dd").innerText = money(draw.toFixed(0));
+    
 }
 
 function render(){
@@ -1360,7 +1354,7 @@ function updateAccount(){
     document.getElementById("dailyP").innerText=money(daily(b));
     document.getElementById("weekly").innerText=money(daily(b)*5);
     document.getElementById("monthly").innerText=money(daily(b)*22);
-    document.getElementById("accdd").innerText=money(dd(b));
+    
 
     let elInput = document.getElementById("balance");
 
