@@ -880,44 +880,28 @@ function changeMonth(dir){
     let year = calendarDate.getFullYear();
     let month = calendarDate.getMonth();
 
-    let monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    let monthNames = [
+        "Jan","Feb","Mar","Apr","May","Jun",
+        "Jul","Aug","Sep","Oct","Nov","Dec"
+    ];
 
     title.innerText = monthNames[month] + " " + year;
 
-    let firstDay = new Date(year, month, 1).getDay(); // 0 = Sunday
+    let firstDay = new Date(year, month, 1).getDay();
     let lastDay = new Date(year, month + 1, 0).getDate();
 
-    // Convert Sunday-start → Monday-start
     let startOffset = (firstDay === 0) ? 6 : firstDay - 1;
 
     let html = "";
+    let total = 0;
 
-    // WEEK HEADER
-    html += `
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px;">
-        <div class="small">Mon</div>
-        <div class="small">Tue</div>
-        <div class="small">Wed</div>
-        <div class="small">Thu</div>
-        <div class="small">Fri</div>
-        <div class="small">Sat</div>
-        <div class="small">Sun</div>
-    </div>
-    `;
+    html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">`;
 
-    // GRID
-    html += `
-    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">
-    `;
-
-    // empty slots before day 1
-    for(let i = 0; i < startOffset; i++){
+    for (let i = 0; i < startOffset; i++) {
         html += `<div></div>`;
     }
 
-    let total = 0;
-
-    for(let d = 1; d <= lastDay; d++){
+    for (let d = 1; d <= lastDay; d++) {
 
         let dateKey = `${year}-${month+1}-${d}`;
         let val = num(localStorage.getItem("cal_" + dateKey) || 0);
@@ -927,11 +911,15 @@ function changeMonth(dir){
         let color = val > 0 ? "green" : (val < 0 ? "red" : "");
 
         html += `
-        <div class="card" style="padding:10px; text-align:center;">
+        <div class="card"
+            onclick="openCalInput('${dateKey}')"
+            style="padding:12px;text-align:center;cursor:pointer;">
+
             <div class="small">${d}</div>
-            <div class="${color}" style="font-size:12px;">
+            <div class="${color}" style="font-size:12px;margin-top:4px;">
                 ${money(val)}
             </div>
+
         </div>
         `;
     }
