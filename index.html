@@ -1685,140 +1685,222 @@ function renderProjection(){
 
     let base = getBaseBalance();
 
-    let balance = base.balance;
-    let anchor = base.anchor;
-
     let html = "";
+
+    // ===== PORTFOLIO MODE =====
+    let simAccounts = [];
+
+    if(base.anchor === null){
+        simAccounts = accounts.map(a => ({
+            balance: num(a.balance),
+            anchor: a.anchor || 40000
+        }));
+    }
+
+    // ===== SINGLE/CUSTOM =====
+    let simBalance = base.balance;
+    let simAnchor = base.anchor;
 
     for(let m = 1; m <= 12; m++){
 
-        let monthDailyTotal = 0;
+        let startDaily = 0;
         let monthProfit = 0;
 
-        // ===== TOTAL PORTFOLIO MODE =====
-        if(anchor === null){
+        // ==========================
+        // TOTAL PORTFOLIO
+        // ==========================
+        if(base.anchor === null){
 
-            // clone account balances so we can simulate daily growth
-            let simAccounts = accounts.map(a => ({
-                balance: num(a.balance),
-                anchor: a.anchor || 40000
-            }));
+            // daily at START of month
+            simAccounts.forEach(acc=>{
+                startDaily += daily(
+                    acc.balance,
+                    acc.anchor
+                );
+            });
 
             // simulate 22 trading days
             for(let day = 1; day <= 22; day++){
 
-                let dailyTotal = 0;
+                simAccounts.forEach(acc=>{
 
-                simAccounts.forEach(acc => {
+                    let d = daily(
+                        acc.balance,
+                        acc.anchor
+                    );
 
-                    let d =
-                        daily(acc.balance, acc.anchor);
+                    monthProfit += d;
 
-                    dailyTotal += d;
-
-                    // grow balance immediately
+                    // instant scaling
                     acc.balance += d;
                 });
-
-                monthProfit += dailyTotal;
-                monthDailyTotal = dailyTotal;
             }
 
-            balance += monthProfit;
+            // total portfolio balance
+            let portfolioBalance = 0;
+
+            simAccounts.forEach(acc=>{
+                portfolioBalance += acc.balance;
+            });
+
+            let weekly = startDaily * 5;
+
+            html += `
+            <div class="card">
+
+                <div class="small">
+                    Month ${m}
+                </div>
+
+                <div class="big">
+                    ${money(portfolioBalance.toFixed(0))}
+                </div>
+
+                <div style="
+                    margin-top:8px;
+                    display:flex;
+                    justify-content:space-between;
+                    gap:6px;
+                    text-align:center;
+                    font-size:12px;
+                ">
+
+                    <div style="flex:1;">
+                        <div>
+                            Daily ${money(startDaily)}
+                        </div>
+                        <div style="
+                            font-size:10px;
+                            color:#93a4b8;
+                            margin-top:2px;
+                        ">
+                            (${money(startDaily / 100)})
+                        </div>
+                    </div>
+
+                    <div style="flex:1;">
+                        <div>
+                            Weekly ${money(weekly)}
+                        </div>
+                        <div style="
+                            font-size:10px;
+                            color:#93a4b8;
+                            margin-top:2px;
+                        ">
+                            (${money(weekly / 100)})
+                        </div>
+                    </div>
+
+                    <div style="flex:1;">
+                        <div>
+                            Monthly ${money(monthProfit)}
+                        </div>
+                        <div style="
+                            font-size:10px;
+                            color:#93a4b8;
+                            margin-top:2px;
+                        ">
+                            (${money(monthProfit / 100)})
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            `;
 
         } else {
 
-            // ===== SINGLE ACCOUNT / CUSTOM =====
-            let simBalance = balance;
+            // ==========================
+            // SINGLE ACCOUNT / CUSTOM
+            // ==========================
+
+            startDaily =
+                daily(simBalance, simAnchor);
 
             for(let day = 1; day <= 22; day++){
 
-                let d = daily(simBalance, anchor);
+                let d =
+                    daily(simBalance, simAnchor);
 
-                monthDailyTotal = d;
                 monthProfit += d;
 
-                // grow instantly so multiplier updates mid-month
+                // instant scaling
                 simBalance += d;
             }
 
-            balance = simBalance;
+            let weekly =
+                startDaily * 5;
+
+            html += `
+            <div class="card">
+
+                <div class="small">
+                    Month ${m}
+                </div>
+
+                <div class="big">
+                    ${money(simBalance.toFixed(0))}
+                </div>
+
+                <div style="
+                    margin-top:8px;
+                    display:flex;
+                    justify-content:space-between;
+                    gap:6px;
+                    text-align:center;
+                    font-size:12px;
+                ">
+
+                    <div style="flex:1;">
+                        <div>
+                            Daily ${money(startDaily)}
+                        </div>
+                        <div style="
+                            font-size:10px;
+                            color:#93a4b8;
+                            margin-top:2px;
+                        ">
+                            (${money(startDaily / 100)})
+                        </div>
+                    </div>
+
+                    <div style="flex:1;">
+                        <div>
+                            Weekly ${money(weekly)}
+                        </div>
+                        <div style="
+                            font-size:10px;
+                            color:#93a4b8;
+                            margin-top:2px;
+                        ">
+                            (${money(weekly / 100)})
+                        </div>
+                    </div>
+
+                    <div style="flex:1;">
+                        <div>
+                            Monthly ${money(monthProfit)}
+                        </div>
+                        <div style="
+                            font-size:10px;
+                            color:#93a4b8;
+                            margin-top:2px;
+                        ">
+                            (${money(monthProfit / 100)})
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            `;
         }
-
-        let d = monthDailyTotal;
-        let w = d * 5;
-        let mo = monthProfit;
-
-        html += `
-        <div class="card">
-
-            <div class="small">
-                Month ${m}
-            </div>
-
-            <div class="big">
-                ${money(balance.toFixed(0))}
-            </div>
-
-            <div style="
-                margin-top:8px;
-                display:flex;
-                justify-content:space-between;
-                gap:6px;
-                text-align:center;
-                font-size:12px;
-            ">
-
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Daily ${money(d)}
-                    </div>
-
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
-                        (${money(d / 100)})
-                    </div>
-                </div>
-
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Weekly ${money(w)}
-                    </div>
-
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
-                        (${money(w / 100)})
-                    </div>
-                </div>
-
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Monthly ${money(mo)}
-                    </div>
-
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
-                        (${money(mo / 100)})
-                    </div>
-                </div>
-
-            </div>
-
-        </div>
-        `;
     }
 
-    document.getElementById("projResults")
-        .innerHTML = html;
+    document.getElementById(
+        "projResults"
+    ).innerHTML = html;
 }
 
 function setAnchor(i){
