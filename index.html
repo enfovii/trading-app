@@ -1581,16 +1581,66 @@ function deleteAccount(){
     // CUSTOM BALANCE
     if(mode === "custom"){
 
-        return {
-            balance: num(
+        let customBalance =
+            num(
                 document.getElementById("projCustom").value
-            ),
+            );
+
+        return {
+            balance: customBalance,
             daily: daily(
-                num(document.getElementById("projCustom").value)
+                customBalance,
+                customBalance
             ),
-            anchor: 40000
+            anchor: customBalance
         };
     }
+
+    return {
+        balance: 0,
+        daily: 0,
+        anchor: 40000
+    };
+}
+            balance: totalBalance,
+            daily: totalDaily,
+            anchor: null
+        };
+    }
+
+    // SINGLE ACCOUNT
+    if(mode === "account"){
+
+        let i =
+            document.getElementById("projAccount").value;
+
+        let a = accounts[i];
+
+        return {
+            balance: num(a.balance),
+            daily: daily(
+                num(a.balance),
+                a.anchor || 40000
+            ),
+            anchor: a.anchor || 40000
+        };
+    }
+
+   // CUSTOM BALANCE
+if(mode === "custom"){
+
+    let customBalance =
+        num(document.getElementById("projCustom").value);
+
+    return {
+        balance: customBalance,
+        daily: daily(
+            customBalance,
+            customBalance
+        ),
+        anchor: customBalance
+    };
+}
 
     return {
         balance: 0,
