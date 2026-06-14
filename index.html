@@ -1705,7 +1705,6 @@ function renderProjection(){
         }));
     }
 
-    // ===== SINGLE / CUSTOM =====
     let simBalance = base.balance;
     let simAnchor = base.anchor;
 
@@ -1724,13 +1723,11 @@ function renderProjection(){
 
                 simAccounts.forEach(acc => {
 
-                    // 🔥 FIX: lock multiplier per day
+                    // ✔ MID-MONTH TIER CHANGE (correct logic)
                     let mult = getTierMultiplier(acc.balance, acc.anchor);
                     let d = mult * 800;
 
                     monthProfit += d;
-
-                    // apply AFTER calculation
                     acc.balance += d;
                 });
             }
@@ -1742,7 +1739,6 @@ function renderProjection(){
                 let mult = getTierMultiplier(acc.balance, acc.anchor);
                 displayDaily += mult * 800;
             });
-
         }
 
         // ==========================
@@ -1752,12 +1748,11 @@ function renderProjection(){
 
             for(let day = 1; day <= 22; day++){
 
-                // 🔥 FIX: lock multiplier per day
+                // ✔ MID-MONTH TIER CHANGE (correct logic)
                 let mult = getTierMultiplier(simBalance, simAnchor);
                 let d = mult * 800;
 
                 monthProfit += d;
-
                 simBalance += d;
             }
 
@@ -1794,11 +1789,7 @@ function renderProjection(){
                         Daily ${money(displayDaily)}
                     </div>
 
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
+                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
                         (${money(displayDaily / 100)})
                     </div>
                 </div>
@@ -1808,11 +1799,7 @@ function renderProjection(){
                         Weekly ${money(weekly)}
                     </div>
 
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
+                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
                         (${money(weekly / 100)})
                     </div>
                 </div>
@@ -1822,11 +1809,7 @@ function renderProjection(){
                         Monthly ${money(monthProfit)}
                     </div>
 
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
+                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
                         (${money(monthProfit / 100)})
                     </div>
                 </div>
