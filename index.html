@@ -1504,22 +1504,68 @@ function deleteAccount(){
 }
     function getBaseBalance(){
 
-    let mode = document.getElementById("projMode").value;
+    let mode =
+        document.getElementById("projMode").value;
 
+    // TOTAL PORTFOLIO
     if(mode === "portfolio"){
-        return accounts.reduce((t,a)=>t + num(a.balance),0);
+
+        let totalBalance = 0;
+        let totalDaily = 0;
+
+        accounts.forEach(a => {
+
+            let b = num(a.balance);
+            let anchor = a.anchor || 40000;
+
+            totalBalance += b;
+            totalDaily += daily(b, anchor);
+        });
+
+        return {
+            balance: totalBalance,
+            daily: totalDaily,
+            anchor: null
+        };
     }
 
+    // SINGLE ACCOUNT
     if(mode === "account"){
-        let i = document.getElementById("projAccount").value;
-        return num(accounts[i].balance);
+
+        let i =
+            document.getElementById("projAccount").value;
+
+        let a = accounts[i];
+
+        return {
+            balance: num(a.balance),
+            daily: daily(
+                num(a.balance),
+                a.anchor || 40000
+            ),
+            anchor: a.anchor || 40000
+        };
     }
 
+    // CUSTOM BALANCE
     if(mode === "custom"){
-        return num(document.getElementById("projCustom").value);
+
+        return {
+            balance: num(
+                document.getElementById("projCustom").value
+            ),
+            daily: daily(
+                num(document.getElementById("projCustom").value)
+            ),
+            anchor: 40000
+        };
     }
 
-    return 0;
+    return {
+        balance: 0,
+        daily: 0,
+        anchor: 40000
+    };
 }
 
    function simulateDrawdown(pips){
@@ -1606,12 +1652,19 @@ function saveCalendarDay(){
 }
 function renderProjection(){
 
-    let balance = getBaseBalance();
+   let base = getBaseBalance();
+
+let balance = base.balance;
+let projectionDaily = base.daily;
+let anchor = base.anchor;
     let html = "";
 
     for(let m = 1; m <= 12; m++){
 
-        let d = daily(balance);
+        let d =
+    anchor === null
+    ? projectionDaily
+    : daily(balance, anchor);
         let w = d * 5;
         let mo = d * 22;
 
@@ -1677,6 +1730,11 @@ function renderProjection(){
         `;
 
         balance += mo;
+
+if(anchor !== null){
+    projectionDaily =
+        daily(balance, anchor);
+}
     }
 
     document.getElementById("projResults").innerHTML = html;
