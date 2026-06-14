@@ -1327,10 +1327,17 @@ if (b < anchor) {
         <div class="label">ETA</div>
         <div class="value">
             ${(() => {
-                let dp = daily(b);
-                if (dp <= 0) return "~";
-                let days = needed / dp;
-                return isFinite(days) ? "~" + days.toFixed(1) + "d" : "~";
+                let anchor = accounts[i].anchor || 40000;
+
+let dp = daily(b, anchor);
+
+if (dp <= 0) return "~";
+
+let days = needed / dp;
+
+return isFinite(days)
+    ? "~" + days.toFixed(1) + "d"
+    : "~";
             })()}
         </div>
     </div>
