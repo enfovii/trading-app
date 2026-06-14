@@ -1723,7 +1723,6 @@ function renderProjection(){
 
                 simAccounts.forEach(acc => {
 
-                    // ✔ MID-MONTH TIER CHANGE (correct logic)
                     let mult = getTierMultiplier(acc.balance, acc.anchor);
                     let d = mult * 800;
 
@@ -1737,7 +1736,7 @@ function renderProjection(){
                 displayBalance += acc.balance;
 
                 let mult = getTierMultiplier(acc.balance, acc.anchor);
-                displayDaily += mult * 800;
+                displayDaily = displayDaily + (mult * 800);
             });
         }
 
@@ -1748,7 +1747,6 @@ function renderProjection(){
 
             for(let day = 1; day <= 22; day++){
 
-                // ✔ MID-MONTH TIER CHANGE (correct logic)
                 let mult = getTierMultiplier(simBalance, simAnchor);
                 let d = mult * 800;
 
@@ -1763,6 +1761,7 @@ function renderProjection(){
         }
 
         let weekly = displayDaily * 5;
+        let monthly = displayDaily * 22; // ✅ FIXED (was compounding)
 
         html += `
         <div class="card">
@@ -1806,11 +1805,11 @@ function renderProjection(){
 
                 <div style="flex:1; min-width:0;">
                     <div style="white-space:nowrap;">
-                        Monthly ${money(monthProfit)}
+                        Monthly ${money(monthly)}
                     </div>
 
                     <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
-                        (${money(monthProfit / 100)})
+                        (${money(monthly / 100)})
                     </div>
                 </div>
 
