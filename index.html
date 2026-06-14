@@ -1778,10 +1778,16 @@ function setAnchor(i){
 
     let val = accounts[i].anchor || 40000;
 
-    document.getElementById("anchorInput").value =
-        Number(val).toLocaleString('en-US');
+    let input = document.getElementById("anchorInput");
+
+    input.value = Number(val).toLocaleString('en-US');
 
     document.getElementById("anchorModal").style.display = "flex";
+
+    setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }, 100);
 }
     function saveAnchor(){
 
@@ -1789,27 +1795,32 @@ function setAnchor(i){
 
     if(editingAnchorIndex === null || val <= 0) return;
 
-    accounts[editingAnchorIndex].anchor = val;
+    let i = editingAnchorIndex;
+
+    accounts[i].anchor = val;
 
     localStorage.setItem(
         "accounts",
         JSON.stringify(accounts)
     );
 
-    // 🔥 FIX 1: update UI immediately if you're still on account 
-if(current === editingAnchorIndex){
-    refreshAccountUI(current);
-}
     closeAnchorModal();
 
-    // 🔥 FIX 2: re-render list so cards update too
-    render();
+    // reset FIRST (important)
+    editingAnchorIndex = null;
 
-    // optional but safe
-    openAccount(editingAnchorIndex);
+    // refresh UI safely
+    if(current === i){
+        refreshAccountUI(i);
+    }
+
+    render();
 }
     function closeAnchorModal(){
     document.getElementById("anchorModal").style.display = "none";
+
+    document.getElementById("anchorInput").blur();
+
     editingAnchorIndex = null;
 }
 
