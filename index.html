@@ -798,6 +798,32 @@ body.hideNav .addBtn {
         <div class="small">Multiplier</div>
         <div class="big green" id="mult"></div>
     </div>
+    <div class="card">
+    <div class="small">1X Starting Balance</div>
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-top:8px;
+    ">
+
+        <div class="big" id="anchorDisplay">
+            $40,000
+        </div>
+
+        <button onclick="setAnchor(current)"
+        style="
+            width:auto;
+            margin:0;
+            padding:10px 14px;
+            border-radius:12px;
+        ">
+            Edit
+        </button>
+
+    </div>
+</div>
 
     <div class="card">
         <div class="small">Daily Profit</div>
@@ -1308,22 +1334,7 @@ if (b < anchor) {
             })()}
         </div>
     </div>
-<!-- SET 1X START -->
-<div class="col num">
-    <div class="label">1X</div>
-    <div class="value">
-        <button onclick="event.stopPropagation(); setAnchor(${i})"
-        style="
-            width:70px;
-            margin:0;
-            padding:8px;
-            font-size:11px;
-            border-radius:10px;
-        ">
-            Set
-        </button>
-    </div>
-</div>
+
 
 </div>`;
 
@@ -1358,6 +1369,10 @@ document.getElementById("monthlyHome").innerHTML =
 function openAccount(i){
     current=i;
     let a=accounts[i];
+    let anchor = a.anchor || 40000;
+
+document.getElementById("anchorDisplay")
+    .innerText = money(anchor);
     document.getElementById("name").innerText=a.name;
     document.getElementById("balance").value=num(a.balance);
     show("account");
