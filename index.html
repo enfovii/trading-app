@@ -1521,34 +1521,45 @@ function deleteAccount(){
     }
 
     if(mode === "custom"){
-    extra.innerHTML = `
+        extra.innerHTML = `
 
-        <div class="small" style="margin-top:10px;">
-            Custom Balance
-        </div>
+            <div class="small" style="margin-top:10px;">
+                Custom Balance
+            </div>
 
-        <input
-            id="projCustom"
-            oninput="formatBalanceInput(this)"
-            placeholder="Enter balance"
-            inputmode="decimal"
-            oninput="renderProjection()"
-            style="margin-top:8px;"
-        >
+            <input
+                id="projCustom"
+                placeholder="Enter balance"
+                inputmode="decimal"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+                onfocus="this.select()"
+                oninput="formatBalanceInput(this); renderProjection();"
+                style="margin-top:8px;"
+            >
 
-        <div class="small" style="margin-top:12px;">
-            1X Starting Balance
-        </div>
+            <div class="small" style="margin-top:12px;">
+                1X Starting Balance
+            </div>
 
-        <input
-            id="projCustomAnchor"
-            oninput="formatBalanceInput(this)"
-            placeholder="Enter 1X start"
-            inputmode="decimal"
-            oninput="renderProjection()"
-            style="margin-top:8px;"
-        >
-    `;
+            <input
+                id="projCustomAnchor"
+                placeholder="Enter 1X start"
+                inputmode="decimal"
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="none"
+                spellcheck="false"
+                onfocus="this.select()"
+                oninput="formatBalanceInput(this); renderProjection();"
+                style="margin-top:8px;"
+            >
+        `;
+    }
+
+    renderProjection();
 }
 
     renderProjection();
