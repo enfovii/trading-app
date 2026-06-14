@@ -365,17 +365,15 @@ button {
         minmax(58px, 0.9fr)
         minmax(58px, 0.9fr)
         minmax(72px, 1fr)
-        minmax(42px, 0.6fr);
+        minmax(42px, 0.6fr)
+        minmax(70px, 0.9fr);
 
     gap: 4px;
     align-items: start;
-
     padding: 12px 6px;
     box-sizing: border-box;
     overflow: hidden;
 }
-
-/* NEW STRUCTURE (replace old cell system) */
 .col {
     display: flex;
     flex-direction: column;
@@ -1380,7 +1378,7 @@ function updateAccount(){
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
     document.getElementById("mult").innerText=mult(b, anchor).toFixed(2)+"x";
-    document.getElementById("dailyP").innerText=money(daily(b, anchor);
+    document.getElementById("dailyP").innerText = money(daily(b, anchor));
     document.getElementById("weekly").innerText=money(daily(b, anchor)*5);
     document.getElementById("monthly").innerText=money(daily(b, anchor)*22);
     
