@@ -1681,6 +1681,32 @@ function saveCalendarDay(){
     closeCalendarEdit();
     renderCalendar();
 }
+    function getTradingDaysInMonth(offsetMonths = 0){
+
+    let d = new Date();
+
+    // move into projected month
+    d.setMonth(d.getMonth() + offsetMonths);
+
+    let year = d.getFullYear();
+    let month = d.getMonth();
+
+    let lastDay = new Date(year, month + 1, 0).getDate();
+
+    let tradingDays = 0;
+
+    for(let i = 1; i <= lastDay; i++){
+
+        let jsDay = new Date(year, month, i).getDay();
+
+        // skip weekend
+        if(jsDay === 0 || jsDay === 6) continue;
+
+        tradingDays++;
+    }
+
+    return tradingDays;
+}
 function renderProjection(){
 
     let base = getBaseBalance();
@@ -1706,76 +1732,69 @@ function renderProjection(){
         let displayBalance = 0;
         let displayDaily = 0;
 
+        // ✔ ONLY CHANGE: dynamic trading days per month
+        let days =
+            (m === 1)
+                ? getTradingDaysInMonth(0)
+                : 22;
+
         // ==========================
-        // TOTAL PORTFOLIO
+        // PORTFOLIO MODE
         // ==========================
         if(base.anchor === null){
 
-            // simulate 22 trading days
-            for(let day = 1; day <= 22; day++){
+            for(let day = 1; day <= days; day++){
 
                 simAccounts.forEach(acc => {
 
-                    let d =
-                        daily(
-                            acc.balance,
-                            acc.anchor
-                        );
+                    let d = daily(
+                        acc.balance,
+                        acc.anchor
+                    );
 
                     monthProfit += d;
 
-                    // grow immediately
-                    // so multiplier updates mid-month
                     acc.balance += d;
                 });
             }
 
-            // final portfolio stats
             simAccounts.forEach(acc => {
 
                 displayBalance += acc.balance;
 
-                displayDaily +=
-                    daily(
-                        acc.balance,
-                        acc.anchor
-                    );
+                displayDaily += daily(
+                    acc.balance,
+                    acc.anchor
+                );
             });
 
         } else {
 
             // ==========================
-            // SINGLE ACCOUNT / CUSTOM
+            // SINGLE / CUSTOM
             // ==========================
 
-            for(let day = 1; day <= 22; day++){
+            for(let day = 1; day <= days; day++){
 
-                let d =
-                    daily(
-                        simBalance,
-                        simAnchor
-                    );
-
-                monthProfit += d;
-
-                // instant compounding
-                simBalance += d;
-            }
-
-            displayBalance =
-                simBalance;
-
-            // calculate profit
-            // based on shown balance
-            displayDaily =
-                daily(
+                let d = daily(
                     simBalance,
                     simAnchor
                 );
+
+                monthProfit += d;
+
+                simBalance += d;
+            }
+
+            displayBalance = simBalance;
+
+            displayDaily = daily(
+                simBalance,
+                simAnchor
+            );
         }
 
-        let weekly =
-            displayDaily * 5;
+        let weekly = displayDaily * 5;
 
         html += `
         <div class="card">
@@ -1785,9 +1804,7 @@ function renderProjection(){
             </div>
 
             <div class="big">
-                ${money(
-                    displayBalance.toFixed(0)
-                )}
+                ${money(displayBalance.toFixed(0))}
             </div>
 
             <div style="
@@ -1799,44 +1816,23 @@ function renderProjection(){
                 font-size:12px;
             ">
 
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Daily ${money(displayDaily)}
-                    </div>
-
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
+                <div style="flex:1;">
+                    <div>Daily ${money(displayDaily)}</div>
+                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
                         (${money(displayDaily / 100)})
                     </div>
                 </div>
 
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Weekly ${money(weekly)}
-                    </div>
-
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
+                <div style="flex:1;">
+                    <div>Weekly ${money(weekly)}</div>
+                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
                         (${money(weekly / 100)})
                     </div>
                 </div>
 
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Monthly ${money(monthProfit)}
-                    </div>
-
-                    <div style="
-                        font-size:10px;
-                        color:#93a4b8;
-                        margin-top:2px;
-                    ">
+                <div style="flex:1;">
+                    <div>Monthly ${money(monthProfit)}</div>
+                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
                         (${money(monthProfit / 100)})
                     </div>
                 </div>
@@ -1847,9 +1843,7 @@ function renderProjection(){
         `;
     }
 
-    document.getElementById(
-        "projResults"
-    ).innerHTML = html;
+    document.getElementById("projResults").innerHTML = html;
 }
 
 function setAnchor(i){
