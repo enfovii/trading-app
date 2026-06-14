@@ -936,6 +936,19 @@ body.hideNav .addBtn {
         <button onclick="closeCalendarEdit()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
+    <div class="modal" id="anchorModal">
+    <div class="modal-content">
+        <div class="big">Set 1X Balance</div>
+
+        <input id="anchorInput"
+            inputmode="decimal"
+            onfocus="this.select()"
+            oninput="formatBalanceInput(this)">
+
+        <button onclick="saveAnchor()">Save</button>
+        <button onclick="closeAnchorModal()">Cancel</button>
+    </div>
+</div>
     
 <script>
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
@@ -1746,30 +1759,35 @@ if(anchor !== null){
 
     document.getElementById("projResults").innerHTML = html;
 }
-    function setAnchor(i){
+    let editingAnchorIndex = null;
 
-    let currentAnchor =
-        accounts[i].anchor || 40000;
+function setAnchor(i){
 
-    let input = prompt(
-        "Set starting balance for 1x scaling:",
-        currentAnchor
-    );
+    editingAnchorIndex = i;
 
-    if(input === null) return;
+    let val = accounts[i].anchor || 40000;
 
-    let value = num(input);
+    document.getElementById("anchorInput").value =
+        Number(val).toLocaleString('en-US');
 
-    if(value <= 0) return;
+    document.getElementById("anchorModal").style.display = "flex";
+}
+    function saveAnchor(){
 
-    accounts[i].anchor = value;
+    let val = num(document.getElementById("anchorInput").value);
 
-    localStorage.setItem(
-        "accounts",
-        JSON.stringify(accounts)
-    );
+    if(!editingAnchorIndex || val <= 0) return;
 
+    accounts[editingAnchorIndex].anchor = val;
+
+    localStorage.setItem("accounts", JSON.stringify(accounts));
+
+    closeAnchorModal();
     render();
+}
+    function closeAnchorModal(){
+    document.getElementById("anchorModal").style.display = "none";
+    editingAnchorIndex = null;
 }
 
 window.onload=function(){
