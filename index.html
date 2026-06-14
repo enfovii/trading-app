@@ -1780,15 +1780,19 @@ function setAnchor(i){
 
     accounts[editingAnchorIndex].anchor = val;
 
-    localStorage.setItem(
-        "accounts",
-        JSON.stringify(accounts)
-    );
+    localStorage.setItem("accounts", JSON.stringify(accounts));
 
     closeAnchorModal();
 
-    updateAccount();
-    openAccount(editingAnchorIndex);
+    // 🔥 FORCE FULL UI REFRESH
+    render();                       // <-- THIS is missing
+    renderPortfolio();
+    renderProjection();
+
+    // refresh current open account view instantly
+    if(current === editingAnchorIndex){
+        openAccount(editingAnchorIndex);
+    }
 }
     function closeAnchorModal(){
     document.getElementById("anchorModal").style.display = "none";
