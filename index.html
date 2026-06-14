@@ -1529,6 +1529,7 @@ function deleteAccount(){
 
         <input
             id="projCustom"
+            oninput="formatBalanceInput(this)"
             placeholder="Enter balance"
             inputmode="decimal"
             oninput="renderProjection()"
@@ -1541,6 +1542,7 @@ function deleteAccount(){
 
         <input
             id="projCustomAnchor"
+            oninput="formatBalanceInput(this)"
             placeholder="Enter 1X start"
             inputmode="decimal"
             oninput="renderProjection()"
