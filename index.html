@@ -1695,9 +1695,9 @@ function renderProjection(){
     let base = getBaseBalance();
     let html = "";
 
-    // ===== PORTFOLIO MODE =====
     let simAccounts = [];
 
+    // ===== PORTFOLIO MODE =====
     if(base.anchor === null){
         simAccounts = accounts.map(a => ({
             balance: num(a.balance),
@@ -1705,7 +1705,7 @@ function renderProjection(){
         }));
     }
 
-    // ===== SINGLE ACCOUNT / CUSTOM =====
+    // ===== SINGLE / CUSTOM =====
     let simBalance = base.balance;
     let simAnchor = base.anchor;
 
@@ -1716,69 +1716,58 @@ function renderProjection(){
         let displayDaily = 0;
 
         // ==========================
-        // TOTAL PORTFOLIO
+        // PORTFOLIO MODE
         // ==========================
         if(base.anchor === null){
 
-            // simulate 22 trading days
             for(let day = 1; day <= 22; day++){
 
                 simAccounts.forEach(acc => {
 
-                   let m = getTierMultiplier(acc.balance, acc.anchor);
-let d = m * 800;
+                    // 🔥 FIX: lock multiplier per day
+                    let mult = getTierMultiplier(acc.balance, acc.anchor);
+                    let d = mult * 800;
 
                     monthProfit += d;
 
-                    // grow immediately
-                    // so multiplier updates mid-month
-                    acc.balance += m * 800;
+                    // apply AFTER calculation
+                    acc.balance += d;
                 });
             }
 
-            // final portfolio stats
             simAccounts.forEach(acc => {
 
                 displayBalance += acc.balance;
 
-                displayDaily +=
-                    daily(
-                        acc.balance,
-                        acc.anchor
-                    );
+                let mult = getTierMultiplier(acc.balance, acc.anchor);
+                displayDaily += mult * 800;
             });
 
-        } else {
+        }
 
-            // ==========================
-            // SINGLE ACCOUNT / CUSTOM
-            // ==========================
+        // ==========================
+        // SINGLE / CUSTOM MODE
+        // ==========================
+        else {
 
             for(let day = 1; day <= 22; day++){
 
-                let m = getTierMultiplier(simBalance, simAnchor);
-let d = m * 800;
+                // 🔥 FIX: lock multiplier per day
+                let mult = getTierMultiplier(simBalance, simAnchor);
+                let d = mult * 800;
 
                 monthProfit += d;
 
-                // instant compounding
-                simBalance += m * 800;
+                simBalance += d;
             }
 
-            displayBalance =
-                simBalance;
+            displayBalance = simBalance;
 
-            // calculate profit
-            // based on shown balance
-            displayDaily =
-                daily(
-                    simBalance,
-                    simAnchor
-                );
+            let mult = getTierMultiplier(simBalance, simAnchor);
+            displayDaily = mult * 800;
         }
 
-        let weekly =
-            displayDaily * 5;
+        let weekly = displayDaily * 5;
 
         html += `
         <div class="card">
@@ -1788,9 +1777,7 @@ let d = m * 800;
             </div>
 
             <div class="big">
-                ${money(
-                    displayBalance.toFixed(0)
-                )}
+                ${money(displayBalance.toFixed(0))}
             </div>
 
             <div style="
@@ -1850,9 +1837,7 @@ let d = m * 800;
         `;
     }
 
-    document.getElementById(
-        "projResults"
-    ).innerHTML = html;
+    document.getElementById("projResults").innerHTML = html;
 }
 
 function setAnchor(i){
