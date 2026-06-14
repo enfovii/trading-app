@@ -1780,19 +1780,26 @@ function setAnchor(i){
 
     accounts[editingAnchorIndex].anchor = val;
 
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    localStorage.setItem(
+        "accounts",
+        JSON.stringify(accounts)
+    );
+
+    // 🔥 FIX 1: update UI immediately if you're still on account page
+    if(current === editingAnchorIndex){
+        document.getElementById("anchorDisplay").innerText = money(val);
+
+        // also refresh dependent values instantly
+        updateAccount();
+    }
 
     closeAnchorModal();
 
-    // 🔥 FORCE FULL UI REFRESH
-    render();                       // <-- THIS is missing
-    renderPortfolio();
-    renderProjection();
+    // 🔥 FIX 2: re-render list so cards update too
+    render();
 
-    // refresh current open account view instantly
-    if(current === editingAnchorIndex){
-        openAccount(editingAnchorIndex);
-    }
+    // optional but safe
+    openAccount(editingAnchorIndex);
 }
     function closeAnchorModal(){
     document.getElementById("anchorModal").style.display = "none";
