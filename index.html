@@ -1692,43 +1692,73 @@ function renderProjection(){
 
     for(let m = 1; m <= 12; m++){
 
-        let d = 0;
+        let monthDailyTotal = 0;
+        let monthProfit = 0;
 
-        // TOTAL PORTFOLIO MODE
+        // ===== TOTAL PORTFOLIO MODE =====
         if(anchor === null){
 
-            accounts.forEach(a => {
+            // clone account balances so we can simulate daily growth
+            let simAccounts = accounts.map(a => ({
+                balance: num(a.balance),
+                anchor: a.anchor || 40000
+            }));
 
-                let accountAnchor =
-                    a.anchor || 40000;
+            // simulate 22 trading days
+            for(let day = 1; day <= 22; day++){
 
-                let accountWeight =
-                    num(a.balance) /
-                    base.balance;
+                let dailyTotal = 0;
 
-                let projectedBalance =
-                    balance * accountWeight;
+                simAccounts.forEach(acc => {
 
-                d += daily(
-                    projectedBalance,
-                    accountAnchor
-                );
-            });
+                    let d =
+                        daily(acc.balance, acc.anchor);
+
+                    dailyTotal += d;
+
+                    // grow balance immediately
+                    acc.balance += d;
+                });
+
+                monthProfit += dailyTotal;
+                monthDailyTotal = dailyTotal;
+            }
+
+            balance += monthProfit;
 
         } else {
 
-            // SINGLE ACCOUNT / CUSTOM
-            d = daily(balance, anchor);
+            // ===== SINGLE ACCOUNT / CUSTOM =====
+            let simBalance = balance;
+
+            for(let day = 1; day <= 22; day++){
+
+                let d = daily(simBalance, anchor);
+
+                monthDailyTotal = d;
+                monthProfit += d;
+
+                // grow instantly so multiplier updates mid-month
+                simBalance += d;
+            }
+
+            balance = simBalance;
         }
 
+        let d = monthDailyTotal;
         let w = d * 5;
-        let mo = d * 22;
+        let mo = monthProfit;
 
         html += `
         <div class="card">
-            <div class="small">Month ${m}</div>
 
-            <div class="big">${money(balance.toFixed(0))}</div>
+            <div class="small">
+                Month ${m}
+            </div>
+
+            <div class="big">
+                ${money(balance.toFixed(0))}
+            </div>
 
             <div style="
                 margin-top:8px;
@@ -1782,13 +1812,13 @@ function renderProjection(){
                 </div>
 
             </div>
+
         </div>
         `;
-
-        balance += mo;
     }
 
-    document.getElementById("projResults").innerHTML = html;
+    document.getElementById("projResults")
+        .innerHTML = html;
 }
 
 function setAnchor(i){
