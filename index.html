@@ -1075,6 +1075,17 @@ for (let d = 1; d <= lastDay; d++) {
     document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
     document.getElementById("calAllTime").innerText = money(allTimeTotal);
 }
+    function refreshAccountUI(i){
+    let a = accounts[i];
+    let b = num(a.balance);
+    let anchor = a.anchor || 40000;
+
+    document.getElementById("anchorDisplay").innerText = money(anchor);
+    document.getElementById("mult").innerText = mult(b, anchor).toFixed(2) + "x";
+    document.getElementById("dailyP").innerText = money(daily(b, anchor));
+    document.getElementById("weekly").innerText = money(daily(b, anchor) * 5);
+    document.getElementById("monthly").innerText = money(daily(b, anchor) * 22);
+}
     
 function num(v){
     if(!v) return 0;
@@ -1785,14 +1796,10 @@ function setAnchor(i){
         JSON.stringify(accounts)
     );
 
-    // 🔥 FIX 1: update UI immediately if you're still on account page
-    if(current === editingAnchorIndex){
-        document.getElementById("anchorDisplay").innerText = money(val);
-
-        // also refresh dependent values instantly
-        updateAccount();
-    }
-
+    // 🔥 FIX 1: update UI immediately if you're still on account 
+if(current === editingAnchorIndex){
+    refreshAccountUI(current);
+}
     closeAnchorModal();
 
     // 🔥 FIX 2: re-render list so cards update too
