@@ -1699,6 +1699,17 @@ function renderProjection(){
 
     let base = getBaseBalance();
     let html = "";
+    let mode =
+    document.getElementById("projMode").value;
+
+// CUSTOM MODE MINIMUM BALANCE
+if(mode === "custom" && base.balance < 1000){
+
+    document.getElementById("projResults")
+        .innerHTML = "";
+
+    return;
+}
 
     let simAccounts = [];
 
