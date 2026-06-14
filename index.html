@@ -1683,19 +1683,44 @@ function saveCalendarDay(){
 }
 function renderProjection(){
 
-   let base = getBaseBalance();
+    let base = getBaseBalance();
 
-let balance = base.balance;
-let projectionDaily = base.daily;
-let anchor = base.anchor;
+    let balance = base.balance;
+    let anchor = base.anchor;
+
     let html = "";
 
     for(let m = 1; m <= 12; m++){
 
-        let d =
-    anchor === null
-    ? projectionDaily
-    : daily(balance, anchor);
+        let d = 0;
+
+        // TOTAL PORTFOLIO MODE
+        if(anchor === null){
+
+            accounts.forEach(a => {
+
+                let accountAnchor =
+                    a.anchor || 40000;
+
+                let accountWeight =
+                    num(a.balance) /
+                    base.balance;
+
+                let projectedBalance =
+                    balance * accountWeight;
+
+                d += daily(
+                    projectedBalance,
+                    accountAnchor
+                );
+            });
+
+        } else {
+
+            // SINGLE ACCOUNT / CUSTOM
+            d = daily(balance, anchor);
+        }
+
         let w = d * 5;
         let mo = d * 22;
 
@@ -1706,71 +1731,65 @@ let anchor = base.anchor;
             <div class="big">${money(balance.toFixed(0))}</div>
 
             <div style="
-    margin-top:8px;
-    display:flex;
-    justify-content:space-between;
-    gap:6px;
-    text-align:center;
-    font-size:12px;
-">
+                margin-top:8px;
+                display:flex;
+                justify-content:space-between;
+                gap:6px;
+                text-align:center;
+                font-size:12px;
+            ">
 
-    <div style="flex:1; min-width:0;">
-        <div style="white-space:nowrap;">
-            Daily ${money(d)}
-        </div>
+                <div style="flex:1; min-width:0;">
+                    <div style="white-space:nowrap;">
+                        Daily ${money(d)}
+                    </div>
 
-        <div style="
-            font-size:10px;
-            color:#93a4b8;
-            margin-top:2px;
-        ">
-            (${money(d / 100)})
-        </div>
-    </div>
+                    <div style="
+                        font-size:10px;
+                        color:#93a4b8;
+                        margin-top:2px;
+                    ">
+                        (${money(d / 100)})
+                    </div>
+                </div>
 
-    <div style="flex:1; min-width:0;">
-        <div style="white-space:nowrap;">
-            Weekly ${money(w)}
-        </div>
+                <div style="flex:1; min-width:0;">
+                    <div style="white-space:nowrap;">
+                        Weekly ${money(w)}
+                    </div>
 
-        <div style="
-            font-size:10px;
-            color:#93a4b8;
-            margin-top:2px;
-        ">
-            (${money(w / 100)})
-        </div>
-    </div>
+                    <div style="
+                        font-size:10px;
+                        color:#93a4b8;
+                        margin-top:2px;
+                    ">
+                        (${money(w / 100)})
+                    </div>
+                </div>
 
-    <div style="flex:1; min-width:0;">
-        <div style="white-space:nowrap;">
-            Monthly ${money(mo)}
-        </div>
+                <div style="flex:1; min-width:0;">
+                    <div style="white-space:nowrap;">
+                        Monthly ${money(mo)}
+                    </div>
 
-        <div style="
-            font-size:10px;
-            color:#93a4b8;
-            margin-top:2px;
-        ">
-            (${money(mo / 100)})
-        </div>
-    </div>
+                    <div style="
+                        font-size:10px;
+                        color:#93a4b8;
+                        margin-top:2px;
+                    ">
+                        (${money(mo / 100)})
+                    </div>
+                </div>
 
-</div>
+            </div>
         </div>
         `;
 
         balance += mo;
-
-if(anchor !== null){
-    projectionDaily =
-        daily(balance, anchor);
-}
     }
 
     document.getElementById("projResults").innerHTML = html;
 }
-    let editingAnchorIndex = null;
 
 function setAnchor(i){
 
