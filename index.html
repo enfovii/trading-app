@@ -1776,15 +1776,19 @@ function setAnchor(i){
 
     let val = num(document.getElementById("anchorInput").value);
 
-    if(!editingAnchorIndex || val <= 0) return;
+    if(editingAnchorIndex === null || val <= 0) return;
 
     accounts[editingAnchorIndex].anchor = val;
 
-    localStorage.setItem("accounts", JSON.stringify(accounts));
+    localStorage.setItem(
+        "accounts",
+        JSON.stringify(accounts)
+    );
 
     closeAnchorModal();
-    render();
-updateAccount();
+
+    updateAccount();
+    openAccount(editingAnchorIndex);
 }
     function closeAnchorModal(){
     document.getElementById("anchorModal").style.display = "none";
