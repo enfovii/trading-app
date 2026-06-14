@@ -1727,7 +1727,14 @@ function renderProjection(){
     document.getElementById("projMode").value;
 
 // CUSTOM MODE MINIMUM BALANCE
-if(mode === "custom" && base.balance < 1000){
+// CUSTOM MODE MINIMUM BALANCE
+if(
+    mode === "custom" &&
+    (
+        base.balance < 1000 ||
+        base.anchor < 1000
+    )
+){
 
     let html = "";
 
