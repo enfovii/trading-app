@@ -1721,81 +1721,65 @@ function saveCalendarDay(){
 }
 function renderProjection(){
 
+    let mode =
+        document.getElementById("projMode").value;
+
+    let rawBalance = num(document.getElementById("projCustom")?.value);
+    let rawAnchor = num(document.getElementById("projCustomAnchor")?.value);
+
     let base = getBaseBalance();
     let html = "";
-    let mode =
-    document.getElementById("projMode").value;
 
-// CUSTOM MODE MINIMUM BALANCE
-// CUSTOM MODE MINIMUM BALANCE
-if(
-    mode === "custom" &&
-    (
-        base.balance < 1000 ||
-        base.anchor < 1000
-    )
-){
+    // CUSTOM MODE LOCK (both inputs must be >= 1000)
+    if(
+        mode === "custom" &&
+        (rawBalance < 1000 || rawAnchor < 1000)
+    ){
 
-    let html = "";
+        for(let m = 1; m <= 12; m++){
 
-    for(let m = 1; m <= 12; m++){
+            html += `
+            <div class="card">
 
-        html += `
-        <div class="card">
+                <div class="small">Month ${m}</div>
 
-            <div class="small">
-                Month ${m}
-            </div>
+                <div class="big">$0</div>
 
-            <div class="big">
-                $0
-            </div>
+                <div style="
+                    margin-top:8px;
+                    display:flex;
+                    justify-content:space-between;
+                    gap:6px;
+                    text-align:center;
+                    font-size:12px;
+                ">
 
-            <div style="
-                margin-top:8px;
-                display:flex;
-                justify-content:space-between;
-                gap:6px;
-                text-align:center;
-                font-size:12px;
-            ">
-
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Daily $0
+                    <div style="flex:1;">
+                        <div>Daily $0</div>
+                        <div style="font-size:10px;color:#93a4b8;">($0)</div>
                     </div>
-                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
-                        ($0)
-                    </div>
-                </div>
 
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Weekly $0
+                    <div style="flex:1;">
+                        <div>Weekly $0</div>
+                        <div style="font-size:10px;color:#93a4b8;">($0)</div>
                     </div>
-                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
-                        ($0)
-                    </div>
-                </div>
 
-                <div style="flex:1; min-width:0;">
-                    <div style="white-space:nowrap;">
-                        Monthly $0
+                    <div style="flex:1;">
+                        <div>Monthly $0</div>
+                        <div style="font-size:10px;color:#93a4b8;">($0)</div>
                     </div>
-                    <div style="font-size:10px;color:#93a4b8;margin-top:2px;">
-                        ($0)
-                    </div>
+
                 </div>
 
             </div>
+            `;
+        }
 
-        </div>
-        `;
+        document.getElementById("projResults").innerHTML = html;
+        return;
     }
 
-    document.getElementById("projResults").innerHTML = html;
-    return;
-}
+    
 
     let simAccounts = [];
 
