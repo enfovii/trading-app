@@ -1521,15 +1521,33 @@ function deleteAccount(){
     }
 
     if(mode === "custom"){
-        extra.innerHTML = `
-            <div class="small" style="margin-top:10px;">Custom Balance</div>
-            <input id="projCustom"
-    placeholder="Enter balance"
-    inputmode="decimal"
-    oninput="renderProjection()"
-    style="margin-top:8px;">
-        `;
-    }
+    extra.innerHTML = `
+
+        <div class="small" style="margin-top:10px;">
+            Custom Balance
+        </div>
+
+        <input
+            id="projCustom"
+            placeholder="Enter balance"
+            inputmode="decimal"
+            oninput="renderProjection()"
+            style="margin-top:8px;"
+        >
+
+        <div class="small" style="margin-top:12px;">
+            1X Starting Balance
+        </div>
+
+        <input
+            id="projCustomAnchor"
+            placeholder="Enter 1X start"
+            inputmode="decimal"
+            oninput="renderProjection()"
+            style="margin-top:8px;"
+        >
+    `;
+}
 
     renderProjection();
 }
@@ -1579,22 +1597,28 @@ function deleteAccount(){
     }
 
     // CUSTOM BALANCE
-    if(mode === "custom"){
+    // CUSTOM BALANCE
+if(mode === "custom"){
 
-        let customBalance =
-            num(
-                document.getElementById("projCustom").value
-            );
+    let customBalance =
+        num(
+            document.getElementById("projCustom").value
+        );
 
-        return {
-            balance: customBalance,
-            daily: daily(
-                customBalance,
-                customBalance
-            ),
-            anchor: customBalance
-        };
-    }
+    let customAnchor =
+        num(
+            document.getElementById("projCustomAnchor")?.value
+        ) || 40000;
+
+    return {
+        balance: customBalance,
+        daily: daily(
+            customBalance,
+            customAnchor
+        ),
+        anchor: customAnchor
+    };
+}
 
     return {
         balance: 0,
