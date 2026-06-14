@@ -1233,26 +1233,35 @@ function render(){
 
         let currentMult = mult(b, anchor);
 
-       function nextTargetFromBalance(b){
+       function nextTargetFromBalance(b, anchor = 40000){
 
-    if (b < 40000) return 40000;
+    if (b < anchor) return anchor;
 
-    let steps = Math.floor((b - 40000) / 20000) + 1;
+    let step = anchor / 2;
 
-    return 40000 + (steps * 20000);
+    let steps =
+        Math.floor((b - anchor) / step) + 1;
+
+    return anchor + (steps * step);
 }
-
-        let nextTarget = nextTargetFromBalance(b);
+        let nextTarget =
+    nextTargetFromBalance(b, anchor);
         let nextMult = mult(nextTarget);
         let needed = Math.max(0, nextTarget - b);
 
    let tierStart;
 
-if (b < 40000) {
+if (b < anchor) {
     tierStart = 0;
 } else {
-    let steps = Math.floor((b - 40000) / 20000);
-    tierStart = 40000 + (steps * 20000);
+
+    let step = anchor / 2;
+
+    let steps =
+        Math.floor((b - anchor) / step);
+
+    tierStart =
+        anchor + (steps * step);
 }
 
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
