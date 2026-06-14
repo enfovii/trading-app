@@ -1681,6 +1681,15 @@ function saveCalendarDay(){
     closeCalendarEdit();
     renderCalendar();
 }
+    function getTierMultiplier(balance, anchor = 40000){
+
+    if (balance < anchor) return 0;
+
+    let step = anchor / 2;
+    let steps = Math.floor((balance - anchor) / step);
+
+    return 1 + (steps * 0.5);
+}
 function renderProjection(){
 
     let base = getBaseBalance();
@@ -1716,17 +1725,14 @@ function renderProjection(){
 
                 simAccounts.forEach(acc => {
 
-                    let d =
-                        daily(
-                            acc.balance,
-                            acc.anchor
-                        );
+                   let m = getTierMultiplier(acc.balance, acc.anchor);
+let d = m * 800;
 
                     monthProfit += d;
 
                     // grow immediately
                     // so multiplier updates mid-month
-                    acc.balance += d;
+                    acc.balance += m * 800;
                 });
             }
 
@@ -1750,16 +1756,13 @@ function renderProjection(){
 
             for(let day = 1; day <= 22; day++){
 
-                let d =
-                    daily(
-                        simBalance,
-                        simAnchor
-                    );
+                let m = getTierMultiplier(simBalance, simAnchor);
+let d = m * 800;
 
                 monthProfit += d;
 
                 // instant compounding
-                simBalance += d;
+                simBalance += m * 800;
             }
 
             displayBalance =
