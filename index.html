@@ -1136,23 +1136,25 @@ function formatBalanceInput(el){
     updateAccount();
 }
 
-function tier(b){
+function tier(b, anchor = 40000){
 
-    // No multiplier below 40k
-    if (b < 40000) return 0;
+    if (b < anchor) return 0;
 
-    // 1x starts at 40k
-    let x = 1;
+    let step = anchor / 2;
 
-    // Every extra 20k adds 0.5x
-    x += Math.floor((b - 40000) / 20000) * 0.5;
+    let steps =
+        Math.floor((b - anchor) / step);
 
-    return x;
+    return 1 + (steps * 0.5);
 }
     
 
-function mult(b){ return tier(b); }
-function daily(b){ return mult(b)*800; }
+function mult(b, anchor = 40000){
+    return tier(b, anchor);
+}
+function daily(b, anchor = 40000){
+    return mult(b, anchor) * 800;
+}
 function dd(b){ return b*0.4; }
 
 
@@ -1226,10 +1228,12 @@ function render(){
 
     accounts.forEach((a,i)=>{
         let b = num(a.balance);
+        let anchor = a.anchor || 40000;
         t += b;
-        d += daily(b);
+        d += daily(b, anchor);
+        
 
-        let currentMult = mult(b);
+        let currentMult = mult(b, anchor);
 
        function nextTargetFromBalance(b){
 
@@ -1269,7 +1273,7 @@ if (b < 40000) {
 <div class="col num">
     <div class="label">Daily</div>
     <div class="value ${daily(b) >= 100000 ? 'dailyLarge' : ''}">
-        ${money(daily(b))}
+        ${money(daily(b, anchor))}
     </div>
 </div>
 
@@ -1297,8 +1301,25 @@ if (b < 40000) {
             })()}
         </div>
     </div>
+<!-- SET 1X START -->
+<div class="col num">
+    <div class="label">1X</div>
+    <div class="value">
+        <button onclick="event.stopPropagation(); setAnchor(${i})"
+        style="
+            width:70px;
+            margin:0;
+            padding:8px;
+            font-size:11px;
+            border-radius:10px;
+        ">
+            Set
+        </button>
+    </div>
+</div>
 
 </div>`;
+
             });
 
     el.innerHTML = html;
@@ -1352,14 +1373,16 @@ function updateAccount(){
     if(raw === "" || raw === null) return;
 
     let b = num(raw);
+    let anchor =
+    accounts[current].anchor || 40000;
 
     accounts[current].balance = b;
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
-    document.getElementById("mult").innerText=mult(b).toFixed(2)+"x";
-    document.getElementById("dailyP").innerText=money(daily(b));
-    document.getElementById("weekly").innerText=money(daily(b)*5);
-    document.getElementById("monthly").innerText=money(daily(b)*22);
+    document.getElementById("mult").innerText=mult(b, anchor).toFixed(2)+"x";
+    document.getElementById("dailyP").innerText=money(daily(b, anchor);
+    document.getElementById("weekly").innerText=money(daily(b, anchor)*5);
+    document.getElementById("monthly").innerText=money(daily(b, anchor)*22);
     
 
     let elInput = document.getElementById("balance");
@@ -1635,6 +1658,31 @@ function renderProjection(){
     }
 
     document.getElementById("projResults").innerHTML = html;
+}
+    function setAnchor(i){
+
+    let currentAnchor =
+        accounts[i].anchor || 40000;
+
+    let input = prompt(
+        "Set starting balance for 1x scaling:",
+        currentAnchor
+    );
+
+    if(input === null) return;
+
+    let value = num(input);
+
+    if(value <= 0) return;
+
+    accounts[i].anchor = value;
+
+    localStorage.setItem(
+        "accounts",
+        JSON.stringify(accounts)
+    );
+
+    render();
 }
 
 window.onload=function(){
