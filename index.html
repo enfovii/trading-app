@@ -77,11 +77,11 @@ body {
 }
 
 h2 {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 800;
     margin: 0;
     text-align: center;
-    letter-spacing: 0.5px;
+    letter-spacing:-0.3px;
 }
 
 .page {
@@ -118,7 +118,7 @@ h2 {
 .statsRow {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
+    gap: 14px;
 }
 
 .stat {
@@ -160,7 +160,7 @@ h2 {
    background: linear-gradient(145deg, var(--card), var(--card2));
 border: 1px solid var(--border);
     backdrop-filter: blur(14px);
-    padding: 14px;
+    padding: 18px;
     margin-top: 10px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.25);
@@ -176,25 +176,19 @@ border: 1px solid var(--border);
     overflow: hidden;
 }
 
-/* left accent strip */
-.portfolioBox::before,
-.stat::before,
-.card::before,
-.account::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 4px;
-    height: 100%;
-    background: linear-gradient(180deg, #1f6feb, #2ee59d);
-    opacity: 0.9;
-}
 
 /* cleaner spacing rhythm */
 .card,
 .account {
     margin-top: 12px;
+}
+    .portfolioBox .big{
+    font-size:34px;
+    font-weight:800;
+}
+
+.portfolioBox .small{
+    font-size:13px;
 }
 
 /* tap feedback (does NOT affect functionality) */
@@ -205,13 +199,14 @@ border: 1px solid var(--border);
     transform: scale(0.99);
     transition: transform 0.12s ease;
 }
-    .card,
+   .card,
 .account,
 .stat,
 .portfolioBox {
-    box-shadow: 0 10px 28px rgba(0,0,0,0.35);
-    border: 1px solid rgba(120,170,255,0.14);
-    backdrop-filter: blur(18px);
+    background: rgba(15,20,35,0.85);
+    border: 1px solid rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.18);
 }
 
 .account {
@@ -368,9 +363,9 @@ button {
         minmax(42px, 0.6fr)
         minmax(70px, 0.9fr);
 
-    gap: 4px;
+    gap: 10px;
     align-items: start;
-    padding: 12px 6px;
+    padding: 18px 10px;
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -499,7 +494,8 @@ button {
 .navBtn{
     padding: 14px;
     border: none;
-    border-radius: 16px;
+    border-radius:22px;
+    height:56px;
 
     background: linear-gradient(
         145deg,
@@ -718,7 +714,7 @@ body.hideNav .addBtn {
 <div id="drawdown" class="page">
 
 <div class="card">
-    <h3>📉 Drawdown Scenarios</h3>
+    <h3> Drawdown Scenarios</h3>
     <div class="small">Drawdown stress test (100 → 500 pips)</div>
 </div>
 
@@ -734,7 +730,7 @@ body.hideNav .addBtn {
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         
         <div>
-            <h3>📅 Profit Calendar</h3>
+            <h3> Profit Calendar</h3>
             <div class="small">Track daily profit per month</div>
         </div>
 
@@ -851,13 +847,13 @@ body.hideNav .addBtn {
 
     <button class="navBtn"
             onclick="openProjection()">
-        📈 Projection
+        Projection
     </button>
         <button class="navBtn" onclick="show('drawdown')">
-    📉 Drawdown
+    Drawdown
 </button>
         <button class="navBtn" onclick="openCalendar()">
-    📅 Calendar
+    Calendar
 </button>
 
 </div>
