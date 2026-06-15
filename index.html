@@ -103,16 +103,30 @@ h2 {
     gap: 12px;
 }
 
-.portfolioBox {
-    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
-    border: 1px solid rgba(120,170,255,0.25);
-    backdrop-filter: blur(16px);
-    padding: 18px;
-    border-radius: 18px;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    will-change: transform;
+.portfolioBox{
+    background: linear-gradient(
+        135deg,
+        rgba(20,40,90,0.95),
+        rgba(10,20,50,0.95)
+    );
+
+    border-radius:24px;
+    padding:24px;
+    border:none;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,0.3);
+
+    text-align:left;
+}
+    .portfolioBox .big{
+    font-size:42px;
+    font-weight:800;
+    margin-top:8px;
+}
+
+.portfolioBox .small{
+    font-size:14px;
 }
 
 .statsRow {
@@ -121,24 +135,13 @@ h2 {
     gap: 14px;
 }
 
-.stat {
-    background:
-        linear-gradient(
-            145deg,
-            rgba(18,28,48,0.82),
-            rgba(8,12,24,0.72)
-        );
 
-    border: 1px solid rgba(120,170,255,0.12);
-
-    backdrop-filter: blur(18px);
-
-    padding: 14px 10px;
-
-    border-radius: 20px;
-
-    text-align: center;
-    will-change: transform;
+    .stat{
+    background: rgba(18,22,35,0.9);
+    border:none;
+    border-radius:20px;
+    padding:18px 12px;
+    text-align:center;
 }
     .stat .small {
     margin-bottom: 6px;
@@ -353,20 +356,28 @@ button {
     color: #eaf1ff;
 }
 
-.accountRow {
-    display: grid;
-    grid-template-columns:
-    minmax(105px, 1.8fr)
-    minmax(58px, 0.9fr)
-    minmax(58px, 0.9fr)
-    minmax(72px, 1fr)
-    minmax(65px, 0.9fr);
+.accountRow{
+    background: rgba(15,20,35,0.95);
 
-    gap: 10px;
-    align-items: start;
-    padding: 18px 10px;
-    box-sizing: border-box;
-    overflow: hidden;
+    border-radius:20px;
+
+    padding:18px;
+
+    margin-bottom:12px;
+
+    display:grid;
+
+    grid-template-columns:
+        1.8fr
+        1fr
+        1fr
+        1fr
+        .8fr;
+
+    gap:12px;
+}
+    .accountRow:hover{
+    transform:translateY(-1px);
 }
 .col {
     display: flex;
@@ -406,7 +417,7 @@ button {
 
 /* THIS replaces cellStrong (KEEP IT) */
 .strong {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
 }
    .value {
@@ -472,16 +483,22 @@ button {
 }
 
 .bottomNav{
-    position: fixed !important;
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
 
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 10px;
+    position:fixed;
+    left:12px;
+    right:12px;
+    bottom:12px;
 
-    z-index: 9999;
+    background:rgba(12,18,30,0.95);
+
+    border-radius:24px;
+
+    padding:10px;
+
+    display:flex;
+    gap:10px;
+
+    backdrop-filter:blur(20px);
 }
 
 /* IMPORTANT: kill global button styling inside nav */
@@ -627,14 +644,17 @@ body.hideNav .addBtn {
     }
 
 }
-    
+    #projResults .card{
+    border-radius:22px;
+    padding:20px;
+}
 </style>
 </head>
 
 <body>
 
 <div class="title">
-    <h2>Pro Trading Dashboard</h2>
+    <h2>Dashboard</h2>
 </div>
 
 <div id="home" class="page active">
@@ -1679,12 +1699,20 @@ function renderDrawdown(){
         let totalDD = simulateDrawdown(p);
 
         html += `
-        <div class="card">
-            <h3>${p} Pips Move</h3>
-            <div class="small">Fixed scenario model</div>
-            <div class="big red">Total DD: ${money(totalDD)}</div>
-        </div>
-        `;
+<div class="card">
+
+    <h3>${p} Pip Move</h3>
+
+    <div class="small">
+        Fixed scenario model
+    </div>
+
+    <div class="big red">
+        ${money(totalDD)}
+    </div>
+
+</div>
+`;
     }
 
     container.innerHTML = html;
