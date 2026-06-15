@@ -923,14 +923,15 @@ body.hideNav .addBtn {
     <div class="modal-content">
         <div class="big" id="calEditTitle">Edit Day</div>
 
-        <input
-            id="calEditInput"
-            placeholder="Enter profit"
-            inputmode="decimal"
-            autocomplete="off"
-            onfocus="this.select()"
-            oninput="formatBalanceInput(this)"
-        >
+       <input
+    id="calEditInput"
+    placeholder="Enter profit"
+    inputmode="decimal"
+    step="0.01"
+    autocomplete="off"
+    onfocus="this.select()"
+    oninput="formatBalanceInput(this)"
+>
 
         <button onclick="saveCalendarDay()">Save</button>
         <button onclick="closeCalendarEdit()" style="background:rgba(255,255,255,0.08);">Cancel</button>
@@ -1166,20 +1167,34 @@ function formatBalanceInput(el){
 
     let raw = el.value.replace(/,/g,'');
 
-    if(raw === '' || raw === '-'){
-        el.value = raw;
-        updateAccount();
+    // allow empty, minus, decimal point, or negative decimal
+    if(raw === '' || raw === '-' || raw === '.' || raw === '-.'){
         return;
     }
 
-    let isNegative = raw.startsWith('-');
+    // allow typing a decimal point at the end
+    let endsWithDot = raw.endsWith('.');
+
     let numVal = Number(raw);
 
     if(isNaN(numVal)) return;
 
-    let formatted = Math.abs(numVal).toLocaleString('en-US');
+    let parts = raw.split('.');
+    let integerPart = Number(parts[0] || 0).toLocaleString('en-US');
 
-    el.value = isNegative ? '-' + formatted : formatted;
+    let formatted = integerPart;
+
+    if(parts.length > 1){
+        formatted += '.' + parts[1];
+    } else if(endsWithDot){
+        formatted += '.';
+    }
+
+    if(raw.startsWith('-') && !formatted.startsWith('-')){
+        formatted = '-' + formatted;
+    }
+
+    el.value = formatted;
 
     updateAccount();
 }
