@@ -287,13 +287,40 @@ button {
     backdrop-filter: blur(18px);
 }
 
-.addBtn {
+.addBtn{
     position: fixed;
-    bottom: 78px;
-    left: 12px;
-    right: 12px;
-    z-index: 10;
-    backdrop-filter: blur(12px);
+
+    left: 50%;
+    transform: translateX(-50%);
+
+    bottom: 90px;
+
+    width: 70px !important;
+    height: 70px;
+
+    border-radius: 50%;
+
+    padding: 0;
+    margin: 0;
+
+    font-size: 0;
+
+    background: linear-gradient(
+        135deg,
+        #1f6feb,
+        #2ee59d
+    );
+
+    box-shadow:
+        0 12px 30px rgba(31,111,235,0.35);
+
+    z-index: 10000;
+}
+
+.addBtn::before{
+    content:"+";
+    font-size:32px;
+    color:white;
 }
 
 .modal {
@@ -476,67 +503,57 @@ button {
     font-weight: 500;
 }
 
+/* ===== FLOATING NAV ===== */
+
 .bottomNav{
-    position: fixed !important;
+    position: fixed;
     left: 12px;
     right: 12px;
     bottom: 12px;
 
-    display: flex !important;
-    flex-direction: row !important;
+    display: flex;
     gap: 10px;
+
+    padding: 10px;
+
+    border-radius: 24px;
+
+    background: rgba(12,18,35,0.75);
+    backdrop-filter: blur(24px);
+
+    border: 1px solid rgba(120,170,255,0.15);
+
+    box-shadow: 0 12px 35px rgba(0,0,0,0.45);
 
     z-index: 9999;
 }
 
-/* IMPORTANT: kill global button styling inside nav */
 .bottomNav button{
-    width: auto !important;
-    margin: 0 !important;
-    flex: 1 !important;
+    width:auto !important;
+    margin:0 !important;
+    flex:1 !important;
 }
 
 .navBtn{
-    padding: 14px;
-    border: none;
-    border-radius: 16px;
+    padding:14px;
+    border-radius:18px;
 
-    background: linear-gradient(
-        145deg,
-        rgba(20,30,50,0.75),
-        rgba(10,15,30,0.55)
-    );
+    background:transparent;
+    border:1px solid transparent;
 
-    border: 1px solid rgba(120,170,255,0.18);
-
-    color: #eaf1ff;
-    font-size: 15px;
-    font-weight: 600;
-
-    backdrop-filter: blur(18px);
-}
-    .fixedBack{
-    position: fixed;
-    left: 12px;
-    right: 12px;
-    bottom: 78px; /* sits just above your bottomNav */
-    z-index: 9999;
+    color:#c8d7eb;
+    font-size:14px;
+    font-weight:600;
 }
 
-.fixedBack button{
-    width: 100%;
-    margin: 0;
-    padding: 14px;
-    border-radius: 16px;
-    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
-    border: 1px solid rgba(120,170,255,0.18);
-    color: #eaf1ff;
-    font-weight: 600;
-    backdrop-filter: blur(18px);
+.navBtn:active{
+    transform:scale(.97);
 }
 
 .activeNav{
-    border:1px solid rgba(56,230,176,0.45);
+    background:rgba(31,111,235,0.20);
+    border:1px solid rgba(56,230,176,0.35);
+    color:white;
 }
     body.hideNav .bottomNav,
 body.hideNav .addBtn {
