@@ -8,18 +8,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Pro Trading Dashboard">
 
-<title>Trading Dashboard</title>
+<title>Pro Trading Dashboard</title>
 
 <style>
 
 * {
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
-}
-    h2{
-    font-size:22px;
-    font-weight:800;
-    letter-spacing:.5px;
 }
 :root {
     --bg: #050913;
@@ -107,17 +102,6 @@ h2 {
     flex-direction: column;
     gap: 12px;
 }
-    .stat.daily{
-    box-shadow:0 0 20px rgba(46,229,157,.15);
-}
-
-.stat.weekly{
-    box-shadow:0 0 20px rgba(77,163,255,.15);
-}
-
-.stat.monthly{
-    box-shadow:0 0 20px rgba(255,195,80,.15);
-}
 
 .portfolioBox {
     background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
@@ -129,18 +113,6 @@ h2 {
     cursor: pointer;
     box-shadow: 0 10px 30px rgba(0,0,0,0.35);
     will-change: transform;
-}
-    .portfolioBox .big{
-    font-size:36px;
-    font-weight:800;
-    letter-spacing:-0.5px;
-    margin-top:4px;
-}
-
-.portfolioBox .small{
-    font-size:12px;
-    text-transform:uppercase;
-    letter-spacing:1px;
 }
 
 .statsRow {
@@ -426,34 +398,15 @@ button {
 }
 
 /* labels stay same idea as your old cellTitle */
-.label{
-    text-transform:none;
-    letter-spacing:0.2px;
-    font-size:10px;
-    opacity:.75;
-}
-    .navBtn{
-    transition:
-        transform .15s ease,
-        border-color .15s ease;
-}
+.label {
+    font-size: 9px;
+    color: #93a4b8;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    opacity: 0.8;
 
-.navBtn:active{
-    transform:scale(.97);
-}
 
-.activeNav{
-    background:
-        linear-gradient(
-            145deg,
-            rgba(31,111,235,.25),
-            rgba(46,229,157,.10)
-        );
-
-    border:1px solid rgba(46,229,157,.40);
-
-    box-shadow:
-        0 0 18px rgba(46,229,157,.12);
+    white-space: nowrap;
 }
 
 
@@ -659,66 +612,6 @@ body.hideNav .addBtn {
     user-select: text;
     -webkit-user-select: text;
 }
-    .dailyStat{
-    box-shadow:
-        0 10px 28px rgba(0,0,0,.35),
-        0 0 18px rgba(46,229,157,.12);
-}
-
-.weeklyStat{
-    box-shadow:
-        0 10px 28px rgba(0,0,0,.35),
-        0 0 18px rgba(77,163,255,.12);
-}
-
-.monthlyStat{
-    box-shadow:
-        0 10px 28px rgba(0,0,0,.35),
-        0 0 18px rgba(255,190,80,.12);
-}
-    .accountRow{
-
-    background:
-        linear-gradient(
-            145deg,
-            rgba(20,30,50,.75),
-            rgba(10,15,30,.55)
-        );
-
-    border:1px solid rgba(120,170,255,.14);
-
-    border-radius:18px;
-
-    margin-bottom:12px;
-
-    padding:16px 12px;
-
-    backdrop-filter:blur(18px);
-
-    box-shadow:
-        0 10px 24px rgba(0,0,0,.28);
-}
-    .card::after,
-.stat::after,
-.portfolioBox::after,
-.accountRow::after{
-
-    content:"";
-
-    position:absolute;
-    inset:1px;
-
-    border-radius:inherit;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(255,255,255,.06),
-            transparent 35%
-        );
-
-    pointer-events:none;
-}
     
 </style>
 </head>
@@ -758,9 +651,6 @@ body.hideNav .addBtn {
     </div>
 
 </div>
-    <div class="stat dailyStat">
-<div class="stat weeklyStat">
-<div class="stat monthlyStat">
 
 <div id="accounts"></div>
 
@@ -961,13 +851,13 @@ body.hideNav .addBtn {
 
     <button class="navBtn"
             onclick="openProjection()">
-        ↗ Projection
+        📈 Projection
     </button>
         <button class="navBtn" onclick="show('drawdown')">
-    ↘ Drawdown
+    📉 Drawdown
 </button>
         <button class="navBtn" onclick="openCalendar()">
-    Calendar
+    📅 Calendar
 </button>
 
 </div>
