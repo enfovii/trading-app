@@ -289,38 +289,39 @@ button {
 
 .addBtn{
     position: fixed;
+    bottom: 78px;
+    left: 12px;
+    right: 12px;
 
-    left: 50%;
-    transform: translateX(-50%);
+    z-index: 9999;
 
-    bottom: 90px;
+    padding: 16px;
 
-    width: 70px !important;
-    height: 70px;
-
-    border-radius: 50%;
-
-    padding: 0;
-    margin: 0;
-
-    font-size: 0;
+    border-radius: 18px;
 
     background: linear-gradient(
-        135deg,
-        #1f6feb,
-        #2ee59d
+        145deg,
+        rgba(20,30,50,0.85),
+        rgba(10,15,30,0.75)
     );
 
-    box-shadow:
-        0 12px 30px rgba(31,111,235,0.35);
+    border: 1px solid rgba(120,170,255,0.22);
 
-    z-index: 10000;
+    color: #eaf1ff;
+    font-size: 16px;
+    font-weight: 700;
+
+    backdrop-filter: blur(18px);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.35),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+
+    transition: all 0.15s ease;
 }
 
-.addBtn::before{
-    content:"+";
-    font-size:32px;
-    color:white;
+.addBtn:active{
+    transform: scale(0.99);
 }
 
 .modal {
