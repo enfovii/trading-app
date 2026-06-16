@@ -16,26 +16,22 @@
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
 }
-:root{
+:root {
+    --bg: #050913;
 
-    --bg:#0B1220;
-    --bg2:#111827;
+    --card: rgba(18, 28, 48, 0.70);
+    --card2: rgba(10, 14, 28, 0.55);
 
-    --card:#151F31;
-    --card2:#1B263B;
+    --primary: #4da3ff;
+    --accent: #38e6b0;
 
-    --primary:#3B82F6;
-    --primarySoft:rgba(59,130,246,.12);
+    --profit: #2ee59d;
+    --loss: #ff5c7a;
 
-    --accent:#14B8A6;
+    --text: #eaf1ff;
+    --muted: #8ea2bb;
 
-    --profit:#22C55E;
-    --loss:#EF4444;
-
-    --text:#F8FAFC;
-    --muted:#94A3B8;
-
-    --border:rgba(255,255,255,.06);
+    --border: rgba(120, 170, 255, 0.14);
 }
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
@@ -48,31 +44,16 @@ body {
     -webkit-text-size-adjust: 100%;
 }
 
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
     background:
-    radial-gradient(
-        circle at top right,
-        rgba(59,130,246,.12),
-        transparent 40%
-    ),
-
-    radial-gradient(
-        circle at bottom left,
-        rgba(20,184,166,.08),
-        transparent 35%
-    ),
-
-    linear-gradient(
-        180deg,
-        #0B1220 0%,
-        #111827 100%
-    );
-
-    z-index:-1;
+        radial-gradient(circle at 15% 20%, rgba(77,163,255,0.18), transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(56,230,176,0.10), transparent 50%),
+        radial-gradient(circle at 50% 90%, rgba(77,163,255,0.08), transparent 55%),
+        var(--bg);
+    z-index: -1;
 }
 body {
     color: var(--text);
@@ -122,47 +103,42 @@ h2 {
     gap: 12px;
 }
 
-.portfolioBox{
-
-    background:
-    linear-gradient(
-        145deg,
-        rgba(25,35,55,.95),
-        rgba(18,26,42,.95)
-    );
-
-    border:1px solid rgba(255,255,255,.08);
-
-    border-radius:24px;
-
-    padding:22px;
-
-    box-shadow:
-    0 10px 40px rgba(0,0,0,.35);
-
-    backdrop-filter:blur(24px);
+.portfolioBox {
+    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
+    padding: 18px;
+    border-radius: 18px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    will-change: transform;
 }
+
 .statsRow {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 }
 
-.stat{
-
+.stat {
     background:
-    rgba(21,31,49,.85);
+        linear-gradient(
+            145deg,
+            rgba(18,28,48,0.82),
+            rgba(8,12,24,0.72)
+        );
 
-    border:
-    1px solid rgba(255,255,255,.05);
+    border: 1px solid rgba(120,170,255,0.12);
 
-    border-radius:20px;
+    backdrop-filter: blur(18px);
 
-    padding:18px 12px;
+    padding: 14px 10px;
 
-    backdrop-filter:blur(18px);
+    border-radius: 20px;
 
-    min-height:84px;
+    text-align: center;
+    will-change: transform;
 }
     .stat .small {
     margin-bottom: 6px;
@@ -200,26 +176,19 @@ border: 1px solid var(--border);
     overflow: hidden;
 }
 
-.card::after,
-.stat::after,
-.account::after,
-.portfolioBox::after{
-
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    top:0;
-
-    height:1px;
-
-    background:
-    linear-gradient(
-        90deg,
-        transparent,
-        rgba(255,255,255,.15),
-        transparent
-    );
+/* left accent strip */
+.portfolioBox::before,
+.stat::before,
+.card::before,
+.account::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #1f6feb, #2ee59d);
+    opacity: 0.9;
 }
 
 /* cleaner spacing rhythm */
@@ -283,23 +252,18 @@ input:focus {
     box-shadow: 0 0 12px rgba(46,229,157,0.25);
 }
 
-button{
-
-    border:none;
-
-    border-radius:16px;
-
-    background:
-    linear-gradient(
-        180deg,
-        #3B82F6,
-        #2563EB
-    );
-
-    font-weight:700;
-
-    box-shadow:
-    0 6px 20px rgba(37,99,235,.35);
+button {
+    width: calc(100% - 24px);
+    margin-left: 12px;
+    margin-right: 12px;
+    padding: 14px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #1f6feb, #144a99);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0,120,255,0.25);
 }
    .stickyBackBtn{
     position: fixed !important;
@@ -343,34 +307,14 @@ button{
     z-index: 20;
 }
 
-.modal-content{
-
-    background:
-    rgba(17,24,39,.96);
-
-    border:
-    1px solid rgba(255,255,255,.08);
-
-    border-radius:24px;
-
-    padding:22px;
-
-    backdrop-filter:blur(30px);
-
-    box-shadow:
-    0 20px 60px rgba(0,0,0,.45);
-}
-    .green{
-    color:#22C55E;
-    font-weight:700;
-}
-    .title{
-    margin:18px 0 22px;
-}
-
-.red{
-    color:#EF4444;
-    font-weight:700;
+.modal-content {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(15,20,35,0.9);
+    border: 1px solid rgba(120,170,255,0.25);
+    backdrop-filter: blur(16px);
+    padding: 16px;
+    border-radius: 16px;
 }
 
 .danger {
@@ -414,23 +358,21 @@ button{
     color: #eaf1ff;
 }
 
-.accountRow{
+.accountRow {
+    display: grid;
+    grid-template-columns:
+        minmax(105px, 1.8fr)
+        minmax(58px, 0.9fr)
+        minmax(58px, 0.9fr)
+        minmax(72px, 1fr)
+        minmax(42px, 0.6fr)
+        minmax(70px, 0.9fr);
 
-    background:
-    rgba(21,31,49,.65);
-
-    border:
-    1px solid rgba(255,255,255,.04);
-
-    border-radius:18px;
-
-    margin-bottom:10px;
-
-    padding:14px 10px;
-}
-    .accountRow:hover{
-    border-color:
-    rgba(59,130,246,.25);
+    gap: 4px;
+    align-items: start;
+    padding: 12px 6px;
+    box-sizing: border-box;
+    overflow: hidden;
 }
 .col {
     display: flex;
@@ -555,24 +497,23 @@ button{
 }
 
 .navBtn{
+    padding: 14px;
+    border: none;
+    border-radius: 16px;
 
-    background:
-    rgba(21,31,49,.9);
+    background: linear-gradient(
+        145deg,
+        rgba(20,30,50,0.75),
+        rgba(10,15,30,0.55)
+    );
 
-    border:
-    1px solid rgba(255,255,255,.06);
+    border: 1px solid rgba(120,170,255,0.18);
 
-    color:#F8FAFC;
-}
-    body{
+    color: #eaf1ff;
+    font-size: 15px;
+    font-weight: 600;
 
-    max-width:600px;
-    margin:auto;
-
-    padding-left:16px;
-    padding-right:16px;
-
-    padding-bottom:220px;
+    backdrop-filter: blur(18px);
 }
     .fixedBack{
     position: fixed;
@@ -670,25 +611,6 @@ body.hideNav .addBtn {
     input {
     user-select: text;
     -webkit-user-select: text;
-}
-    body{
-    font-family:
-    Inter,
-    -apple-system,
-    BlinkMacSystemFont,
-    "SF Pro Display",
-    sans-serif;
-}
-    .big{
-    font-size:24px;
-    font-weight:700;
-    letter-spacing:-0.03em;
-}
-
-h2{
-    font-size:24px;
-    font-weight:800;
-    letter-spacing:-0.03em;
 }
     
 </style>
@@ -1001,15 +923,14 @@ h2{
     <div class="modal-content">
         <div class="big" id="calEditTitle">Edit Day</div>
 
-       <input
-    id="calEditInput"
-    placeholder="Enter profit"
-    inputmode="decimal"
-    step="0.01"
-    autocomplete="off"
-    onfocus="this.select()"
-    oninput="formatBalanceInput(this)"
->
+        <input
+            id="calEditInput"
+            placeholder="Enter profit"
+            inputmode="decimal"
+            autocomplete="off"
+            onfocus="this.select()"
+            oninput="formatBalanceInput(this)"
+        >
 
         <button onclick="saveCalendarDay()">Save</button>
         <button onclick="closeCalendarEdit()" style="background:rgba(255,255,255,0.08);">Cancel</button>
@@ -1245,34 +1166,20 @@ function formatBalanceInput(el){
 
     let raw = el.value.replace(/,/g,'');
 
-    // allow empty, minus, decimal point, or negative decimal
-    if(raw === '' || raw === '-' || raw === '.' || raw === '-.'){
+    if(raw === '' || raw === '-'){
+        el.value = raw;
+        updateAccount();
         return;
     }
 
-    // allow typing a decimal point at the end
-    let endsWithDot = raw.endsWith('.');
-
+    let isNegative = raw.startsWith('-');
     let numVal = Number(raw);
 
     if(isNaN(numVal)) return;
 
-    let parts = raw.split('.');
-    let integerPart = Number(parts[0] || 0).toLocaleString('en-US');
+    let formatted = Math.abs(numVal).toLocaleString('en-US');
 
-    let formatted = integerPart;
-
-    if(parts.length > 1){
-        formatted += '.' + parts[1];
-    } else if(endsWithDot){
-        formatted += '.';
-    }
-
-    if(raw.startsWith('-') && !formatted.startsWith('-')){
-        formatted = '-' + formatted;
-    }
-
-    el.value = formatted;
+    el.value = isNegative ? '-' + formatted : formatted;
 
     updateAccount();
 }
