@@ -1535,25 +1535,29 @@ h3 {
     padding: 15px 15px 13px;
     overflow: hidden;
     background:
-        radial-gradient(circle at 90% 58%, rgba(28, 245, 184, 0.28), transparent 32%),
+        radial-gradient(circle at 88% 58%, rgba(28, 245, 184, 0.18), transparent 34%),
+        radial-gradient(circle at 58% 88%, rgba(25, 214, 255, 0.10), transparent 38%),
         linear-gradient(135deg, rgba(13, 39, 76, 0.96), rgba(5, 17, 30, 0.98));
 }
 
 .portfolioBox::after {
     content: "";
     position: absolute;
-    left: 16px;
-    right: 0;
-    bottom: 7px;
+    left: 76px;
+    right: 10px;
+    bottom: 12px;
     height: 58px;
-    background:
-        linear-gradient(135deg, transparent 0 12%, rgba(25, 214, 255, 0.9) 13% 15%, transparent 16% 23%, rgba(25, 214, 255, 0.9) 24% 26%, transparent 27% 39%, rgba(25, 214, 255, 0.9) 40% 42%, transparent 43% 55%, rgba(25, 214, 255, 0.9) 56% 58%, transparent 59% 70%, rgba(25, 214, 255, 0.9) 71% 73%, transparent 74%),
-        linear-gradient(180deg, rgba(25, 214, 255, 0.24), rgba(45, 245, 102, 0.08), transparent);
-    clip-path: polygon(0 82%, 10% 82%, 17% 78%, 25% 83%, 33% 76%, 42% 80%, 49% 66%, 56% 74%, 63% 52%, 70% 58%, 78% 24%, 86% 29%, 94% 8%, 100% 0, 100% 100%, 0 100%);
-    opacity: 0.95;
+    z-index: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 320 90' xmlns='http://www.w3.org/2000/svg' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='area' x1='0' y1='0' x2='0' y2='1'%3E%3Cstop offset='0' stop-color='%2319d6ff' stop-opacity='0.38'/%3E%3Cstop offset='0.58' stop-color='%232df566' stop-opacity='0.14'/%3E%3Cstop offset='1' stop-color='%23020812' stop-opacity='0'/%3E%3C/linearGradient%3E%3ClinearGradient id='line' x1='0' y1='0' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%230b64f6'/%3E%3Cstop offset='0.48' stop-color='%2319d6ff'/%3E%3Cstop offset='1' stop-color='%232df566'/%3E%3C/linearGradient%3E%3Cfilter id='glow' x='-15%25' y='-55%25' width='130%25' height='210%25'%3E%3CfeGaussianBlur stdDeviation='3.5' result='blur'/%3E%3CfeMerge%3E%3CfeMergeNode in='blur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Cg opacity='0.28'%3E%3Cpath d='M0 74 H320' stroke='%235e82ac' stroke-width='1'/%3E%3Cpath d='M0 50 H320' stroke='%235e82ac' stroke-width='1'/%3E%3Cpath d='M0 26 H320' stroke='%235e82ac' stroke-width='1'/%3E%3C/g%3E%3Cpath d='M0 76 C18 76 26 77 42 75 C56 72 62 75 74 73 C88 70 96 76 108 70 C120 64 126 67 138 57 C150 47 160 57 172 46 C185 34 196 44 210 32 C224 20 238 31 250 23 C263 16 270 20 280 12 C292 3 304 9 320 0 L320 90 L0 90 Z' fill='url(%23area)'/%3E%3Cpath d='M0 76 C18 76 26 77 42 75 C56 72 62 75 74 73 C88 70 96 76 108 70 C120 64 126 67 138 57 C150 47 160 57 172 46 C185 34 196 44 210 32 C224 20 238 31 250 23 C263 16 270 20 280 12 C292 3 304 9 320 0' fill='none' stroke='url(%23line)' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round' filter='url(%23glow)'/%3E%3Cg fill='%2319d6ff' opacity='0.65'%3E%3Ccircle cx='108' cy='70' r='2'/%3E%3Ccircle cx='172' cy='46' r='2'/%3E%3Ccircle cx='250' cy='23' r='2'/%3E%3C/g%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    opacity: 0.98;
 }
 
 .portfolioBox .small {
+    position: relative;
+    z-index: 1;
     color: #fff;
     font-size: 13px;
     font-weight: 560;
@@ -1826,6 +1830,191 @@ select {
 }
      
 /* ===== SMALL FIXES: ACCOUNT ANCHOR + PROJECTION MODE CLARITY ===== */
+.accountRow {
+    grid-template-columns: 30px minmax(82px, 1fr) 52px 64px 46px 10px;
+    grid-template-rows: 1fr;
+    gap: 6px;
+    min-height: 56px;
+    align-items: center;
+}
+
+.accountRow::before {
+    grid-row: 1;
+}
+
+.accountRow::after {
+    grid-column: 6;
+    grid-row: 1;
+}
+
+.accountRow .col.name {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.accountRow .col.num:nth-of-type(2) {
+    grid-column: 3;
+    grid-row: 1;
+    align-items: flex-end;
+}
+
+.accountRow .col.num:nth-of-type(3) {
+    grid-column: 5;
+    grid-row: 1;
+    align-items: center;
+}
+
+.accountRow .col.num:nth-of-type(4) {
+    display: flex;
+    grid-column: 4;
+    grid-row: 1;
+    align-items: flex-end;
+    padding-top: 0;
+}
+
+.accountRow .col.num:nth-of-type(5) {
+    display: none;
+}
+
+.accountRow .col.num .label {
+    display: block;
+    margin-bottom: 2px;
+    color: #718096;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    line-height: 1;
+}
+
+.accountRow .col.num:nth-of-type(4) .label {
+    width: 100%;
+    color: transparent;
+    text-align: right;
+}
+
+.accountRow .col.num:nth-of-type(4) .label::after {
+    content: "NEXT";
+    color: #718096;
+}
+
+.accountRow .col.num:nth-of-type(2) .value,
+.accountRow .col.num:nth-of-type(4) .value {
+    font-size: 11px;
+    white-space: nowrap;
+}
+
+.accountRow .col.num:nth-of-type(4) .value {
+    color: #fff;
+    width: 100%;
+    text-align: right;
+}
+
+.accountRow .col.num:nth-of-type(3) .label {
+    display: none;
+}
+
+.accountRow .col.num:nth-of-type(3) .value {
+    font-size: 10px;
+    padding: 4px 6px;
+}
+
+.accountRow .strong,
+.accountBalance {
+    font-size: 11px;
+}
+
+/* Next target sits under the multiplier for a cleaner compact row. */
+.accountRow {
+    grid-template-columns: 30px minmax(104px, 1fr) 54px 54px 10px;
+    grid-template-rows: auto auto;
+    min-height: 64px;
+    row-gap: 1px;
+    column-gap: 8px;
+}
+
+.accountRow::before {
+    grid-column: 1;
+    grid-row: 1 / 3;
+}
+
+.accountRow .col.name {
+    grid-column: 2;
+    grid-row: 1 / 3;
+}
+
+.accountRow .col.num:nth-of-type(2) {
+    grid-column: 3;
+    grid-row: 1 / 3;
+    align-items: center;
+    transform: translateX(-4px);
+}
+
+.accountRow .col.num:nth-of-type(3) {
+    grid-column: 4;
+    grid-row: 1;
+    align-items: center;
+    align-self: end;
+}
+
+.accountRow .col.num:nth-of-type(4) {
+    display: flex;
+    grid-column: 4;
+    grid-row: 2;
+    align-items: center;
+    align-self: start;
+    padding-top: 0;
+}
+
+.accountRow .col.num:nth-of-type(5) {
+    display: none;
+}
+
+.accountRow::after {
+    grid-column: 5;
+    grid-row: 1 / 3;
+    align-self: center;
+}
+
+.accountRow .col.num:nth-of-type(4) .label {
+    display: none;
+}
+
+.accountRow .col.num:nth-of-type(4) .value {
+    width: auto;
+    margin-top: 2px;
+    color: #9fb0c7;
+    font-size: 9px;
+    font-weight: 750;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.accountRow .col.num:nth-of-type(4) .value::before {
+    content: "↗ ";
+    color: var(--green);
+}
+
+.accountRow .col.num:nth-of-type(3) .value {
+    margin-bottom: 1px;
+}
+
+.accountRow .col.num:nth-of-type(2) .value {
+    font-size: 12px;
+    line-height: 1;
+    text-align: center;
+}
+
+.accountRow .dailyMini {
+    margin-top: 3px;
+    color: #9fb0c7;
+    font-size: 9px;
+    font-weight: 750;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
 #account > .card > .card:nth-of-type(3) {
     padding-right: 16px;
 }
@@ -2610,6 +2799,9 @@ if (b < anchor) {
     <div class="label">Daily</div>
     <div class="value ${daily(b) >= 100000 ? 'dailyLarge' : ''}">
         ${money(daily(b, anchor))}
+    </div>
+    <div class="dailyMini">
+        ${money(daily(b, anchor) / 100)}
     </div>
 </div>
 
