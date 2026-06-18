@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -600,19 +601,29 @@ body.hideNav .page.active {
     margin-bottom: 14px;
 }
 
-#portfolio > .card > h3::before,
-#projection > .card > h3::before,
-#drawdown > .card > h3::before,
-#calendar > .card h3::before,
-#account > .card .nameRow::before {
-    content: "‹";
+.backArrow {
     position: absolute;
     left: 0;
-    top: -2px;
+    top: -8px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 36px !important;
+    min-height: 36px;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    box-shadow: none;
     color: #fff;
     font-size: 31px;
     font-weight: 260;
     line-height: 1;
+}
+
+.backArrow:active {
+    opacity: 0.72;
 }
 
 #portfolio > .card > .card,
@@ -914,6 +925,18 @@ body.hideNav .page.active {
     width: 100%;
     margin-left: 0;
     margin-right: 0;
+}
+
+.calActionRow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.calActionRow button {
+    width: 100%;
+    margin: 0;
 }
     #calendarGrid{
     display: grid;
@@ -2103,11 +2126,11 @@ select {
     box-shadow: 0 0 12px rgba(25, 214, 255, 0.32);
 }
 
-#account > .card > .card:nth-of-type(3) {
+#account > .card > .card {
     padding-right: 16px;
 }
 
-#account > .card > .card:nth-of-type(3)::after {
+#account > .card > .card::after {
     content: "" !important;
     display: none !important;
 }
@@ -2151,6 +2174,232 @@ select {
 
 #projMode {
     margin-top: 8px !important;
+}
+
+/* ===== STABILITY + MOBILE POLISH PASS ===== */
+html {
+    min-height: 100%;
+    background: #07101d;
+}
+
+body {
+    width: min(100%, 430px);
+    max-width: 430px;
+    min-height: 100svh;
+    margin: 0 auto;
+    padding: 28px 16px calc(env(safe-area-inset-bottom) + 132px);
+    border: 0;
+    border-radius: 0;
+    background:
+        radial-gradient(circle at 50% -8%, rgba(25, 214, 255, 0.16), transparent 34%),
+        linear-gradient(180deg, #020812 0%, #06101c 52%, #020610 100%);
+    box-shadow: none;
+}
+
+.title {
+    margin-bottom: 14px;
+    justify-content: center;
+    text-align: center;
+}
+
+h2 {
+    font-size: 24px;
+    letter-spacing: -0.03em;
+    text-align: center;
+}
+
+.page {
+    padding-bottom: 12px;
+}
+
+.portfolioBox,
+.stat,
+.card,
+.modal-content,
+.calendarDay,
+.accountRow {
+    border-color: rgba(101, 142, 190, 0.24);
+    background:
+        linear-gradient(145deg, rgba(14, 34, 58, 0.94), rgba(4, 13, 24, 0.98));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 14px 34px rgba(0,0,0,0.24);
+}
+
+.portfolioBox {
+    min-height: 124px;
+    border-radius: 16px;
+}
+
+.portfolioBox .big {
+    font-size: 38px;
+}
+
+.statsRow {
+    margin-top: 10px;
+}
+
+.stat {
+    min-height: 76px;
+    border-radius: 14px;
+}
+
+.card {
+    border-radius: 14px;
+}
+
+.accountRow {
+    grid-template-columns: 32px minmax(0, 1fr) 64px 58px 12px;
+    min-height: 82px;
+    padding: 11px 12px 10px;
+    border-radius: 14px;
+}
+
+.accountRow::before {
+    border-radius: 10px;
+    background: linear-gradient(180deg, #1478ff, #0750d8);
+}
+
+.accountRow .strong,
+.accountBalance {
+    font-size: 12px;
+}
+
+.accountRow .col.num:nth-of-type(2) {
+    transform: none;
+}
+
+.accountProgress {
+    margin-top: 7px;
+}
+
+.emptyState {
+    margin-top: 14px;
+    padding: 18px 16px;
+    border: 1px dashed rgba(101, 142, 190, 0.32);
+    border-radius: 14px;
+    color: #9fb0c7;
+    background: rgba(7, 19, 34, 0.56);
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.bottomNav,
+.addBtn,
+.stickyBackBtn {
+    left: max(16px, calc((100vw - 430px) / 2 + 16px));
+    right: max(16px, calc((100vw - 430px) / 2 + 16px));
+    width: auto !important;
+    transform: none;
+}
+
+.bottomNav {
+    bottom: calc(env(safe-area-inset-bottom) + 12px);
+    height: auto;
+    padding: 7px;
+    border: 1px solid rgba(101, 142, 190, 0.18);
+    border-radius: 18px;
+    background: rgba(2, 8, 18, 0.9);
+    backdrop-filter: blur(18px);
+}
+
+.navBtn {
+    min-height: 42px;
+    border-radius: 12px;
+}
+
+.addBtn {
+    bottom: calc(env(safe-area-inset-bottom) + 72px);
+    border-radius: 12px;
+}
+
+.stickyBackBtn {
+    bottom: calc(env(safe-area-inset-bottom) + 72px);
+    border-radius: 12px;
+}
+
+body.hideNav .addBtn {
+    display: none !important;
+}
+
+body.hideNav .bottomNav {
+    display: grid !important;
+}
+
+body.hideNav .title {
+    display: none;
+}
+
+body.hideNav .page.active {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 184px);
+}
+
+#calendar .card > div:first-child {
+    gap: 14px;
+}
+
+#calendarGrid,
+.weekHeaderOutside {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 7px;
+}
+
+.calendarDay {
+    min-height: 56px;
+    border-radius: 12px;
+}
+
+.calendarDay .green .calValue,
+.calendarDay .green .calValue span {
+    color: var(--green) !important;
+}
+
+.calendarDay .red .calValue,
+.calendarDay .red .calValue span {
+    color: var(--red) !important;
+}
+
+#projResults .card,
+#dd_results .card {
+    border-radius: 14px;
+}
+
+input,
+select,
+button {
+    font-family: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+@media (min-width: 431px) {
+    body {
+        margin-top: 18px;
+        margin-bottom: 18px;
+        min-height: calc(100svh - 36px);
+        border: 1px solid rgba(101, 142, 190, 0.18);
+        border-radius: 30px;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+    }
+}
+
+@media (max-width: 360px) {
+    body {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .accountRow {
+        grid-template-columns: 28px minmax(0, 1fr) 54px 50px 10px;
+        gap: 6px;
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .portfolioBox .big {
+        font-size: 34px;
+    }
 }
 
 </style>
@@ -2198,7 +2447,7 @@ select {
 
 <div id="portfolio" class="page">
 <div class="card">
-    <h3>Portfolio Overview</h3>
+    <h3><button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>Portfolio Overview</h3>
 
     <div class="card">
         <div class="small">Total Balance</div>
@@ -2229,7 +2478,7 @@ select {
 <div id="projection" class="page">
 
 <div class="card">
-    <h3>Projection Calculator</h3>
+    <h3><button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>Projection Calculator</h3>
 
     <div class="small">Select Mode</div>
 
@@ -2258,7 +2507,7 @@ select {
 <div id="drawdown" class="page">
 
 <div class="card">
-    <h3>Drawdown Scenarios</h3>
+    <h3><button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>Drawdown Scenarios</h3>
     <div class="small">Drawdown stress test (100 → 500 pips)</div>
 
     <div class="ddMultiplierControl">
@@ -2280,8 +2529,6 @@ select {
 <div id="dd_results"></div>
 
 </div>
-
-</div>
     
     <div id="calendar" class="page">
 
@@ -2289,7 +2536,7 @@ select {
     <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         
         <div>
-            <h3>Profit Calendar</h3>
+            <h3><button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>Profit Calendar</h3>
             <div class="small">Track daily profit per month</div>
         </div>
 
@@ -2335,19 +2582,33 @@ select {
 <div class="card">
 
     <div class="nameRow">
+        <button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>
         <h3 id="name"></h3>
         <button class="editBtn" onclick="renameAccount()">✏️</button>
     </div>
 
-    <input id="balance"
-       inputmode="decimal"
-       pattern="[0-9]*"
-       autocomplete="off"
-       autocorrect="off"
-       autocapitalize="none"
-       spellcheck="false"
-       onfocus="this.select()"
-       oninput="formatBalanceInput(this)">
+    <div class="card balanceEditCard">
+        <div class="small">Balance</div>
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:8px;
+        ">
+            <div class="big" id="balanceDisplay">$0</div>
+
+            <button onclick="setBalance(current)"
+            style="
+                width:auto;
+                margin:0;
+                padding:10px 14px;
+                border-radius:12px;
+            ">
+                Edit
+            </button>
+        </div>
+    </div>
 
     <div class="card">
         <div class="small">Multiplier</div>
@@ -2480,15 +2741,22 @@ select {
 
        <input
     id="calEditInput"
-    placeholder="Enter profit"
+    placeholder="Enter amount"
     inputmode="decimal"
+    pattern="[0-9,.]*"
     step="0.01"
     autocomplete="off"
+    autocorrect="off"
+    autocapitalize="none"
+    spellcheck="false"
     onfocus="this.select()"
-    oninput="formatBalanceInput(this)"
+    oninput="formatMoneyInput(this)"
 >
 
-        <button onclick="saveCalendarDay()">Save</button>
+        <div class="calActionRow">
+            <button onclick="saveCalendarDay('profit')">Add Profit</button>
+            <button class="danger" onclick="saveCalendarDay('loss')">Add Loss</button>
+        </div>
         <button onclick="closeCalendarEdit()" style="background:rgba(255,255,255,0.08);">Cancel</button>
     </div>
 </div>
@@ -2499,10 +2767,28 @@ select {
         <input id="anchorInput"
             inputmode="decimal"
             onfocus="this.select()"
-            oninput="formatBalanceInput(this)">
+            oninput="formatMoneyInput(this)">
 
         <button onclick="saveAnchor()">Save</button>
         <button onclick="closeAnchorModal()">Cancel</button>
+    </div>
+</div>
+
+    <div class="modal" id="balanceModal">
+    <div class="modal-content">
+        <div class="big">Edit Balance</div>
+
+        <input id="balanceInput"
+            inputmode="decimal"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            onfocus="this.select()"
+            oninput="formatMoneyInput(this)">
+
+        <button onclick="saveBalance()">Save</button>
+        <button onclick="closeBalanceModal()">Cancel</button>
     </div>
 </div>
     
@@ -2510,6 +2796,7 @@ select {
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 let editingAnchorIndex = null;
+let editingBalanceIndex = null;
     let calendarDate = new Date();
     let selectedCalDate = null;
 
@@ -2637,6 +2924,7 @@ for (let d = 1; d <= lastDay; d++) {
     let b = num(a.balance);
     let anchor = a.anchor || 40000;
 
+    document.getElementById("balanceDisplay").innerText = money(b);
     document.getElementById("anchorDisplay").innerText = money(anchor);
     document.getElementById("mult").innerText = mult(b, anchor).toFixed(2) + "x";
     document.getElementById("dailyP").innerText = money(daily(b, anchor));
@@ -2662,6 +2950,15 @@ function money(v){
     }
 
     return "$" + v.toLocaleString();
+}
+
+function escapeHtml(value){
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
     
     function openProjection(){
@@ -2755,6 +3052,37 @@ function formatBalanceInput(el){
     updateAccount();
 }
 
+function formatMoneyInput(el){
+
+    let raw = el.value.replace(/,/g,'');
+
+    if(raw === '' || raw === '-' || raw === '.' || raw === '-.'){
+        return;
+    }
+
+    let endsWithDot = raw.endsWith('.');
+    let numVal = Number(raw);
+
+    if(isNaN(numVal)) return;
+
+    let parts = raw.split('.');
+    let integerPart = Number(parts[0] || 0).toLocaleString('en-US');
+
+    let formatted = integerPart;
+
+    if(parts.length > 1){
+        formatted += '.' + parts[1];
+    } else if(endsWithDot){
+        formatted += '.';
+    }
+
+    if(raw.startsWith('-') && !formatted.startsWith('-')){
+        formatted = '-' + formatted;
+    }
+
+    el.value = formatted;
+}
+
 function tier(b, anchor = 40000){
 
     if (b < anchor) return 0;
@@ -2821,8 +3149,9 @@ function renderPortfolio(){
 
     accounts.forEach(a=>{
         let b = num(a.balance);
+        let anchor = a.anchor || 40000;
         t += b;
-        d += daily(b);
+        d += daily(b, anchor);
     });
 
     document.getElementById("p_total").innerText =
@@ -2867,7 +3196,6 @@ function render(){
 }
         let nextTarget =
     nextTargetFromBalance(b, anchor);
-        let nextMult = mult(nextTarget);
         let needed = Math.max(0, nextTarget - b);
 
    let tierStart;
@@ -2893,7 +3221,7 @@ if (b < anchor) {
     <!-- ACCOUNT -->
     <div class="col name">
         <div class="label">Account</div>
-        <div class="value strong">${a.name}</div>
+        <div class="value strong">${escapeHtml(a.name)}</div>
         <div class="accountBalance">${money(b)}</div>
     </div>
 
@@ -2954,6 +3282,14 @@ return isFinite(days)
 
             });
 
+    if(accounts.length === 0){
+        html = `
+            <div class="emptyState">
+                Add your first account to start tracking balance, daily profit, multiplier progress, and projections.
+            </div>
+        `;
+    }
+
     el.innerHTML = html;
 
     document.getElementById("total").innerText = money(t.toFixed(0));
@@ -2988,44 +3324,25 @@ function openAccount(i){
 document.getElementById("anchorDisplay")
     .innerText = money(anchor);
     document.getElementById("name").innerText=a.name;
-    document.getElementById("balance").value=num(a.balance);
+    document.getElementById("balanceDisplay").innerText=money(num(a.balance));
     show("account");
     updateAccount();
-
-    setTimeout(() => {
-        let input = document.getElementById("balance");
-        input.focus();
-        input.setSelectionRange(input.value.length, input.value.length);
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 100);
 }
 
 function updateAccount(){
     if(current===null) return;
 
-    let inputEl = document.getElementById("balance");
-    let raw = inputEl.value;
-
-    if(raw === "" || raw === null) return;
-
-    let b = num(raw);
+    let b = num(accounts[current].balance);
     let anchor =
     accounts[current].anchor || 40000;
 
-    accounts[current].balance = b;
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
+    document.getElementById("balanceDisplay").innerText = money(b);
     document.getElementById("mult").innerText=mult(b, anchor).toFixed(2)+"x";
     document.getElementById("dailyP").innerText = money(daily(b, anchor));
     document.getElementById("weekly").innerText=money(daily(b, anchor)*5);
     document.getElementById("monthly").innerText=money(daily(b, anchor)*22);
-    
-
-    let elInput = document.getElementById("balance");
-
-    
-    elInput.value = Number(b).toLocaleString('en-US');
-    elInput.setSelectionRange(elInput.value.length, elInput.value.length);
 
     requestAnimationFrame(render);
 }
@@ -3086,10 +3403,20 @@ function deleteAccount(){
     extra.innerHTML = "";
 
     if(mode === "account"){
+        if(accounts.length === 0){
+            extra.innerHTML = `
+                <div class="emptyState">
+                    Add an account first, then come back to project a single account.
+                </div>
+            `;
+            renderProjection();
+            return;
+        }
+
         let options = "";
 
         accounts.forEach((a,i)=>{
-            options += `<option value="${i}">${a.name}</option>`;
+            options += `<option value="${i}">${escapeHtml(a.name)}</option>`;
         });
 
         extra.innerHTML = `
@@ -3179,6 +3506,14 @@ function deleteAccount(){
 
         let a = accounts[i];
 
+        if(!a){
+            return {
+                balance: 0,
+                daily: 0,
+                anchor: 40000
+            };
+        }
+
         return {
             balance: num(a.balance),
             daily: daily(
@@ -3266,7 +3601,8 @@ function openCalendarEdit(dateKey, val){
 
     selectedCalDate = dateKey;
 
-    document.getElementById("calEditInput").value = val ? val : "";
+    document.getElementById("calEditInput").value =
+        val ? Number(val).toLocaleString('en-US') : "";
     document.getElementById("calEditTitle").innerText = "Edit " + dateKey;
 
     document.getElementById("calEditModal").style.display = "flex";
@@ -3289,11 +3625,15 @@ function closeCalendarEdit(){
     selectedCalDate = null;
 }
 
-function saveCalendarDay(){
+function saveCalendarDay(type){
 
     if(!selectedCalDate) return;
 
-    let val = num(document.getElementById("calEditInput").value);
+    let val = Math.abs(num(document.getElementById("calEditInput").value));
+
+    if(type === "loss"){
+        val = -val;
+    }
 
     let key = "cal_" + selectedCalDate;
 
@@ -3505,6 +3845,60 @@ function renderProjection(){
     }
 
     document.getElementById("projResults").innerHTML = html;
+}
+
+function setBalance(i){
+
+    editingBalanceIndex = i;
+
+    if(i === null || !accounts[i]) return;
+
+    let val = num(accounts[i].balance);
+
+    let input = document.getElementById("balanceInput");
+
+    input.value = Number(val).toLocaleString('en-US');
+
+    document.getElementById("balanceModal").style.display = "flex";
+
+    setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }, 100);
+}
+
+function saveBalance(){
+
+    let val = num(document.getElementById("balanceInput").value);
+
+    if(editingBalanceIndex === null || val < 0) return;
+
+    let i = editingBalanceIndex;
+
+    accounts[i].balance = val;
+
+    localStorage.setItem(
+        "accounts",
+        JSON.stringify(accounts)
+    );
+
+    closeBalanceModal();
+
+    editingBalanceIndex = null;
+
+    if(current === i){
+        refreshAccountUI(i);
+    }
+
+    render();
+}
+
+function closeBalanceModal(){
+    document.getElementById("balanceModal").style.display = "none";
+
+    document.getElementById("balanceInput").blur();
+
+    editingBalanceIndex = null;
 }
 
 function setAnchor(i){
