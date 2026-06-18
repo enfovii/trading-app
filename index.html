@@ -120,15 +120,20 @@ body {
 }
 
 .portfolioBox {
-    background: linear-gradient(145deg, rgba(20,30,50,0.75), rgba(10,15,30,0.55));
-    border: 1px solid rgba(120,170,255,0.25);
-    backdrop-filter: blur(16px);
-    padding: 18px;
-    border-radius: 18px;
-    text-align: center;
+    background:
+        linear-gradient(145deg, rgba(38, 76, 132, 0.88), rgba(12, 22, 42, 0.78)),
+        radial-gradient(circle at top right, rgba(56,230,176,0.28), transparent 40%);
+    border: 1px solid rgba(150, 200, 255, 0.24);
+    backdrop-filter: blur(22px);
+    padding: 24px 20px;
+    border-radius: 30px;
+    text-align: left;
     cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.35);
-    will-change: transform;
+    box-shadow: 0 22px 60px rgba(0,0,0,0.45);
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .statsRow {
@@ -643,9 +648,15 @@ body.hideNav .addBtn {
 <div class="topbar">
 
     <div class="portfolioBox" onclick="openPortfolio()">
-        <div class="small">Portfolio</div>
+    <div>
+        <div class="small">Total Portfolio</div>
         <div class="big" id="total">$0</div>
     </div>
+
+    <div class="small" style="margin-top:18px;">
+        Tap to open portfolio overview
+    </div>
+</div>
 
     <div class="statsRow">
 
