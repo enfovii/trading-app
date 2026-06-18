@@ -3702,12 +3702,6 @@ function simulateDrawdown(pips, multiplier = 1){
     };
 }
 
-function drawdownLotExamples(multiplier){
-    return [0.01, 0.02, 0.03]
-        .map(lot => `${lot.toFixed(2)}→${roundLotSize(lot * multiplier).toFixed(2)}`)
-        .join(" | ");
-}
-
 function renderDrawdown(){
 
     let container = document.getElementById("dd_results");
@@ -3719,7 +3713,6 @@ function renderDrawdown(){
     }
 
     const scenarios = [100, 200, 300, 400, 500];
-    const lotExamples = drawdownLotExamples(multiplier);
 
     for(let p of scenarios){
 
@@ -3728,12 +3721,6 @@ function renderDrawdown(){
         html += `
         <div class="card">
             <h3>${p} Pips Move</h3>
-            <div class="small">
-                1x ${money(result.baseDrawdown)} × ${multiplier}x
-                <span class="bonus">
-                    ${result.entryCount} trades • lots ${lotExamples}
-                </span>
-            </div>
             <div class="big red">Total DD: ${money(result.totalDrawdown)}</div>
         </div>
         `;
