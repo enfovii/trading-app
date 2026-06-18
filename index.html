@@ -2015,6 +2015,61 @@ select {
     white-space: nowrap;
 }
 
+.accountRow {
+    grid-template-rows: auto auto auto;
+    min-height: 78px;
+    padding-bottom: 9px;
+}
+
+.accountRow::before,
+.accountRow .col.name,
+.accountRow .col.num:nth-of-type(2) {
+    grid-row: 1 / 3;
+}
+
+.accountRow::after {
+    grid-row: 1 / 3;
+}
+
+.accountProgress {
+    grid-column: 2 / 5;
+    grid-row: 3;
+    align-self: end;
+    margin-top: 5px;
+}
+
+.accountProgressTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+    color: #7f8da3;
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.accountProgressTop span:last-child {
+    color: #9fb0c7;
+    letter-spacing: 0;
+}
+
+.accountProgressTrack {
+    height: 4px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(159, 176, 199, 0.12);
+}
+
+.accountProgressFill {
+    height: 100%;
+    min-width: 4px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #0b64f6, #19d6ff, #2df566);
+    box-shadow: 0 0 12px rgba(25, 214, 255, 0.32);
+}
+
 #account > .card > .card:nth-of-type(3) {
     padding-right: 16px;
 }
@@ -2837,6 +2892,15 @@ return isFinite(days)
         </div>
     </div>
 
+    <div class="accountProgress" aria-label="Progress to next multiplier">
+        <div class="accountProgressTop">
+            <span>Progress</span>
+            <span>${progress.toFixed(0)}%</span>
+        </div>
+        <div class="accountProgressTrack">
+            <div class="accountProgressFill" style="width:${progress}%"></div>
+        </div>
+    </div>
 
 </div>`;
 
