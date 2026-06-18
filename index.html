@@ -81,16 +81,24 @@ body {
 }
 .title {
     display: flex;
-    justify-content: center;
-    margin: 12px 0 16px;
+    justify-content: flex-start;
+    margin: 10px 0 18px;
 }
 
-h2 {
-    font-size: 20px;
-    font-weight: 700;
+.title h2::before {
+    content: "Dashboard";
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+    h2 {
+    font-size: 28px;
+    font-weight: 800;
     margin: 0;
-    text-align: center;
-    letter-spacing: 0.5px;
+    text-align: left;
+    letter-spacing: -0.4px;
 }
 
 .page {
