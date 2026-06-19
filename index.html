@@ -2,6 +2,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -774,9 +775,73 @@ body.hideNav .page.active {
 
 .calendarSummary {
     display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    min-width: 184px;
+}
+
+.calendarSummaryTop {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
-    min-width: 154px;
+    align-items: start;
+}
+
+.calendarMonthWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.calendarMonthBtn {
+    width: 100% !important;
+    margin: 0 !important;
+    min-height: 44px;
+    padding: 8px 9px;
+    border: 1px solid rgba(120,170,255,0.14);
+    border-radius: 12px;
+    background: rgba(8, 12, 25, 0.52) !important;
+    color: inherit;
+    text-align: right;
+    cursor: pointer;
+    box-shadow: none !important;
+    font-family: inherit;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
+}
+
+.calendarMonthBtn .small,
+.calendarMonthBtn .big {
+    pointer-events: none;
+}
+
+.calendarMonthBtn:active {
+    transform: scale(0.99);
+}
+
+.calendarMonthBtn[aria-expanded="true"] {
+    border-color: rgba(45, 245, 102, 0.42);
+    background: rgba(11, 100, 246, 0.14) !important;
+}
+
+.calendarSummaryTop .calendarSummaryItem {
+    min-height: 44px;
+    text-align: right;
+}
+
+.calendarSummaryTop .calendarSummaryItem .big,
+.calendarMonthBtn .big {
+    font-size: 13px;
+}
+
+.calendarWeeklyTotals {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.calendarSummary.showWeeks .calendarWeeklyTotals {
+    display: flex;
 }
 
 .calendarSummaryItem {
@@ -798,6 +863,41 @@ body.hideNav .page.active {
     line-height: 1.15;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.calendarAverageItem {
+    text-align: center;
+    width: 100%;
+}
+
+.calendarMonthWrap .calendarWeeklyTotals .calendarSummaryItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.calendarWeeklyTotals .calendarSummaryItem .small {
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.calendarWeeklyTotals .calendarSummaryItem .big {
+    max-width: 96px;
+    font-size: 11px;
+    text-align: right;
+}
+
+.calendarAverageItem {
+    padding: 7px 8px;
+}
+
+.calendarAverageItem .big {
+    font-size: 12px;
 }
 
 #calendarGrid,
@@ -917,16 +1017,8 @@ body.hideNav .page.active {
 
 #calendar .card > div:first-child {
     display: grid !important;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-}
-
-#calendar .card > div:first-child > div:first-child {
-    grid-column: 1 / -1;
-}
-
-#calendar .card > div:first-child > div:last-child {
-    display: contents;
+    grid-template-columns: 1fr;
+    gap: 10px;
 }
 
 #calendar .card > div:first-child > div:last-child .small,
@@ -934,8 +1026,7 @@ body.hideNav .page.active {
     display: block;
 }
 
-#calMonthTotal,
-#calAllTime {
+.calendarSummaryItem {
     padding: 12px;
     border: 1px solid var(--stroke);
     border-radius: 8px;
@@ -2824,15 +2915,32 @@ button {
             <div class="small">Track daily profit per month</div>
         </div>
 
-        <div class="calendarSummary">
-            <div class="calendarSummaryItem">
-                <div class="small">Monthly</div>
-                <div class="big green" id="calMonthTotal">$0</div>
+        <div class="calendarSummary" id="calendarSummary">
+            <div class="calendarSummaryTop">
+                <div class="calendarMonthWrap">
+                    <button
+                        type="button"
+                        class="calendarMonthBtn"
+                        id="calMonthBtn"
+                        onclick="toggleCalendarWeeks()"
+                        aria-expanded="false"
+                        aria-controls="calWeeklyTotals">
+                        <div class="small">Monthly</div>
+                        <div class="big green" id="calMonthTotal">$0</div>
+                    </button>
+
+                    <div id="calWeeklyTotals" class="calendarWeeklyTotals" hidden></div>
+                </div>
+
+                <div class="calendarSummaryItem">
+                    <div class="small">All Time</div>
+                    <div class="big" id="calAllTime">$0</div>
+                </div>
             </div>
 
-            <div class="calendarSummaryItem">
-                <div class="small">All Time</div>
-                <div class="big" id="calAllTime">$0</div>
+            <div class="calendarSummaryItem calendarAverageItem">
+                <div class="small">Avg Daily</div>
+                <div class="big green" id="calDailyAverage">$0</div>
             </div>
         </div>
 
@@ -3146,10 +3254,28 @@ let takeProfitRenderTimer = null;
 let projectionMonthDetails = [];
     let calendarDate = new Date();
     let selectedCalDate = null;
+    let calendarShowWeeks = false;
 
     function openCalendar(){
     show("calendar");
     renderCalendar();
+}
+
+function toggleCalendarWeeks(){
+    calendarShowWeeks = !calendarShowWeeks;
+    syncCalendarWeeksView();
+}
+
+function syncCalendarWeeksView(){
+    let summary = document.getElementById("calendarSummary");
+    let btn = document.getElementById("calMonthBtn");
+    let weeks = document.getElementById("calWeeklyTotals");
+
+    if(!summary || !btn || !weeks) return;
+
+    summary.classList.toggle("showWeeks", calendarShowWeeks);
+    btn.setAttribute("aria-expanded", calendarShowWeeks ? "true" : "false");
+    weeks.hidden = !calendarShowWeeks;
 }
 
 function changeMonth(dir){
@@ -3208,9 +3334,11 @@ function changeMonth(dir){
 
     let lastDay = new Date(year, month + 1, 0).getDate();
 
-    let html = "";
+let html = "";
 let monthlyTotal = 0;
 let allTimeTotal = 0;
+let recordedTradingDays = 0;
+let weekTotals = [];
 
 let firstDay = new Date(year, month, 1).getDay(); 
 // JS: 0=Sun ... 6=Sat
@@ -3221,6 +3349,7 @@ let startOffset = (firstDay >= 1 && firstDay <= 5) ? firstDay - 1 : 0;
 let weekTotal = 0;
 let weekHasDays = false;
 let weekCellCount = 0;
+let weekNumber = 1;
 
 // 🔲 add blank cells BEFORE day 1
 for (let i = 0; i < startOffset; i++) {
@@ -3240,6 +3369,7 @@ for (let d = 1; d <= lastDay; d++) {
     let val = num(localStorage.getItem("cal_" + dateKey) || 0);
     monthlyTotal += val;
     weekTotal += val;
+    if (val !== 0) recordedTradingDays++;
     weekHasDays = true;
 
     let color = val > 0 ? "green" : (val < 0 ? "red" : "");
@@ -3261,9 +3391,10 @@ for (let d = 1; d <= lastDay; d++) {
     weekCellCount++;
 
     if(weekCellCount === 5){
+        weekTotals.push(weekTotal);
         html += `
         <div class="calendarDay weekTotal">
-            <div class="dayLabel">Total</div>
+            <div class="dayLabel">Week ${weekNumber}</div>
             <div class="${weekTotal > 0 ? 'weekTotalPositive' : (weekTotal < 0 ? 'red' : '')}">
                 <span class="calValue">${formatCalValue(weekTotal)}</span>
             </div>
@@ -3273,6 +3404,7 @@ for (let d = 1; d <= lastDay; d++) {
         weekTotal = 0;
         weekHasDays = false;
         weekCellCount = 0;
+        weekNumber++;
     }
 }
 
@@ -3282,9 +3414,10 @@ if(weekHasDays || weekCellCount > 0){
         weekCellCount++;
     }
 
+    weekTotals.push(weekTotal);
     html += `
     <div class="calendarDay weekTotal">
-        <div class="dayLabel">Total</div>
+        <div class="dayLabel">Week ${weekNumber}</div>
         <div class="${weekTotal > 0 ? 'weekTotalPositive' : (weekTotal < 0 ? 'red' : '')}">
             <span class="calValue">${formatCalValue(weekTotal)}</span>
         </div>
@@ -3303,9 +3436,19 @@ if(weekHasDays || weekCellCount > 0){
 
     grid.innerHTML = html;
 
-    // header stats (unchanged)
     document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
     document.getElementById("calAllTime").innerText = money(allTimeTotal);
+
+    document.getElementById("calWeeklyTotals").innerHTML = weekTotals.map((total, index) => `
+        <div class="calendarSummaryItem">
+            <div class="small">Week ${index + 1}</div>
+            <div class="big ${total < 0 ? 'red' : 'green'}">${money(total)}</div>
+        </div>
+    `).join("");
+
+    let dailyAverage = recordedTradingDays ? monthlyTotal / recordedTradingDays : 0;
+    document.getElementById("calDailyAverage").innerText = money(dailyAverage);
+    syncCalendarWeeksView();
 }
     function refreshAccountUI(i){
     let a = accounts[i];
