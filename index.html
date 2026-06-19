@@ -1,6 +1,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -731,6 +732,44 @@ body.hideNav .page.active {
 #projResults .card > div:last-child > div > div:last-child {
     color: var(--green) !important;
     font-size: 11px !important;
+}
+
+#projectionMonthModal .modal-content {
+    max-height: 82vh;
+    overflow-y: auto;
+}
+
+#projectionMonthDetails .projectionAnalysisGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 10px;
+}
+
+#projectionMonthDetails .projectionMetric {
+    min-width: 0;
+    padding: 12px 10px;
+    border-radius: 14px;
+    text-align: left;
+}
+
+#projectionMonthDetails .projectionMetric .small {
+    margin-bottom: 5px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+#projectionMonthDetails .projectionMetric .big {
+    overflow: hidden;
+    margin-top: 0;
+    font-size: clamp(14px, 4vw, 18px);
+    line-height: 1.12;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#projectionMonthDetails .projectionWide {
+    grid-column: 1 / -1;
 }
 
 #dd_results .card {
@@ -2590,7 +2629,6 @@ button {
 
 <div class="card">
     <h3><button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>Drawdown Scenarios</h3>
-    <div class="small">Drawdown stress test (100 → 500 pips)</div>
 </div>
 
 <div class="card">
@@ -2625,6 +2663,7 @@ button {
 
 <div class="card">
     <h3>Preset Scenarios</h3>
+    <div class="small">Drawdown stress test (100 → 500 pips)</div>
 
     <div class="ddMultiplierControl">
         <div>
@@ -2966,6 +3005,13 @@ button {
         <button onclick="closeBalanceModal()">Cancel</button>
     </div>
 </div>
+    <div class="modal" id="projectionMonthModal">
+    <div class="modal-content">
+        <div class="big" id="projectionMonthTitle">Month Details</div>
+        <div id="projectionMonthDetails"></div>
+        <button onclick="closeProjectionMonth()">Close</button>
+    </div>
+</div>
     
 <script>
 let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
@@ -2973,6 +3019,7 @@ let current = null;
 let editingAnchorIndex = null;
 let editingBalanceIndex = null;
 let takeProfitRenderTimer = null;
+let projectionMonthDetails = [];
     let calendarDate = new Date();
     let selectedCalDate = null;
 
@@ -4191,6 +4238,7 @@ function renderProjection(){
 
     let base = getBaseBalance();
     let html = "";
+    projectionMonthDetails = [];
 
     // CUSTOM MODE LOCK (both inputs must be >= 1000)
     if(
@@ -4258,9 +4306,22 @@ function renderProjection(){
 
     for(let m = 1; m <= 12; m++){
 
+        let startBalance = base.anchor === null
+            ? simAccounts.reduce((sum, acc) => sum + acc.balance, 0)
+            : simBalance;
+        let startDaily = base.anchor === null
+            ? simAccounts.reduce((sum, acc) => {
+                return sum + (getTierMultiplier(acc.balance, acc.anchor) * 800);
+            }, 0)
+            : getTierMultiplier(simBalance, simAnchor) * 800;
+        let startMultiplier = base.anchor === null
+            ? null
+            : getTierMultiplier(simBalance, simAnchor);
         let monthProfit = 0;
         let displayBalance = 0;
         let displayDaily = 0;
+        let weeklyBreakdown = [];
+        let currentWeekProfit = 0;
 
         // ==========================
         // PORTFOLIO MODE
@@ -4275,8 +4336,14 @@ function renderProjection(){
                     let d = mult * 800;
 
                     monthProfit += d;
+                    currentWeekProfit += d;
                     acc.balance += d;
                 });
+
+                if(day % 5 === 0 || day === 22){
+                    weeklyBreakdown.push(currentWeekProfit);
+                    currentWeekProfit = 0;
+                }
             }
 
             simAccounts.forEach(acc => {
@@ -4299,7 +4366,13 @@ function renderProjection(){
                 let d = mult * 800;
 
                 monthProfit += d;
+                currentWeekProfit += d;
                 simBalance += d;
+
+                if(day % 5 === 0 || day === 22){
+                    weeklyBreakdown.push(currentWeekProfit);
+                    currentWeekProfit = 0;
+                }
             }
 
             displayBalance = simBalance;
@@ -4311,8 +4384,22 @@ function renderProjection(){
         let weekly = displayDaily * 5;
         let monthly = displayDaily * 22; // ✅ FIXED (was compounding)
 
+        projectionMonthDetails[m - 1] = {
+            month: m,
+            weeks: weeklyBreakdown,
+            total: monthProfit,
+            startingBalance: startBalance,
+            endingBalance: displayBalance,
+            startDaily,
+            endDaily: displayDaily,
+            startMultiplier,
+            endMultiplier: base.anchor === null ? null : getTierMultiplier(displayBalance, simAnchor),
+            nextTarget: base.anchor === null ? null : nextProjectionTarget(displayBalance, simAnchor),
+            neededToNext: base.anchor === null ? null : Math.max(0, nextProjectionTarget(displayBalance, simAnchor) - displayBalance)
+        };
+
         html += `
-        <div class="card">
+        <div class="card" onclick="openProjectionMonth(${m - 1})" style="cursor:pointer;">
 
             <div class="small">
                 Month ${m}
@@ -4368,6 +4455,102 @@ function renderProjection(){
     }
 
     document.getElementById("projResults").innerHTML = html;
+}
+
+function nextProjectionTarget(balance, anchor = 40000){
+    if(balance < anchor) return anchor;
+
+    let step = anchor / 2;
+    let steps = Math.floor((balance - anchor) / step) + 1;
+
+    return anchor + (steps * step);
+}
+
+function openProjectionMonth(index){
+    let detail = projectionMonthDetails[index];
+
+    if(!detail) return;
+
+    let bestWeek = detail.weeks.length
+        ? Math.max(...detail.weeks)
+        : 0;
+    let avgWeek = detail.weeks.length
+        ? detail.total / detail.weeks.length
+        : 0;
+    let multiplierText = detail.endMultiplier === null
+        ? "Portfolio Mode"
+        : `${detail.startMultiplier.toFixed(2)}x → ${detail.endMultiplier.toFixed(2)}x`;
+    let targetHtml = detail.nextTarget === null
+        ? `
+            <div class="card projectionMetric projectionWide">
+                <div class="small">Next Target</div>
+                <div class="big">Portfolio Mode</div>
+            </div>
+        `
+        : `
+            <div class="card projectionMetric projectionWide">
+                <div class="small">Next Target</div>
+                <div class="big">${money(detail.nextTarget)}</div>
+                <div class="small" style="margin-top:6px;">Needed: ${money(detail.neededToNext)}</div>
+            </div>
+        `;
+
+    document.getElementById("projectionMonthTitle").innerText =
+        "Month " + detail.month + " Analysis";
+
+    document.getElementById("projectionMonthDetails").innerHTML = `
+        <div class="card projectionMetric projectionWide">
+            <div class="small">Month Total</div>
+            <div class="big green">${money(detail.total)}</div>
+        </div>
+        <div class="projectionAnalysisGrid">
+            <div class="card projectionMetric">
+                <div class="small">Start</div>
+                <div class="big">${money(detail.startingBalance)}</div>
+            </div>
+            <div class="card projectionMetric">
+                <div class="small">End</div>
+                <div class="big">${money(detail.endingBalance)}</div>
+            </div>
+            <div class="card projectionMetric">
+                <div class="small">Growth</div>
+                <div class="big green">${money(detail.endingBalance - detail.startingBalance)}</div>
+            </div>
+            <div class="card projectionMetric">
+                <div class="small">Avg Week</div>
+                <div class="big green">${money(avgWeek)}</div>
+            </div>
+            <div class="card projectionMetric">
+                <div class="small">Best Week</div>
+                <div class="big green">${money(bestWeek)}</div>
+            </div>
+            <div class="card projectionMetric">
+                <div class="small">End Daily</div>
+                <div class="big green">${money(detail.endDaily)}</div>
+            </div>
+            <div class="card projectionMetric projectionWide">
+                <div class="small">Multiplier</div>
+                <div class="big">${multiplierText}</div>
+            </div>
+        </div>
+        ${targetHtml}
+    `;
+
+    let stickyBtn = document.querySelector(".stickyBackBtn");
+    if(stickyBtn){
+        stickyBtn.style.display = "none";
+    }
+
+    document.getElementById("projectionMonthModal").style.display = "flex";
+}
+
+function closeProjectionMonth(){
+    document.getElementById("projectionMonthModal").style.display = "none";
+
+    let stickyBtn = document.querySelector(".stickyBackBtn");
+    if(stickyBtn && document.getElementById("projection").classList.contains("active")){
+        stickyBtn.style.display = "block";
+    }
 }
 
 function setBalance(i){
