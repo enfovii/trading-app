@@ -772,6 +772,79 @@ body.hideNav .page.active {
     grid-column: 1 / -1;
 }
 
+.calendarSummary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    min-width: 154px;
+}
+
+.calendarSummaryItem {
+    min-width: 0;
+    padding: 8px 9px;
+    border: 1px solid rgba(120,170,255,0.14);
+    border-radius: 12px;
+    background: rgba(8, 12, 25, 0.52);
+    text-align: right;
+}
+
+.calendarSummaryItem .small {
+    font-size: 9px;
+}
+
+.calendarSummaryItem .big {
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#calendarGrid,
+.weekHeaderOutside,
+.weekHeader {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+.calendarDay {
+    position: relative;
+}
+
+.calendarDay.hasProfit {
+    border-color: rgba(46, 229, 157, 0.28);
+    background:
+        linear-gradient(145deg, rgba(46, 229, 157, 0.12), rgba(10, 15, 30, 0.42)),
+        linear-gradient(145deg, var(--card), var(--card2));
+}
+
+.calendarDay.hasLoss {
+    border-color: rgba(255, 92, 122, 0.28);
+    background:
+        linear-gradient(145deg, rgba(255, 92, 122, 0.12), rgba(10, 15, 30, 0.42)),
+        linear-gradient(145deg, var(--card), var(--card2));
+}
+
+.calendarDay.weekTotal {
+    border-color: rgba(77, 163, 255, 0.22);
+    background:
+        linear-gradient(145deg, rgba(77, 163, 255, 0.16), rgba(10, 15, 30, 0.54)),
+        linear-gradient(145deg, var(--card), var(--card2));
+    cursor: default;
+}
+
+.calendarDay.weekTotal .dayLabel {
+    color: #93a4b8;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.calendarDay.weekTotal .weekTotalPositive,
+.calendarDay.weekTotal .weekTotalPositive .calValue,
+.calendarDay.weekTotal .weekTotalPositive .calValue span {
+    color: #8fd8ff !important;
+}
+
 #dd_results .card {
     position: relative;
     min-height: 68px;
@@ -2751,12 +2824,16 @@ button {
             <div class="small">Track daily profit per month</div>
         </div>
 
-        <div style="text-align:right;">
-            <div class="small">Monthly</div>
-            <div class="big green" id="calMonthTotal">$0</div>
+        <div class="calendarSummary">
+            <div class="calendarSummaryItem">
+                <div class="small">Monthly</div>
+                <div class="big green" id="calMonthTotal">$0</div>
+            </div>
 
-            <div class="small" style="margin-top:6px;">All Time</div>
-            <div class="big" id="calAllTime">$0</div>
+            <div class="calendarSummaryItem">
+                <div class="small">All Time</div>
+                <div class="big" id="calAllTime">$0</div>
+            </div>
         </div>
 
     </div>
@@ -2772,6 +2849,7 @@ button {
     <div>Wed</div>
     <div>Thu</div>
     <div>Fri</div>
+    <div>Total</div>
     
 </div>
    </div>
@@ -2782,6 +2860,7 @@ button {
     <div>Wed</div>
     <div>Thu</div>
     <div>Fri</div>
+    <div>Total</div>
 </div>
 
 <div id="calendarGrid"></div>
@@ -3093,10 +3172,14 @@ let firstDay = new Date(year, month, 1).getDay();
 
 // Convert to Monday-start index (0=Mon ... 6=Sun)
 let startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+let weekTotal = 0;
+let weekHasDays = false;
+let weekCellCount = 0;
 
 // 🔲 add blank cells BEFORE day 1
 for (let i = 0; i < startOffset; i++) {
     html += `<div class="calendarDay" style="opacity:0"></div>`;
+    weekCellCount++;
 }
 
 // now real days
@@ -3110,11 +3193,14 @@ for (let d = 1; d <= lastDay; d++) {
 
     let val = num(localStorage.getItem("cal_" + dateKey) || 0);
     monthlyTotal += val;
+    weekTotal += val;
+    weekHasDays = true;
 
     let color = val > 0 ? "green" : (val < 0 ? "red" : "");
+    let dayState = val > 0 ? "hasProfit" : (val < 0 ? "hasLoss" : "");
 
     html += `
-    <div class="calendarDay"
+    <div class="calendarDay ${dayState}"
          onclick="openCalendarEdit('${dateKey}', ${val})">
 
         <div class="dayLabel">Day ${d}</div>
@@ -3123,6 +3209,39 @@ for (let d = 1; d <= lastDay; d++) {
             <span class="calValue">${formatCalValue(val)}</span>
         </div>
 
+    </div>
+    `;
+
+    weekCellCount++;
+
+    if(weekCellCount === 5){
+        html += `
+        <div class="calendarDay weekTotal">
+            <div class="dayLabel">Total</div>
+            <div class="${weekTotal > 0 ? 'weekTotalPositive' : (weekTotal < 0 ? 'red' : '')}">
+                <span class="calValue">${formatCalValue(weekTotal)}</span>
+            </div>
+        </div>
+        `;
+
+        weekTotal = 0;
+        weekHasDays = false;
+        weekCellCount = 0;
+    }
+}
+
+if(weekHasDays || weekCellCount > 0){
+    while(weekCellCount < 5){
+        html += `<div class="calendarDay" style="opacity:0"></div>`;
+        weekCellCount++;
+    }
+
+    html += `
+    <div class="calendarDay weekTotal">
+        <div class="dayLabel">Total</div>
+        <div class="${weekTotal > 0 ? 'weekTotalPositive' : (weekTotal < 0 ? 'red' : '')}">
+            <span class="calValue">${formatCalValue(weekTotal)}</span>
+        </div>
     </div>
     `;
 }
