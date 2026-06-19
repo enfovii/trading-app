@@ -2932,6 +2932,33 @@ button {
 </div>
 
     <div class="card">
+    <div class="small">1X Daily Average</div>
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        margin-top:8px;
+    ">
+
+        <div class="big green" id="dailyBaseDisplay">
+            $800
+        </div>
+
+        <button onclick="setDailyAverage(current)"
+        style="
+            width:auto;
+            margin:0;
+            padding:10px 14px;
+            border-radius:12px;
+        ">
+            Edit
+        </button>
+
+    </div>
+</div>
+
+    <div class="card">
         <div class="small">Daily Profit</div>
         <div id="dailyP"></div>
     </div>
@@ -3084,6 +3111,23 @@ button {
         <button onclick="closeBalanceModal()">Cancel</button>
     </div>
 </div>
+    <div class="modal" id="dailyAverageModal">
+    <div class="modal-content">
+        <div class="big">Edit 1X Daily Average</div>
+
+        <input id="dailyAverageInput"
+            inputmode="decimal"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            onfocus="this.select()"
+            oninput="formatMoneyInput(this)">
+
+        <button onclick="saveDailyAverage()">Save</button>
+        <button onclick="closeDailyAverageModal()">Cancel</button>
+    </div>
+</div>
     <div class="modal" id="projectionMonthModal">
     <div class="modal-content">
         <div class="big" id="projectionMonthTitle">Month Details</div>
@@ -3097,6 +3141,7 @@ let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 let editingAnchorIndex = null;
 let editingBalanceIndex = null;
+let editingDailyAverageIndex = null;
 let takeProfitRenderTimer = null;
 let projectionMonthDetails = [];
     let calendarDate = new Date();
@@ -3266,13 +3311,15 @@ if(weekHasDays || weekCellCount > 0){
     let a = accounts[i];
     let b = num(a.balance);
     let anchor = a.anchor || 40000;
+    let baseDaily = dailyBase(a);
 
     document.getElementById("balanceDisplay").innerText = money(b);
     document.getElementById("anchorDisplay").innerText = money(anchor);
+    document.getElementById("dailyBaseDisplay").innerText = money(baseDaily);
     document.getElementById("mult").innerText = mult(b, anchor).toFixed(2) + "x";
-    document.getElementById("dailyP").innerText = money(daily(b, anchor));
-    document.getElementById("weekly").innerText = money(daily(b, anchor) * 5);
-    document.getElementById("monthly").innerText = money(daily(b, anchor) * 22);
+    document.getElementById("dailyP").innerText = money(daily(b, anchor, baseDaily));
+    document.getElementById("weekly").innerText = money(daily(b, anchor, baseDaily) * 5);
+    document.getElementById("monthly").innerText = money(daily(b, anchor, baseDaily) * 22);
 }
     
 function num(v){
@@ -3442,8 +3489,11 @@ function tier(b, anchor = 40000){
 function mult(b, anchor = 40000){
     return tier(b, anchor);
 }
-function daily(b, anchor = 40000){
-    return mult(b, anchor) * 800;
+function dailyBase(account){
+    return num(account?.dailyBase) || 800;
+}
+function daily(b, anchor = 40000, baseDaily = 800){
+    return mult(b, anchor) * baseDaily;
 }
 function dd(b){ return b*0.4; }
 
@@ -3497,7 +3547,7 @@ function renderPortfolio(){
         let b = num(a.balance);
         let anchor = a.anchor || 40000;
         t += b;
-        d += daily(b, anchor);
+        d += daily(b, anchor, dailyBase(a));
     });
 
     document.getElementById("p_total").innerText =
@@ -3524,7 +3574,7 @@ function render(){
         let b = num(a.balance);
         let anchor = a.anchor || 40000;
         t += b;
-        d += daily(b, anchor);
+        d += daily(b, anchor, dailyBase(a));
         
 
         let currentMult = mult(b, anchor);
@@ -3574,11 +3624,11 @@ if (b < anchor) {
    <!-- DAILY -->
 <div class="col num">
     <div class="label">Daily</div>
-    <div class="value ${daily(b) >= 100000 ? 'dailyLarge' : ''}">
-        ${money(daily(b, anchor))}
+    <div class="value ${daily(b, anchor, dailyBase(a)) >= 100000 ? 'dailyLarge' : ''}">
+        ${money(daily(b, anchor, dailyBase(a)))}
     </div>
     <div class="dailyMini">
-        ${money(daily(b, anchor) / 100)}
+        ${money(daily(b, anchor, dailyBase(a)) / 100)}
     </div>
 </div>
 
@@ -3601,7 +3651,7 @@ if (b < anchor) {
             ${(() => {
                 let anchor = accounts[i].anchor || 40000;
 
-let dp = daily(b, anchor);
+let dp = daily(b, anchor, dailyBase(accounts[i]));
 
 if (dp <= 0) return "~";
 
@@ -3681,14 +3731,16 @@ function updateAccount(){
     let b = num(accounts[current].balance);
     let anchor =
     accounts[current].anchor || 40000;
+    let baseDaily = dailyBase(accounts[current]);
 
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
     document.getElementById("balanceDisplay").innerText = money(b);
     document.getElementById("mult").innerText=mult(b, anchor).toFixed(2)+"x";
-    document.getElementById("dailyP").innerText = money(daily(b, anchor));
-    document.getElementById("weekly").innerText=money(daily(b, anchor)*5);
-    document.getElementById("monthly").innerText=money(daily(b, anchor)*22);
+    document.getElementById("dailyBaseDisplay").innerText = money(baseDaily);
+    document.getElementById("dailyP").innerText = money(daily(b, anchor, baseDaily));
+    document.getElementById("weekly").innerText=money(daily(b, anchor, baseDaily)*5);
+    document.getElementById("monthly").innerText=money(daily(b, anchor, baseDaily)*22);
 
     requestAnimationFrame(render);
 }
@@ -3722,7 +3774,7 @@ function createAccount(){
     let balance=num(document.getElementById("newBalance").value);
     if(!name) return;
 
-    accounts.push({name,balance});
+    accounts.push({name,balance,dailyBase:800});
     localStorage.setItem("accounts",JSON.stringify(accounts));
 
     closeModal();
@@ -3857,7 +3909,7 @@ function syncProjectionModeTabs(){
             let anchor = a.anchor || 40000;
 
             totalBalance += b;
-            totalDaily += daily(b, anchor);
+            totalDaily += daily(b, anchor, dailyBase(a));
         });
 
         return {
@@ -3887,9 +3939,11 @@ function syncProjectionModeTabs(){
             balance: num(a.balance),
             daily: daily(
                 num(a.balance),
-                a.anchor || 40000
+                a.anchor || 40000,
+                dailyBase(a)
             ),
-            anchor: a.anchor || 40000
+            anchor: a.anchor || 40000,
+            dailyBase: dailyBase(a)
         };
     }
 
@@ -3911,9 +3965,11 @@ if(mode === "custom"){
         balance: customBalance,
         daily: daily(
             customBalance,
-            customAnchor
+            customAnchor,
+            800
         ),
-        anchor: customAnchor
+        anchor: customAnchor,
+        dailyBase: 800
     };
 }
 
@@ -4417,12 +4473,14 @@ function renderProjection(){
     if(base.anchor === null){
         simAccounts = accounts.map(a => ({
             balance: num(a.balance),
-            anchor: a.anchor || 40000
+            anchor: a.anchor || 40000,
+            dailyBase: dailyBase(a)
         }));
     }
 
     let simBalance = base.balance;
     let simAnchor = base.anchor;
+    let simDailyBase = base.dailyBase || 800;
 
     for(let m = 1; m <= 12; m++){
 
@@ -4431,9 +4489,9 @@ function renderProjection(){
             : simBalance;
         let startDaily = base.anchor === null
             ? simAccounts.reduce((sum, acc) => {
-                return sum + (getTierMultiplier(acc.balance, acc.anchor) * 800);
+                return sum + (getTierMultiplier(acc.balance, acc.anchor) * acc.dailyBase);
             }, 0)
-            : getTierMultiplier(simBalance, simAnchor) * 800;
+            : getTierMultiplier(simBalance, simAnchor) * simDailyBase;
         let startMultiplier = base.anchor === null
             ? null
             : getTierMultiplier(simBalance, simAnchor);
@@ -4453,7 +4511,7 @@ function renderProjection(){
                 simAccounts.forEach(acc => {
 
                     let mult = getTierMultiplier(acc.balance, acc.anchor);
-                    let d = mult * 800;
+                    let d = mult * acc.dailyBase;
 
                     monthProfit += d;
                     currentWeekProfit += d;
@@ -4471,7 +4529,7 @@ function renderProjection(){
                 displayBalance += acc.balance;
 
                 let mult = getTierMultiplier(acc.balance, acc.anchor);
-                displayDaily = displayDaily + (mult * 800);
+                displayDaily = displayDaily + (mult * acc.dailyBase);
             });
         }
 
@@ -4483,7 +4541,7 @@ function renderProjection(){
             for(let day = 1; day <= 22; day++){
 
                 let mult = getTierMultiplier(simBalance, simAnchor);
-                let d = mult * 800;
+                let d = mult * simDailyBase;
 
                 monthProfit += d;
                 currentWeekProfit += d;
@@ -4498,7 +4556,7 @@ function renderProjection(){
             displayBalance = simBalance;
 
             let mult = getTierMultiplier(simBalance, simAnchor);
-            displayDaily = mult * 800;
+            displayDaily = mult * simDailyBase;
         }
 
         let weekly = displayDaily * 5;
@@ -4725,6 +4783,60 @@ function closeBalanceModal(){
     document.getElementById("balanceInput").blur();
 
     editingBalanceIndex = null;
+}
+
+function setDailyAverage(i){
+
+    editingDailyAverageIndex = i;
+
+    if(i === null || !accounts[i]) return;
+
+    let val = dailyBase(accounts[i]);
+
+    let input = document.getElementById("dailyAverageInput");
+
+    input.value = Number(val).toLocaleString('en-US');
+
+    document.getElementById("dailyAverageModal").style.display = "flex";
+
+    setTimeout(() => {
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }, 100);
+}
+
+function saveDailyAverage(){
+
+    let val = num(document.getElementById("dailyAverageInput").value);
+
+    if(editingDailyAverageIndex === null || val <= 0) return;
+
+    let i = editingDailyAverageIndex;
+
+    accounts[i].dailyBase = val;
+
+    localStorage.setItem(
+        "accounts",
+        JSON.stringify(accounts)
+    );
+
+    closeDailyAverageModal();
+
+    editingDailyAverageIndex = null;
+
+    if(current === i){
+        refreshAccountUI(i);
+    }
+
+    render();
+}
+
+function closeDailyAverageModal(){
+    document.getElementById("dailyAverageModal").style.display = "none";
+
+    document.getElementById("dailyAverageInput").blur();
+
+    editingDailyAverageIndex = null;
 }
 
 function setAnchor(i){
