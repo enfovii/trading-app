@@ -986,7 +986,7 @@ body.hideNav .page.active {
 
 .calendarDay .calValue span {
     color: var(--green);
-    font-size: 11px !important;
+    font-size: 10px !important;
 }
 
 #account > .card .nameRow h3 {
@@ -3130,11 +3130,11 @@ function changeMonth(dir){
     // font sizing (ignore commas safely)
     let len = display.replace(/[^0-9]/g,'').length;
 
-    let fontSize = 13;
-    if (len >= 6) fontSize = 12;
-    if (len >= 7) fontSize = 11;
-    if (len >= 8) fontSize = 10;
-    if (len >= 9) fontSize = 9;
+    let fontSize = 11;
+    if (len >= 6) fontSize = 10;
+    if (len >= 7) fontSize = 9;
+    if (len >= 8) fontSize = 8;
+    if (len >= 9) fontSize = 7;
 
     return `<span style="
         display:block;
@@ -3170,8 +3170,9 @@ let allTimeTotal = 0;
 let firstDay = new Date(year, month, 1).getDay(); 
 // JS: 0=Sun ... 6=Sat
 
-// Convert to Monday-start index (0=Mon ... 6=Sun)
-let startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+// Convert to weekday-only Monday-start index (0=Mon ... 4=Fri).
+// If the month starts on a weekend, the first visible day belongs at Monday.
+let startOffset = (firstDay >= 1 && firstDay <= 5) ? firstDay - 1 : 0;
 let weekTotal = 0;
 let weekHasDays = false;
 let weekCellCount = 0;
@@ -3203,7 +3204,7 @@ for (let d = 1; d <= lastDay; d++) {
     <div class="calendarDay ${dayState}"
          onclick="openCalendarEdit('${dateKey}', ${val})">
 
-        <div class="dayLabel">Day ${d}</div>
+        <div class="dayLabel">${d}</div>
 
         <div class="${color}">
             <span class="calValue">${formatCalValue(val)}</span>
