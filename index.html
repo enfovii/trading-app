@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -120,7 +121,7 @@ h2 {
 
 .statsRow {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 10px;
 }
 
@@ -500,8 +501,8 @@ button {
     bottom: calc(env(safe-area-inset-bottom) + 12px);
 
     display: grid !important;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 5px;
 
     padding: 8px;
     border-radius: 24px;
@@ -520,14 +521,15 @@ button {
 }
 
 .navBtn{
-    padding: 12px 8px;
+    min-width: 0;
+    padding: 10px 4px;
     border-radius: 18px;
 
     background: transparent;
     border: 1px solid transparent;
 
     color: #93a4b8;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
 
     box-shadow: none;
@@ -570,6 +572,7 @@ body.hideNav .page.active {
 
 #projResults,
 #dd_results,
+#tpResults,
 #calendarGrid,
 #accounts {
     padding-bottom: 8px;
@@ -582,6 +585,7 @@ body.hideNav .page.active {
 #portfolio > .card,
 #projection > .card,
 #drawdown > .card,
+#takeProfit > .card,
 #calendar > .card,
 #account > .card {
     margin-top: 0;
@@ -594,6 +598,7 @@ body.hideNav .page.active {
 #portfolio > .card > h3,
 #projection > .card > h3,
 #drawdown > .card > h3,
+#takeProfit > .card > h3,
 #calendar > .card h3,
 #account > .card .nameRow {
     position: relative;
@@ -1332,14 +1337,15 @@ button:active {
     border-radius: 16px;
     background: rgba(7, 11, 18, 0.88);
     border-color: var(--line-strong);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .navBtn {
     min-height: 46px;
-    padding: 10px 8px;
+    padding: 9px 4px;
     border-radius: 11px;
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .navBtn:hover,
@@ -1795,7 +1801,7 @@ button {
     transform: translateX(-50%);
     bottom: 13px;
     height: 47px;
-    padding: 3px 10px;
+    padding: 3px 5px;
     border: none;
     border-top: 1px solid var(--stroke-soft);
     border-radius: 0;
@@ -1810,7 +1816,7 @@ button {
     background: transparent;
     border: 0;
     box-shadow: none;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 520;
 }
 
@@ -1818,13 +1824,14 @@ button {
     display: block;
     margin-bottom: 2px;
     color: inherit;
-    font-size: 17px;
+    font-size: 15px;
     line-height: 1;
 }
 
 .navBtn:nth-child(1)::before { content: "▥"; }
 .navBtn:nth-child(2)::before { content: "⌁"; }
-.navBtn:nth-child(3)::before { content: "▣"; }
+.navBtn:nth-child(3)::before { content: "◇"; }
+.navBtn:nth-child(4)::before { content: "▣"; }
 
 .navBtn:hover,
 .activeNav {
@@ -2365,11 +2372,15 @@ h2 {
     border-radius: 18px;
     background: rgba(2, 8, 18, 0.9);
     backdrop-filter: blur(18px);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .navBtn {
     min-height: 42px;
     border-radius: 12px;
+    padding-left: 2px;
+    padding-right: 2px;
+    white-space: nowrap;
 }
 
 .addBtn {
@@ -2580,6 +2591,40 @@ button {
 <div class="card">
     <h3><button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>Drawdown Scenarios</h3>
     <div class="small">Drawdown stress test (100 → 500 pips)</div>
+</div>
+
+<div class="card">
+    <h3>Custom Drawdown</h3>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px;">
+        <div>
+            <div class="small">Pip Move</div>
+            <input
+                id="ddCustomPips"
+                placeholder="Example: 350"
+                inputmode="decimal"
+                autocomplete="off"
+                onfocus="this.select()"
+                oninput="renderCustomDrawdown()">
+        </div>
+
+        <div>
+            <div class="small">Multiplier</div>
+            <input
+                id="ddCustomMultiplier"
+                value="1"
+                inputmode="decimal"
+                autocomplete="off"
+                onfocus="this.select()"
+                oninput="renderCustomDrawdown()">
+        </div>
+    </div>
+
+    <div id="dd_custom_result"></div>
+</div>
+
+<div class="card">
+    <h3>Preset Scenarios</h3>
 
     <div class="ddMultiplierControl">
         <div>
@@ -2598,6 +2643,62 @@ button {
 </div>
 
 <div id="dd_results"></div>
+
+</div>
+
+<div id="takeProfit" class="page">
+
+<div class="card">
+    <h3><button class="backArrow" onclick="backHome()" aria-label="Back to Dashboard">‹</button>Take Profit Calculator</h3>
+    <div class="small">Work out the XAUUSD take profit price from your first entry and total open trades.</div>
+
+    <div class="projModeTabs" aria-label="Trade direction" style="margin-top:12px;">
+        <button class="projModeBtn activeProjMode" id="tpBuyBtn" type="button" onclick="setTpDirection('buy')">Buy</button>
+        <button class="projModeBtn" id="tpSellBtn" type="button" onclick="setTpDirection('sell')">Sell</button>
+    </div>
+
+    <input type="hidden" id="tpDirection" value="buy">
+
+    <div class="small" style="margin-top:12px;">First Entry</div>
+    <input
+        id="tpFirstEntry"
+        placeholder="Example: 2365.50"
+        inputmode="decimal"
+        autocomplete="off"
+        onfocus="this.select()"
+        oninput="scheduleTakeProfitRender()">
+
+    <div class="small" style="margin-top:12px;">Total Open Trades</div>
+    <input
+        id="tpOpenTrades"
+        placeholder="Example: 21"
+        inputmode="numeric"
+        autocomplete="off"
+        onfocus="this.select()"
+        oninput="scheduleTakeProfitRender()">
+
+    <div class="small" style="margin-top:12px;">Latest Entry (optional)</div>
+    <input
+        id="tpLatestEntry"
+        placeholder="Use if live fill differs from grid"
+        inputmode="decimal"
+        autocomplete="off"
+        onfocus="this.select()"
+        oninput="scheduleTakeProfitRender()">
+
+    <div class="small" style="margin-top:12px;">TP Profit Target (pips)</div>
+    <input
+        id="tpTargetPips"
+        value="10"
+        inputmode="decimal"
+        autocomplete="off"
+        onfocus="this.select()"
+        oninput="scheduleTakeProfitRender()">
+
+    <div class="small" style="margin-top:6px;">For XAUUSD, 10 pips = $10.00 price move.</div>
+
+    <div id="tpResults"></div>
+</div>
 
 </div>
     
@@ -2743,6 +2844,9 @@ button {
         <button class="navBtn" onclick="show('drawdown')">
     Drawdown
 </button>
+        <button class="navBtn" onclick="openTakeProfit()">
+    TP
+</button>
         <button class="navBtn" onclick="openCalendar()">
     Calendar
 </button>
@@ -2868,6 +2972,7 @@ let accounts = JSON.parse(localStorage.getItem("accounts") || "[]");
 let current = null;
 let editingAnchorIndex = null;
 let editingBalanceIndex = null;
+let takeProfitRenderTimer = null;
     let calendarDate = new Date();
     let selectedCalDate = null;
 
@@ -3193,7 +3298,7 @@ function show(page){
 
 if (stickyBtn) {
 
-    const showBackPages = ["projection", "drawdown", "calendar", "account", "portfolio"];
+    const showBackPages = ["projection", "drawdown", "takeProfit", "calendar", "account", "portfolio"];
 
     if (showBackPages.includes(page)) {
         stickyBtn.style.display = "block";
@@ -3211,6 +3316,9 @@ if (stickyBtn) {
     }
     if(page === "drawdown"){
     renderDrawdown();
+}
+    if(page === "takeProfit"){
+    renderTakeProfit();
 }
 }
 
@@ -3654,10 +3762,29 @@ function roundLotSize(lot){
     return Math.ceil((lot - 0.0000001) * 100) / 100;
 }
 
+function drawdownEntryRule(currentDrawdown){
+    if(currentDrawdown >= 20000){
+        return {
+            gridSize: 20,
+            tradesPerLot: 20
+        };
+    }
+
+    if(currentDrawdown >= 10000){
+        return {
+            gridSize: 15,
+            tradesPerLot: 10
+        };
+    }
+
+    return {
+        gridSize: 10,
+        tradesPerLot: 10
+    };
+}
+
 function drawdownGridSize(currentDrawdown){
-    if(currentDrawdown >= 20000) return 20;
-    if(currentDrawdown >= 10000) return 15;
-    return 10;
+    return drawdownEntryRule(currentDrawdown).gridSize;
 }
 
 function drawdownFromEntries(entries, currentPips, multiplier){
@@ -3680,6 +3807,8 @@ function simulateDrawdown(pips, multiplier = 1){
         let currentDrawdown =
             drawdownFromEntries(entries, nextEntryPips, 1);
 
+        let rule = drawdownEntryRule(currentDrawdown);
+
         entries.push({
             pips: nextEntryPips,
             lot: baseLot
@@ -3687,12 +3816,12 @@ function simulateDrawdown(pips, multiplier = 1){
 
         tradesAtLotSize++;
 
-        if(tradesAtLotSize >= 10){
+        if(tradesAtLotSize >= rule.tradesPerLot){
             baseLot = Math.round((baseLot + 0.01) * 100) / 100;
             tradesAtLotSize = 0;
         }
 
-        nextEntryPips += drawdownGridSize(currentDrawdown);
+        nextEntryPips += rule.gridSize;
     }
 
     return {
@@ -3727,6 +3856,269 @@ function renderDrawdown(){
     }
 
     container.innerHTML = html;
+
+    renderCustomDrawdown();
+}
+
+function renderCustomDrawdown(){
+    let container = document.getElementById("dd_custom_result");
+    if(!container) return;
+
+    let pips = num(document.getElementById("ddCustomPips")?.value);
+    let multiplier = num(document.getElementById("ddCustomMultiplier")?.value || 1);
+
+    if(!multiplier || multiplier <= 0){
+        multiplier = 1;
+    }
+
+    if(!pips || pips <= 0){
+        container.innerHTML = `
+            <div class="emptyState" style="margin-top:12px;">
+                Enter a pip move to calculate custom drawdown.
+            </div>
+        `;
+        return;
+    }
+
+    let result = simulateDrawdown(pips, multiplier);
+
+    container.innerHTML = `
+        <div class="card">
+            <div class="small">${pips} Pips Move</div>
+            <div class="big red">Total DD: ${money(result.totalDrawdown)}</div>
+        </div>
+    `;
+}
+
+function openTakeProfit(){
+    show("takeProfit");
+}
+
+function setTpDirection(direction){
+    document.getElementById("tpDirection").value = direction;
+
+    document.getElementById("tpBuyBtn")
+        .classList.toggle("activeProjMode", direction === "buy");
+
+    document.getElementById("tpSellBtn")
+        .classList.toggle("activeProjMode", direction === "sell");
+
+    renderTakeProfit();
+}
+
+function scheduleTakeProfitRender(){
+    clearTimeout(takeProfitRenderTimer);
+
+    takeProfitRenderTimer = setTimeout(() => {
+        renderTakeProfit();
+    }, 180);
+}
+
+function formatPrice(value){
+    if(!isFinite(value)) return "-";
+    return Number(value).toFixed(2);
+}
+
+function xauPipSize(){
+    return 1;
+}
+
+function buildTpEntries(firstEntry, direction, openTrades, latestEntryOverride){
+    let pipSize = xauPipSize();
+    let entryCount = Math.max(1, Math.floor(openTrades || 1));
+
+    if(latestEntryOverride && entryCount > 1){
+        let totalPips = Math.abs(firstEntry - latestEntryOverride) / pipSize;
+        let entryGap = totalPips / (entryCount - 1);
+        let entries = [];
+        let baseLot = 0.01;
+        let tradesAtLotSize = 0;
+
+        for(let i = 0; i < entryCount && i < 1000; i++){
+            let currentPips = entryGap * i;
+            let priceOffset = currentPips * pipSize;
+            let currentDrawdown =
+                drawdownFromEntries(entries, currentPips, 1);
+
+            let rule = drawdownEntryRule(currentDrawdown);
+
+            entries.push({
+                pips: currentPips,
+                lot: baseLot,
+                price: direction === "buy"
+                    ? firstEntry - priceOffset
+                    : firstEntry + priceOffset
+            });
+
+            tradesAtLotSize++;
+
+            if(tradesAtLotSize >= rule.tradesPerLot){
+                baseLot = Math.round((baseLot + 0.01) * 100) / 100;
+                tradesAtLotSize = 0;
+            }
+        }
+
+        entries[entries.length - 1].price = latestEntryOverride;
+        entries[entries.length - 1].pips = totalPips;
+
+        return entries;
+    }
+
+    let entries = [];
+    let nextEntryPips = 0;
+    let baseLot = 0.01;
+    let tradesAtLotSize = 0;
+
+    while(entries.length < entryCount && entries.length < 1000){
+        let priceOffset = nextEntryPips * pipSize;
+
+        let currentDrawdown =
+            drawdownFromEntries(entries, nextEntryPips, 1);
+
+        let rule = drawdownEntryRule(currentDrawdown);
+
+        entries.push({
+            pips: nextEntryPips,
+            lot: baseLot,
+            price: direction === "buy"
+                ? firstEntry - priceOffset
+                : firstEntry + priceOffset
+        });
+
+        tradesAtLotSize++;
+
+        if(tradesAtLotSize >= rule.tradesPerLot){
+            baseLot = Math.round((baseLot + 0.01) * 100) / 100;
+            tradesAtLotSize = 0;
+        }
+
+        nextEntryPips += rule.gridSize;
+    }
+
+    return entries;
+}
+
+function calculateTakeProfit(firstEntry, direction, targetPips, openTrades, latestEntryOverride){
+    let pipSize = xauPipSize();
+    let entries = buildTpEntries(firstEntry, direction, openTrades, latestEntryOverride);
+    let totalLots = entries.reduce((sum, entry) => sum + entry.lot, 0);
+    let weightedEntry = entries.reduce((sum, entry) => {
+        return sum + (entry.price * entry.lot);
+    }, 0) / totalLots;
+
+    let tpPrice = direction === "buy"
+        ? weightedEntry + (targetPips * pipSize)
+        : weightedEntry - (targetPips * pipSize);
+
+    let calculatedLatestEntry = entries[entries.length - 1]?.price || firstEntry;
+    let distanceFromLatest = Math.abs(tpPrice - calculatedLatestEntry) / pipSize;
+    let profit = entries.reduce((sum, entry) => {
+        let priceMove = direction === "buy"
+            ? tpPrice - entry.price
+            : entry.price - tpPrice;
+
+        return sum + (priceMove * entry.lot * 100);
+    }, 0);
+
+    return {
+        entries,
+        totalLots,
+        weightedEntry,
+        tpPrice,
+        calculatedLatestEntry,
+        distanceFromLatest,
+        profit
+    };
+}
+
+function renderTakeProfit(){
+    let container = document.getElementById("tpResults");
+    if(!container) return;
+
+    let direction = document.getElementById("tpDirection")?.value || "buy";
+    let firstEntry = num(document.getElementById("tpFirstEntry")?.value);
+    let openTrades = Math.floor(num(document.getElementById("tpOpenTrades")?.value));
+    let latestEntryOverride = num(document.getElementById("tpLatestEntry")?.value);
+    let targetPips = num(document.getElementById("tpTargetPips")?.value);
+
+    if(!firstEntry || !openTrades || !targetPips){
+        container.innerHTML = `
+            <div class="emptyState" style="margin-top:12px;">
+                Enter your first entry, total open trades, and TP pips to calculate the take profit price.
+            </div>
+        `;
+        return;
+    }
+
+    if(openTrades < 1){
+        container.innerHTML = `
+            <div class="card">
+                <div class="big red">Check Entries</div>
+                <div class="small" style="margin-top:6px;">
+                    Total open trades must be at least 1.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    if(latestEntryOverride && direction === "buy" && latestEntryOverride > firstEntry){
+        container.innerHTML = `
+            <div class="card">
+                <div class="big red">Check Latest Entry</div>
+                <div class="small" style="margin-top:6px;">
+                    For a buy grid, latest entry should be below the first entry.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    if(latestEntryOverride && direction === "sell" && latestEntryOverride < firstEntry){
+        container.innerHTML = `
+            <div class="card">
+                <div class="big red">Check Latest Entry</div>
+                <div class="small" style="margin-top:6px;">
+                    For a sell grid, latest entry should be above the first entry.
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    let result =
+        calculateTakeProfit(
+            firstEntry,
+            direction,
+            targetPips,
+            openTrades,
+            latestEntryOverride
+        );
+
+    container.innerHTML = `
+        <div class="card">
+            <div class="small">Take Profit Price</div>
+            <div class="big green">${formatPrice(result.tpPrice)}</div>
+            <div class="small" style="margin-top:6px;">
+                ${result.distanceFromLatest.toFixed(1)} pips needed for take profit
+            </div>
+        </div>
+
+        <div class="statsRow" style="margin-top:10px;">
+            <div class="stat">
+                <div class="small">Entries</div>
+                <div class="big">${result.entries.length}</div>
+            </div>
+            <div class="stat">
+                <div class="small">Lots</div>
+                <div class="big">${result.totalLots.toFixed(2)}</div>
+            </div>
+            <div class="stat">
+                <div class="small">Profit</div>
+                <div class="big green">${money(result.profit)}</div>
+            </div>
+        </div>
+    `;
 }
 function openCalendarEdit(dateKey, val){
 
@@ -4088,9 +4480,50 @@ window.onload=function(){
     show("home");
     render();
 };
+
+if(window.location.protocol === "file:"){
+    let currentHtmlStamp = "";
+
+    function htmlStamp(html){
+        let hash = 0;
+
+        for(let i = 0; i < html.length; i++){
+            hash = ((hash << 5) - hash + html.charCodeAt(i)) | 0;
+        }
+
+        return html.length + ":" + hash;
+    }
+
+    fetch(window.location.href)
+        .then(response => response.text())
+        .then(html => {
+            currentHtmlStamp = htmlStamp(html);
+        })
+        .catch(() => {});
+
+    setInterval(() => {
+        if(document.activeElement && ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)){
+            return;
+        }
+
+        fetch(window.location.href + "?v=" + Date.now())
+            .then(response => response.text())
+            .then(html => {
+                let nextHtmlStamp = htmlStamp(html);
+
+                if(currentHtmlStamp && nextHtmlStamp !== currentHtmlStamp){
+                    window.location.reload();
+                }
+
+                currentHtmlStamp = nextHtmlStamp;
+            })
+            .catch(() => {});
+    }, 1500);
+}
 </script>
 <button class="stickyBackBtn" onclick="backHome()" style="display:none;">
     Back To Dashboard
 </button>
+<!-- build: xau-tp-dollar-pips-v2 -->
 </body>
 </html>
