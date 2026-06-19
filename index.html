@@ -3,6 +3,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -702,8 +703,35 @@ body.hideNav .page.active {
 }
 
 #projResults .card {
+    position: relative;
     padding: 12px 12px;
     margin-top: 10px;
+}
+
+#projResults .withdrawBadge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    max-width: 46%;
+    padding: 4px 7px;
+    border: 1px solid rgba(46, 229, 157, 0.22);
+    border-radius: 999px;
+    background: rgba(46, 229, 157, 0.10);
+    color: var(--green);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.1;
+    text-align: right;
+    white-space: normal;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#projResults .withdrawBadge span {
+    display: block;
+    margin-top: 2px;
+    color: #93a4b8;
+    font-size: 9px;
 }
 
 #projResults .card .small {
@@ -775,16 +803,14 @@ body.hideNav .page.active {
 
 .calendarSummary {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    min-width: 184px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
 }
 
 .calendarSummaryTop {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
-    align-items: start;
+    display: contents;
 }
 
 .calendarMonthWrap {
@@ -794,59 +820,21 @@ body.hideNav .page.active {
     min-width: 0;
 }
 
-.calendarMonthBtn {
-    width: 100% !important;
-    margin: 0 !important;
-    min-height: 44px;
-    padding: 8px 9px;
-    border: 1px solid rgba(120,170,255,0.14);
-    border-radius: 12px;
-    background: rgba(8, 12, 25, 0.52) !important;
-    color: inherit;
-    text-align: right;
-    cursor: pointer;
-    box-shadow: none !important;
-    font-family: inherit;
-    transition: border-color 0.15s ease, background 0.15s ease, transform 0.12s ease;
-}
-
-.calendarMonthBtn .small,
-.calendarMonthBtn .big {
-    pointer-events: none;
-}
-
-.calendarMonthBtn:active {
-    transform: scale(0.99);
-}
-
-.calendarMonthBtn[aria-expanded="true"] {
-    border-color: rgba(45, 245, 102, 0.42);
-    background: rgba(11, 100, 246, 0.14) !important;
-}
-
 .calendarSummaryTop .calendarSummaryItem {
-    min-height: 44px;
+    min-height: 42px;
     text-align: right;
 }
 
-.calendarSummaryTop .calendarSummaryItem .big,
-.calendarMonthBtn .big {
-    font-size: 13px;
-}
-
-.calendarWeeklyTotals {
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.calendarSummary.showWeeks .calendarWeeklyTotals {
-    display: flex;
+.calendarSummaryTop .calendarSummaryItem .big {
+    font-size: clamp(10px, 3.2vw, 13px);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 .calendarSummaryItem {
     min-width: 0;
-    padding: 8px 9px;
+    padding: 7px 6px;
     border: 1px solid rgba(120,170,255,0.14);
     border-radius: 12px;
     background: rgba(8, 12, 25, 0.52);
@@ -858,46 +846,61 @@ body.hideNav .page.active {
 }
 
 .calendarSummaryItem .big {
-    overflow: hidden;
-    font-size: 13px;
+    font-size: clamp(10px, 3.2vw, 13px);
     line-height: 1.15;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
+    white-space: normal;
 }
 
 .calendarAverageItem {
-    text-align: center;
-    width: 100%;
-}
-
-.calendarMonthWrap .calendarWeeklyTotals .calendarSummaryItem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 6px 8px;
-    border-radius: 8px;
-    text-align: left;
-}
-
-.calendarWeeklyTotals .calendarSummaryItem .small {
-    font-size: 9px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-.calendarWeeklyTotals .calendarSummaryItem .big {
-    max-width: 96px;
-    font-size: 11px;
+    width: auto;
     text-align: right;
 }
 
-.calendarAverageItem {
+.calendarYearBreakdown {
+    grid-column: 1 / -1;
+    border: 1px solid rgba(120,170,255,0.14);
+    border-radius: 8px;
+    background: rgba(8, 12, 25, 0.38);
+}
+
+.calendarYearBreakdown summary {
     padding: 7px 8px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 750;
+    text-align: center;
+    cursor: pointer;
+    list-style: none;
+}
+
+.calendarYearBreakdown summary::-webkit-details-marker {
+    display: none;
+}
+
+#calYearTotals {
+    display: grid;
+    gap: 4px;
+    padding: 0 6px 6px;
+}
+
+#calYearTotals .calendarYearRow {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 5px 7px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.035);
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.calendarAverageItem {
+    padding: 7px 6px;
 }
 
 .calendarAverageItem .big {
-    font-size: 12px;
+    font-size: clamp(10px, 3.2vw, 13px);
 }
 
 #calendarGrid,
@@ -1006,7 +1009,9 @@ body.hideNav .page.active {
     font-weight: 650;
 }
 
-#ddMultiplier {
+#ddMultiplier,
+#tpMultiplier,
+#withdrawPercent {
     width: 82px;
     min-height: 34px;
     margin-top: 0;
@@ -1027,7 +1032,7 @@ body.hideNav .page.active {
 }
 
 .calendarSummaryItem {
-    padding: 12px;
+    padding: 7px 6px;
     border: 1px solid var(--stroke);
     border-radius: 8px;
     background: linear-gradient(135deg, rgba(17, 42, 74, 0.95), rgba(5, 15, 26, 0.98));
@@ -2780,6 +2785,34 @@ button {
 
     <div id="projExtra"></div>
 
+    <div class="projectionWithdrawal">
+        <div class="small">Withdrawal Plan</div>
+
+        <div class="projModeTabs" aria-label="Withdrawal plan" style="margin-top:8px;">
+            <button class="projModeBtn activeProjMode" id="withdrawOffBtn" type="button" onclick="setWithdrawalMode('off')">Off</button>
+            <button class="projModeBtn" id="withdrawWeeklyBtn" type="button" onclick="setWithdrawalMode('weekly')">Weekly %</button>
+        </div>
+
+        <input type="hidden" id="withdrawMode" value="off">
+
+        <div id="withdrawSettings" style="display:none;">
+            <div class="ddMultiplierControl" style="margin-top:10px;">
+                <div>
+                    <div class="small">Withdraw Weekly</div>
+                    <div class="ddMultiplierHint">Percent of that week&apos;s profit</div>
+                </div>
+
+                <input
+                    id="withdrawPercent"
+                    value="50"
+                    inputmode="decimal"
+                    autocomplete="off"
+                    onfocus="this.select()"
+                    oninput="renderProjection()">
+            </div>
+        </div>
+    </div>
+
     <div id="projResults"></div>
 
     <div class="fixedBack">
@@ -2900,6 +2933,21 @@ button {
 
     <div class="small" style="margin-top:6px;">For XAUUSD, 10 pips = $10.00 price move.</div>
 
+    <div class="ddMultiplierControl">
+        <div>
+            <div class="small">Multiplier</div>
+            <div class="ddMultiplierHint">Scales the 1x take profit model</div>
+        </div>
+
+        <input
+            id="tpMultiplier"
+            value="1"
+            inputmode="decimal"
+            autocomplete="off"
+            onfocus="this.select()"
+            oninput="scheduleTakeProfitRender()">
+    </div>
+
     <div id="tpResults"></div>
 </div>
 
@@ -2918,23 +2966,15 @@ button {
         <div class="calendarSummary" id="calendarSummary">
             <div class="calendarSummaryTop">
                 <div class="calendarMonthWrap">
-                    <button
-                        type="button"
-                        class="calendarMonthBtn"
-                        id="calMonthBtn"
-                        onclick="toggleCalendarWeeks()"
-                        aria-expanded="false"
-                        aria-controls="calWeeklyTotals">
+                    <div class="calendarSummaryItem">
                         <div class="small">Monthly</div>
                         <div class="big green" id="calMonthTotal">$0</div>
-                    </button>
-
-                    <div id="calWeeklyTotals" class="calendarWeeklyTotals" hidden></div>
+                    </div>
                 </div>
 
-                <div class="calendarSummaryItem">
-                    <div class="small">All Time</div>
-                    <div class="big" id="calAllTime">$0</div>
+                <div class="calendarSummaryItem calendarYearItem">
+                    <div class="small" id="calYearLabel">Year</div>
+                    <div class="big" id="calYearTotal">$0</div>
                 </div>
             </div>
 
@@ -2942,6 +2982,11 @@ button {
                 <div class="small">Avg Daily</div>
                 <div class="big green" id="calDailyAverage">$0</div>
             </div>
+
+            <details class="calendarYearBreakdown" id="calYearBreakdown">
+                <summary>Year Totals</summary>
+                <div id="calYearTotals"></div>
+            </details>
         </div>
 
     </div>
@@ -3254,28 +3299,10 @@ let takeProfitRenderTimer = null;
 let projectionMonthDetails = [];
     let calendarDate = new Date();
     let selectedCalDate = null;
-    let calendarShowWeeks = false;
 
     function openCalendar(){
     show("calendar");
     renderCalendar();
-}
-
-function toggleCalendarWeeks(){
-    calendarShowWeeks = !calendarShowWeeks;
-    syncCalendarWeeksView();
-}
-
-function syncCalendarWeeksView(){
-    let summary = document.getElementById("calendarSummary");
-    let btn = document.getElementById("calMonthBtn");
-    let weeks = document.getElementById("calWeeklyTotals");
-
-    if(!summary || !btn || !weeks) return;
-
-    summary.classList.toggle("showWeeks", calendarShowWeeks);
-    btn.setAttribute("aria-expanded", calendarShowWeeks ? "true" : "false");
-    weeks.hidden = !calendarShowWeeks;
 }
 
 function changeMonth(dir){
@@ -3337,6 +3364,8 @@ function changeMonth(dir){
 let html = "";
 let monthlyTotal = 0;
 let allTimeTotal = 0;
+let selectedYearTotal = 0;
+let yearTotals = {};
 let recordedTradingDays = 0;
 let weekTotals = [];
 
@@ -3425,30 +3454,54 @@ if(weekHasDays || weekCellCount > 0){
     `;
 }
 
-    // ALL TIME TOTAL (unchanged logic)
+    // Calendar totals by year
     for (let i = 0; i < localStorage.length; i++) {
         let key = localStorage.key(i);
 
         if (key && key.startsWith("cal_")) {
-            allTimeTotal += num(localStorage.getItem(key));
+            let val = num(localStorage.getItem(key));
+            let savedYear = key.split("-")[0].replace("cal_", "");
+
+            if(!/^\d{4}$/.test(savedYear)) continue;
+
+            allTimeTotal += val;
+            yearTotals[savedYear] = (yearTotals[savedYear] || 0) + val;
         }
     }
+
+    selectedYearTotal = yearTotals[String(year)] || 0;
 
     grid.innerHTML = html;
 
     document.getElementById("calMonthTotal").innerText = money(monthlyTotal);
-    document.getElementById("calAllTime").innerText = money(allTimeTotal);
+    document.getElementById("calYearLabel").innerText = `Total: ${year}`;
+    document.getElementById("calYearTotal").innerText = money(selectedYearTotal);
 
-    document.getElementById("calWeeklyTotals").innerHTML = weekTotals.map((total, index) => `
-        <div class="calendarSummaryItem">
-            <div class="small">Week ${index + 1}</div>
-            <div class="big ${total < 0 ? 'red' : 'green'}">${money(total)}</div>
+    let yearRows = Object.keys(yearTotals)
+        .sort((a, b) => Number(b) - Number(a))
+        .map(savedYear => `
+            <div class="calendarYearRow">
+                <span>${savedYear}</span>
+                <span class="${yearTotals[savedYear] < 0 ? 'red' : 'green'}">${money(yearTotals[savedYear])}</span>
+            </div>
+        `)
+        .join("");
+
+    document.getElementById("calYearTotals").innerHTML = `
+        <div class="calendarYearRow">
+            <span>All Time</span>
+            <span class="${allTimeTotal < 0 ? 'red' : 'green'}">${money(allTimeTotal)}</span>
         </div>
-    `).join("");
+        ${yearRows || `
+            <div class="calendarYearRow">
+                <span>No saved years yet</span>
+                <span>$0</span>
+            </div>
+        `}
+    `;
 
     let dailyAverage = recordedTradingDays ? monthlyTotal / recordedTradingDays : 0;
     document.getElementById("calDailyAverage").innerText = money(dailyAverage);
-    syncCalendarWeeksView();
 }
     function refreshAccountUI(i){
     let a = accounts[i];
@@ -3956,12 +4009,34 @@ function syncProjectionModeTabs(){
     }
 }
 
+function setWithdrawalMode(mode){
+    document.getElementById("withdrawMode").value = mode;
+    syncWithdrawalControls();
+    renderProjection();
+}
+
+function syncWithdrawalControls(){
+    let mode = document.getElementById("withdrawMode")?.value || "off";
+    let settings = document.getElementById("withdrawSettings");
+
+    document.getElementById("withdrawOffBtn")
+        ?.classList.toggle("activeProjMode", mode === "off");
+
+    document.getElementById("withdrawWeeklyBtn")
+        ?.classList.toggle("activeProjMode", mode === "weekly");
+
+    if(settings){
+        settings.style.display = mode === "weekly" ? "block" : "none";
+    }
+}
+
     function setupProjection(){
 
     let mode = document.getElementById("projMode").value;
     let extra = document.getElementById("projExtra");
 
     syncProjectionModeTabs();
+    syncWithdrawalControls();
 
     extra.innerHTML = "";
 
@@ -4364,9 +4439,15 @@ function buildTpEntries(firstEntry, direction, openTrades, latestEntryOverride){
     return entries;
 }
 
-function calculateTakeProfit(firstEntry, direction, targetPips, openTrades, latestEntryOverride){
+function calculateTakeProfit(firstEntry, direction, targetPips, openTrades, latestEntryOverride, multiplier = 1){
     let pipSize = xauPipSize();
-    let entries = buildTpEntries(firstEntry, direction, openTrades, latestEntryOverride);
+    let entries = buildTpEntries(firstEntry, direction, openTrades, latestEntryOverride)
+        .map(entry => ({
+            ...entry,
+            baseLot: entry.lot,
+            lot: roundLotSize(entry.lot * multiplier)
+        }));
+
     let totalLots = entries.reduce((sum, entry) => sum + entry.lot, 0);
     let weightedEntry = entries.reduce((sum, entry) => {
         return sum + (entry.price * entry.lot);
@@ -4393,7 +4474,8 @@ function calculateTakeProfit(firstEntry, direction, targetPips, openTrades, late
         tpPrice,
         calculatedLatestEntry,
         distanceFromLatest,
-        profit
+        profit,
+        multiplier
     };
 }
 
@@ -4406,6 +4488,11 @@ function renderTakeProfit(){
     let openTrades = Math.floor(num(document.getElementById("tpOpenTrades")?.value));
     let latestEntryOverride = num(document.getElementById("tpLatestEntry")?.value);
     let targetPips = num(document.getElementById("tpTargetPips")?.value);
+    let multiplier = num(document.getElementById("tpMultiplier")?.value || 1);
+
+    if(!multiplier || multiplier <= 0){
+        multiplier = 1;
+    }
 
     if(!firstEntry || !openTrades || !targetPips){
         container.innerHTML = `
@@ -4458,7 +4545,8 @@ function renderTakeProfit(){
             direction,
             targetPips,
             openTrades,
-            latestEntryOverride
+            latestEntryOverride,
+            multiplier
         );
 
     container.innerHTML = `
@@ -4554,6 +4642,11 @@ function renderProjection(){
 
     let rawBalance = num(document.getElementById("projCustom")?.value);
     let rawAnchor = num(document.getElementById("projCustomAnchor")?.value);
+    let withdrawalMode = document.getElementById("withdrawMode")?.value || "off";
+    let withdrawalPercent = num(document.getElementById("withdrawPercent")?.value || 0);
+    let withdrawalRate = withdrawalMode === "weekly"
+        ? Math.max(0, Math.min(withdrawalPercent, 100)) / 100
+        : 0;
 
     let base = getBaseBalance();
     let html = "";
@@ -4643,6 +4736,7 @@ function renderProjection(){
         let displayDaily = 0;
         let weeklyBreakdown = [];
         let currentWeekProfit = 0;
+        let monthWithdrawn = 0;
 
         // ==========================
         // PORTFOLIO MODE
@@ -4662,6 +4756,22 @@ function renderProjection(){
                 });
 
                 if(day % 5 === 0 || day === 22){
+                    if(withdrawalRate > 0 && currentWeekProfit > 0){
+                        let weekWithdrawn = currentWeekProfit * withdrawalRate;
+                        let totalBalanceBeforeWithdrawal =
+                            simAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+
+                        simAccounts.forEach(acc => {
+                            let share = totalBalanceBeforeWithdrawal > 0
+                                ? acc.balance / totalBalanceBeforeWithdrawal
+                                : 0;
+
+                            acc.balance = Math.max(0, acc.balance - (weekWithdrawn * share));
+                        });
+
+                        monthWithdrawn += weekWithdrawn;
+                    }
+
                     weeklyBreakdown.push(currentWeekProfit);
                     currentWeekProfit = 0;
                 }
@@ -4691,6 +4801,12 @@ function renderProjection(){
                 simBalance += d;
 
                 if(day % 5 === 0 || day === 22){
+                    if(withdrawalRate > 0 && currentWeekProfit > 0){
+                        let weekWithdrawn = currentWeekProfit * withdrawalRate;
+                        simBalance = Math.max(0, simBalance - weekWithdrawn);
+                        monthWithdrawn += weekWithdrawn;
+                    }
+
                     weeklyBreakdown.push(currentWeekProfit);
                     currentWeekProfit = 0;
                 }
@@ -4709,6 +4825,7 @@ function renderProjection(){
             month: m,
             weeks: weeklyBreakdown,
             total: monthProfit,
+            withdrawn: monthWithdrawn,
             startingBalance: startBalance,
             endingBalance: displayBalance,
             startDaily,
@@ -4721,6 +4838,13 @@ function renderProjection(){
 
         html += `
         <div class="card" onclick="openProjectionMonth(${m - 1})" style="cursor:pointer;">
+
+            ${monthWithdrawn > 0 ? `
+                <div class="withdrawBadge">
+                    Withdrawn ${money(monthWithdrawn)}
+                    <span>(${money(monthWithdrawn / 100)})</span>
+                </div>
+            ` : ""}
 
             <div class="small">
                 Month ${m}
@@ -4798,6 +4922,7 @@ function openProjectionMonth(index){
     let avgWeek = detail.weeks.length
         ? detail.total / detail.weeks.length
         : 0;
+    let netGrowth = detail.endingBalance - detail.startingBalance;
     let multiplierText = detail.endMultiplier === null
         ? "Portfolio Mode"
         : `${detail.startMultiplier.toFixed(2)}x → ${detail.endMultiplier.toFixed(2)}x`;
@@ -4835,7 +4960,11 @@ function openProjectionMonth(index){
             </div>
             <div class="card projectionMetric">
                 <div class="small">Growth</div>
-                <div class="big green">${money(detail.endingBalance - detail.startingBalance)}</div>
+                <div class="big ${netGrowth < 0 ? 'red' : 'green'}">${money(netGrowth)}</div>
+            </div>
+            <div class="card projectionMetric">
+                <div class="small">Withdrawn</div>
+                <div class="big">${money(detail.withdrawn || 0)}</div>
             </div>
             <div class="card projectionMetric">
                 <div class="small">Avg Week</div>
