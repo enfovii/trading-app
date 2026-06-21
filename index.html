@@ -4,6 +4,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -2286,6 +2287,85 @@ select {
     white-space: nowrap;
 }
 
+.accountRisk {
+    display: inline-block;
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    background: rgba(5, 15, 26, 0.72);
+    font-size: 9px;
+    font-weight: 850;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-align: center;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.accountNameLine {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.accountNameLine .strong {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.accountRow.risk-safe .accountRisk {
+    color: #8ff0c6;
+    border-color: rgba(143, 240, 198, 0.26);
+    background: rgba(80, 196, 145, 0.09);
+    text-shadow:
+        0 0 7px rgba(143, 240, 198, 0.36),
+        0 0 14px rgba(80, 196, 145, 0.16);
+}
+
+.accountRow.risk-safe {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 14px 34px rgba(0,0,0,0.24),
+        0 0 18px rgba(80, 196, 145, 0.10);
+}
+
+.accountRow.risk-moderate .accountRisk {
+    color: #f2c66d;
+    border-color: rgba(242, 198, 109, 0.26);
+    background: rgba(199, 142, 45, 0.10);
+    text-shadow:
+        0 0 7px rgba(242, 198, 109, 0.36),
+        0 0 14px rgba(199, 142, 45, 0.16);
+}
+
+.accountRow.risk-moderate {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 14px 34px rgba(0,0,0,0.24),
+        0 0 18px rgba(199, 142, 45, 0.10);
+}
+
+.accountRow.risk-aggressive .accountRisk {
+    color: #ff9f8f;
+    border-color: rgba(255, 159, 143, 0.26);
+    background: rgba(221, 98, 83, 0.09);
+    text-shadow:
+        0 0 7px rgba(255, 159, 143, 0.36),
+        0 0 14px rgba(221, 98, 83, 0.16);
+}
+
+.accountRow.risk-aggressive {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 14px 34px rgba(0,0,0,0.24),
+        0 0 18px rgba(221, 98, 83, 0.10);
+}
+
 .accountRow {
     grid-template-rows: auto auto auto;
     min-height: 78px;
@@ -2528,7 +2608,7 @@ h2 {
 
 .accountRow {
     grid-template-columns: 32px minmax(0, 1fr) 64px 58px 12px;
-    min-height: 82px;
+    min-height: 84px;
     padding: 11px 12px 10px;
     border-radius: 14px;
 }
@@ -2545,6 +2625,27 @@ h2 {
 
 .accountRow .col.num:nth-of-type(2) {
     transform: none;
+}
+
+.accountRow.risk-safe {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 14px 34px rgba(0,0,0,0.24),
+        0 0 20px rgba(80, 196, 145, 0.11);
+}
+
+.accountRow.risk-moderate {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 14px 34px rgba(0,0,0,0.24),
+        0 0 20px rgba(199, 142, 45, 0.12);
+}
+
+.accountRow.risk-aggressive {
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        0 14px 34px rgba(0,0,0,0.24),
+        0 0 20px rgba(221, 98, 83, 0.11);
 }
 
 .accountProgress {
@@ -3691,6 +3792,19 @@ function dailyBase(account){
 function daily(b, anchor = 40000, baseDaily = 800){
     return mult(b, anchor) * baseDaily;
 }
+function startingRisk(anchor = 40000){
+    let starting1x = num(anchor) || 40000;
+
+    if (starting1x < 25000) {
+        return { label: "Aggressive", className: "aggressive" };
+    }
+
+    if (starting1x < 40000) {
+        return { label: "Moderate", className: "moderate" };
+    }
+
+    return { label: "Safe", className: "safe" };
+}
 function dd(b){ return b*0.4; }
 
 
@@ -3769,6 +3883,7 @@ function render(){
     accounts.forEach((a,i)=>{
         let b = num(a.balance);
         let anchor = a.anchor || 40000;
+        let risk = startingRisk(anchor);
         t += b;
         d += daily(b, anchor, dailyBase(a));
         
@@ -3808,12 +3923,15 @@ if (b < anchor) {
         let progress = Math.min(100, ((b - tierStart) / (nextTarget - tierStart)) * 100);
 
         html += `
-<div class="accountRow" onclick="openAccount(${i})">
+<div class="accountRow risk-${risk.className}" onclick="openAccount(${i})">
 
     <!-- ACCOUNT -->
     <div class="col name">
         <div class="label">Account</div>
-        <div class="value strong">${escapeHtml(a.name)}</div>
+        <div class="accountNameLine">
+            <div class="value strong">${escapeHtml(a.name)}</div>
+            <div class="accountRisk">${risk.label}</div>
+        </div>
         <div class="accountBalance">${money(b)}</div>
     </div>
 
@@ -3838,26 +3956,6 @@ if (b < anchor) {
     <div class="col num">
        <div class="label">Δ NEXT</div>
         <div class="value">${money(needed)}</div>
-    </div>
-
-    <!-- ETA -->
-    <div class="col num muted">
-        <div class="label">ETA</div>
-        <div class="value">
-            ${(() => {
-                let anchor = accounts[i].anchor || 40000;
-
-let dp = daily(b, anchor, dailyBase(accounts[i]));
-
-if (dp <= 0) return "~";
-
-let days = needed / dp;
-
-return isFinite(days)
-    ? "~" + days.toFixed(1) + "d"
-    : "~";
-            })()}
-        </div>
     </div>
 
     <div class="accountProgress" aria-label="Progress to next multiplier">
