@@ -5,6 +5,7 @@
 
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -1083,7 +1084,6 @@ body.hideNav .page.active {
 
 .calendarDay .calValue span {
     color: var(--green);
-    font-size: 10px !important;
 }
 
 #account > .card .nameRow h3 {
@@ -2743,6 +2743,14 @@ body.hideNav .page.active {
     color: var(--red) !important;
 }
 
+.calendarDay .calValue {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    text-align: center;
+}
+
 #projResults .card,
 #dd_results .card {
     border-radius: 14px;
@@ -3426,17 +3434,20 @@ function changeMonth(dir){
         display = v.toLocaleString('en-US');
     }
 
-    // font sizing (ignore commas safely)
-    let len = display.replace(/[^0-9]/g,'').length;
+    // Size by visible characters so decimals like 1,200.55 fit in a day cell.
+    let len = display.length;
 
     let fontSize = 11;
-    if (len >= 6) fontSize = 10;
-    if (len >= 7) fontSize = 9;
-    if (len >= 8) fontSize = 8;
-    if (len >= 9) fontSize = 7;
+    if (len >= 7) fontSize = 10;
+    if (len >= 8) fontSize = 9;
+    if (len >= 9) fontSize = 8;
+    if (len >= 10) fontSize = 7;
+    if (len >= 11) fontSize = 6.5;
 
     return `<span style="
         display:block;
+        width:100%;
+        max-width:100%;
         font-size:${fontSize}px;
         font-weight:600;
         white-space:nowrap;
